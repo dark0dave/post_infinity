@@ -2,9 +2,11 @@ use std::rc::Rc;
 
 use serde::Serialize;
 
+use crate::common::header::Header;
 use crate::item_table::ItemReferenceTable;
 use crate::model::Model;
 use crate::resources::utils::{copy_buff_to_struct, copy_transmute_buff};
+use crate::tlk::Lookup;
 use crate::{common::fixed_char_array::FixedCharSlice, game::GlobalVarriables};
 
 #[derive(Debug, Serialize)]
@@ -99,8 +101,12 @@ impl Model for Area {
         }
     }
 
-    fn create_as_box(buffer: &[u8]) -> Rc<dyn Model> {
+    fn create_as_rc(buffer: &[u8]) -> Rc<dyn Model> {
         Rc::new(Self::new(buffer))
+    }
+
+    fn name(&self, lookup: &Lookup) -> String {
+        self.header.area_wed.to_string().replace(".WED", ".ARE")
     }
 }
 
@@ -108,8 +114,7 @@ impl Model for Area {
 #[repr(C, packed)]
 #[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
 pub struct FileHeader {
-    pub signature: FixedCharSlice<4>,
-    pub version: FixedCharSlice<4>,
+    pub header: Header<4, 4>,
     pub area_wed: FixedCharSlice<8>,
     pub last_saved: u32,
     pub area_flags: u32,

@@ -3,7 +3,7 @@ use std::{
     slice,
 };
 
-use serde::{ser::SerializeSeq, Serialize, Serializer};
+use serde::{Serialize, Serializer};
 
 #[repr(C, packed)]
 #[derive(PartialEq, Eq, Copy, Clone)]
@@ -23,7 +23,7 @@ impl<const N: usize> From<&[i8]> for SignedFixedCharSlice<N> {
                 // TODO: Throw a warning here
                 break;
             }
-            destination[counter] = *byte;
+            destination[counter] = i8::from_le(*byte);
         }
         Self(destination)
     }
@@ -61,11 +61,7 @@ impl<const N: usize> Serialize for SignedFixedCharSlice<N> {
     where
         S: Serializer,
     {
-        let mut seq = serializer.serialize_seq(Some({ self.0 }.len())).unwrap();
-        for i in self.0 {
-            seq.serialize_element(&i).unwrap();
-        }
-        seq.end()
+        serializer.collect_str(&format!("{}", self))
     }
 }
 

@@ -4,9 +4,11 @@ use serde::Serialize;
 
 use crate::common::feature_block::FeatureBlock;
 use crate::common::fixed_char_array::FixedCharSlice;
+use crate::common::header::Header;
 use crate::common::signed_fixed_char_array::SignedFixedCharSlice;
 use crate::model::Model;
 use crate::resources::utils::{copy_buff_to_struct, copy_transmute_buff};
+use crate::tlk::Lookup;
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/spl_v1.htm
 #[derive(Debug, Serialize)]
@@ -35,8 +37,29 @@ impl Model for Spell {
             equiping_feature_blocks,
         }
     }
-    fn create_as_box(buffer: &[u8]) -> Rc<dyn Model> {
+    fn create_as_rc(buffer: &[u8]) -> Rc<dyn Model> {
         Rc::new(Self::new(buffer))
+    }
+
+    fn name(&self, lookup: &Lookup) -> String {
+        let name = if self.header.identified_spell_name > -1 {
+            lookup
+                .data_entries
+                .get(self.header.identified_spell_name as usize)
+                .unwrap()
+                .strings
+                .to_string()
+        } else if self.header.unidentified_spell_name > -1 {
+            lookup
+                .data_entries
+                .get(self.header.unidentified_spell_name as usize)
+                .unwrap()
+                .strings
+                .to_string()
+        } else {
+            format!("{}", { self.header.identified_spell_name })
+        };
+        format!("{}.spl", name)
     }
 }
 
@@ -44,8 +67,7 @@ impl Model for Spell {
 #[repr(C, packed)]
 #[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
 pub struct SpellHeader {
-    signature: FixedCharSlice<4>,
-    version: FixedCharSlice<4>,
+    header: Header<4, 4>,
     unidentified_spell_name: i32,
     identified_spell_name: i32,
     completion_sound: FixedCharSlice<8>,
@@ -136,8 +158,10 @@ mod tests {
         assert_eq!(
             spell.header,
             SpellHeader {
-                signature: "SPL ".into(),
-                version: "V1  ".into(),
+                header: Header {
+                    signature: "SPL ".into(),
+                    version: "V1  ".into(),
+                },
                 unidentified_spell_name: 14260,
                 identified_spell_name: 9999999,
                 completion_sound: FixedCharSlice([67, 65, 83, 95, 77, 48, 51, 0]),

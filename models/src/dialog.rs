@@ -3,8 +3,10 @@ use std::rc::Rc;
 use serde::Serialize;
 
 use crate::common::fixed_char_array::FixedCharSlice;
+use crate::common::header::Header;
 use crate::model::Model;
 use crate::resources::utils::{copy_buff_to_struct, copy_transmute_buff};
+use crate::tlk::Lookup;
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/dlg_v1.htm
 #[derive(Debug, Serialize)]
@@ -51,8 +53,12 @@ impl Model for Dialog {
         }
     }
 
-    fn create_as_box(buffer: &[u8]) -> Rc<dyn Model> {
+    fn create_as_rc(buffer: &[u8]) -> Rc<dyn Model> {
         Rc::new(Self::new(buffer))
+    }
+
+    fn name(&self, lookup: &Lookup) -> String {
+        todo!()
     }
 }
 
@@ -60,8 +66,7 @@ impl Model for Dialog {
 #[repr(C, packed)]
 #[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
 pub struct DialogHeader {
-    pub signature: FixedCharSlice<4>,
-    pub version: FixedCharSlice<4>,
+    pub header: Header<4, 4>,
     pub count_of_state_tables: i32,
     pub offset_to_state_table: i32,
     pub count_of_transitions: i32,

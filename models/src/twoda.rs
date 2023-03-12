@@ -5,15 +5,16 @@ use std::fmt::Debug;
 use serde::Serialize;
 
 use crate::common::fixed_char_array::FixedCharSlice;
-use crate::common::header::CustomHeader;
+use crate::common::header::Header;
 use crate::common::varriable_char_array::{VarriableCharArray, DEFAULT};
 use crate::model::Model;
 use crate::resources::utils::row_parser;
+use crate::tlk::Lookup;
 
 //https://gibberlings3.github.io/iesdp/file_formats/ie_formats/2da.htm
 #[derive(Debug, Serialize)]
 pub struct TwoDA {
-    pub header: CustomHeader<3, 4>,
+    pub header: Header<3, 4>,
     pub default_value: VarriableCharArray,
     pub data_entries: DataEntry,
 }
@@ -46,7 +47,7 @@ impl Model for TwoDA {
             end = row_end;
         }
         Self {
-            header: CustomHeader {
+            header: Header {
                 signature: FixedCharSlice::<3>::try_from(headers.first().unwrap_or(DEFAULT))
                     .unwrap_or_else(|_| "2DA".into()),
                 version: FixedCharSlice::<4>::try_from(headers.last().unwrap_or(DEFAULT))
@@ -60,8 +61,12 @@ impl Model for TwoDA {
         }
     }
 
-    fn create_as_box(buffer: &[u8]) -> std::rc::Rc<dyn Model> {
+    fn create_as_rc(buffer: &[u8]) -> std::rc::Rc<dyn Model> {
         Rc::new(Self::new(buffer))
+    }
+
+    fn name(&self, lookup: &Lookup) -> String {
+        todo!()
     }
 }
 
@@ -87,7 +92,7 @@ mod tests {
         let item = TwoDA::new(&buffer);
         assert_eq!(
             item.header,
-            CustomHeader {
+            Header {
                 version: "V1.0".into(),
                 signature: "2DA".into(),
             }

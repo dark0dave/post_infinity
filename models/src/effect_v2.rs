@@ -2,46 +2,42 @@ use std::{mem::size_of, rc::Rc};
 
 use serde::Serialize;
 
+use crate::common::header::Header;
 use crate::resources::utils::copy_buff_to_struct;
+use crate::tlk::Lookup;
 use crate::{common::fixed_char_array::FixedCharSlice, model::Model};
 
 #[derive(Debug, PartialEq, Eq, Serialize)]
 pub struct EffectV2 {
-    pub effect_v2_header: EffectV2Header,
+    // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/eff_v2.htm
+    pub effect_v2_header: Header<4, 4>,
     pub body: EffectV2Body,
 }
 
 impl Model for EffectV2 {
     fn new(buffer: &[u8]) -> Self {
-        let effect_v2_header = copy_buff_to_struct::<EffectV2Header>(buffer, 0);
-        let body = copy_buff_to_struct::<EffectV2Body>(buffer, size_of::<EffectV2Header>());
+        let effect_v2_header = copy_buff_to_struct::<Header<4, 4>>(buffer, 0);
+        let body = copy_buff_to_struct::<EffectV2Body>(buffer, size_of::<Header<4, 4>>());
         Self {
             effect_v2_header,
             body,
         }
     }
 
-    fn create_as_box(buffer: &[u8]) -> Rc<dyn Model> {
+    fn create_as_rc(buffer: &[u8]) -> Rc<dyn Model> {
         Rc::new(Self::new(buffer))
     }
-}
 
-// https://gibberlings3.github.io/iesdp/file_formats/ie_formats/eff_v2.htm
-#[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
-pub struct EffectV2Header {
-    pub signature: FixedCharSlice<3>,
-    _unused: u8,
-    pub version: FixedCharSlice<4>,
+    fn name(&self, lookup: &Lookup) -> String {
+        todo!()
+    }
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/eff_v2.htm#effv2_Body
 #[repr(C, packed)]
 #[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
 pub struct EffectV2Body {
-    pub signature: FixedCharSlice<3>,
-    _unused: u8,
-    pub version: FixedCharSlice<4>,
+    pub header: Header<4, 4>,
     pub opcode_number: u32,
     pub target_type: u32,
     pub power: u32,
@@ -111,15 +107,15 @@ mod tests {
         assert_eq!(
             EffectV2::new(&buffer),
             EffectV2 {
-                effect_v2_header: EffectV2Header {
-                    signature: "EFF".into(),
-                    _unused: 32,
+                effect_v2_header: Header {
+                    signature: "EFF ".into(),
                     version: "V2.0".into(),
                 },
                 body: EffectV2Body {
-                    signature: "EFF".into(),
-                    _unused: 32,
-                    version: "V2.0".into(),
+                    header: Header {
+                        signature: "EFF ".into(),
+                        version: "V2.0".into(),
+                    },
                     opcode_number: 98,
                     target_type: 2,
                     power: 0,

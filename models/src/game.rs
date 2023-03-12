@@ -2,7 +2,10 @@ use std::{mem::size_of, rc::Rc};
 
 use serde::Serialize;
 
+use crate::common::header::Header;
+use crate::common::signed_fixed_char_array::SignedFixedCharSlice;
 use crate::resources::utils::{copy_buff_to_struct, copy_transmute_buff};
+use crate::tlk::Lookup;
 use crate::{common::fixed_char_array::FixedCharSlice, creature::Creature, model::Model};
 
 #[derive(Debug, Serialize)]
@@ -79,8 +82,12 @@ impl Model for Game {
             familiar_extra,
         }
     }
-    fn create_as_box(buffer: &[u8]) -> Rc<dyn Model> {
+    fn create_as_rc(buffer: &[u8]) -> Rc<dyn Model> {
         Rc::new(Self::new(buffer))
+    }
+
+    fn name(&self, lookup: &Lookup) -> String {
+        "BALDUR.GAM".to_string()
     }
 }
 
@@ -88,8 +95,7 @@ impl Model for Game {
 #[repr(C, packed)]
 #[derive(Debug, Copy, Clone, Serialize)]
 pub struct BGEEGameHeader {
-    pub signature: FixedCharSlice<4>,
-    pub version: FixedCharSlice<4>,
+    pub header: Header<4, 4>,
     pub game_time: u32,
     pub selected_formation: u16,
     pub formation_button_1: u16,
@@ -150,17 +156,17 @@ pub struct Npc {
 }
 
 fn generate_npcs(buffer: &[u8], start: usize, count: usize) -> Vec<Npc> {
-    (0..count)
-        .into_iter()
-        .map(|counter| {
-            let start: usize = start + counter * size_of::<GameNPC>();
-            let game_npc = copy_buff_to_struct::<GameNPC>(buffer, start);
-
+    copy_transmute_buff::<GameNPC>(buffer, start, count)
+        .iter()
+        .map(|game_npc| {
             let start = game_npc.offset_to_cre_resource as usize;
             let creature_buffer = buffer.get(start..).unwrap();
             let creature = Creature::new(creature_buffer);
 
-            Npc { game_npc, creature }
+            Npc {
+                game_npc: *game_npc,
+                creature,
+            }
         })
         .collect()
 }
@@ -220,14 +226,14 @@ pub struct GameNPC {
     pub talk_count: i32,
     pub character_kill_stats: CharacterKillStats,
     // filename prefix for voice set
-    pub voice_set: [i8; 8],
+    pub voice_set: SignedFixedCharSlice<8>,
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/gam_v2.0.htm#GAMEV2_0_Stats
 #[repr(C, packed)]
 #[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
 pub struct CharacterKillStats {
-    pub most_powerful_vanquished_name: u32,
+    pub most_powerful_vanquished_name: SignedFixedCharSlice<4>,
     pub most_powerful_vanquished_xp_reward: u32,
     // 1/15 seconds
     pub time_in_party: u32,
@@ -351,8 +357,8 @@ mod tests {
             .expect("Could not read to buffer");
 
         let header = Game::new(&buffer).header;
-        assert_eq!(header.signature, "GAME".into());
-        assert_eq!(header.version, "V2.0".into());
+        assert_eq!(header.header.signature, "GAME".into());
+        assert_eq!(header.header.version, "V2.0".into());
         assert_eq!({ header.party_gold }, 109741);
         assert_eq!({ header.game_time }, 1664811);
         assert_eq!({ header.count_of_journal_entries }, 188);
@@ -411,7 +417,7 @@ mod tests {
                     name: "".into(),
                     talk_count: 6,
                     character_kill_stats: CharacterKillStats {
-                        most_powerful_vanquished_name: 34947,
+                        most_powerful_vanquished_name: SignedFixedCharSlice([-125, -120, 0, 0]),
                         most_powerful_vanquished_xp_reward: 64000,
                         time_in_party: 8320583,
                         time_joined: 24563462,
@@ -437,7 +443,7 @@ mod tests {
                         ],
                         favourite_weapon_time: [1910, 126, 1716, 11844]
                     },
-                    voice_set: [0; 8],
+                    voice_set: SignedFixedCharSlice::default(),
                 }
             );
         } else {
@@ -484,7 +490,7 @@ mod tests {
                     name: "".into(),
                     talk_count: 1,
                     character_kill_stats: CharacterKillStats {
-                        most_powerful_vanquished_name: 4294967295,
+                        most_powerful_vanquished_name: SignedFixedCharSlice([-1, -1, -1, -1]),
                         most_powerful_vanquished_xp_reward: 0,
                         time_in_party: 0,
                         time_joined: 0,
@@ -500,7 +506,7 @@ mod tests {
                         favourite_weapons: [0, 0, 0, 0],
                         favourite_weapon_time: [0, 0, 0, 0]
                     },
-                    voice_set: [0; 8],
+                    voice_set: SignedFixedCharSlice::default(),
                 }
             );
         } else {

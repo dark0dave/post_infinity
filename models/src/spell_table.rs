@@ -3,7 +3,7 @@ use std::mem::size_of;
 use serde::Serialize;
 
 use crate::common::fixed_char_array::FixedCharSlice;
-use crate::resources::utils::{copy_buff_to_struct, copy_transmute_buff};
+use crate::resources::utils::copy_transmute_buff;
 
 #[repr(C, packed)]
 #[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
@@ -36,20 +36,16 @@ pub struct MemorizedSpells {
     pub spell_memorization_info: SpellMemorizationInfo,
     pub spell_memorization_table: Vec<SpellMemorizationTable>,
 }
-
+// Slow
 pub fn generate_spell_memorization(
     buffer: &[u8],
     start: usize,
     count: usize,
     spell_table_start: usize,
 ) -> Vec<MemorizedSpells> {
-    (0..count)
-        .into_iter()
-        .map(|counter| {
-            let start: usize = start + counter * size_of::<SpellMemorizationInfo>();
-            let spell_memorization_info =
-                copy_buff_to_struct::<SpellMemorizationInfo>(buffer, start);
-
+    copy_transmute_buff::<SpellMemorizationInfo>(buffer, start, count)
+        .iter()
+        .map(|spell_memorization_info| {
             let start = spell_table_start
                 + size_of::<SpellMemorizationTable>()
                     * usize::try_from(spell_memorization_info.index_to_spell_table).unwrap_or(0);
@@ -61,7 +57,7 @@ pub fn generate_spell_memorization(
             );
 
             MemorizedSpells {
-                spell_memorization_info,
+                spell_memorization_info: *spell_memorization_info,
                 spell_memorization_table,
             }
         })

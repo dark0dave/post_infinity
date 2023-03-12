@@ -3,6 +3,7 @@ use std::rc::Rc;
 use serde::Serialize;
 
 use crate::resources::utils::{copy_buff_to_struct, copy_transmute_buff};
+use crate::tlk::Lookup;
 use crate::{
     common::{fixed_char_array::FixedCharSlice, header::Header},
     model::Model,
@@ -46,8 +47,12 @@ impl Model for Store {
             items_purchased_here,
         }
     }
-    fn create_as_box(buffer: &[u8]) -> Rc<dyn Model> {
+    fn create_as_rc(buffer: &[u8]) -> Rc<dyn Model> {
         Rc::new(Self::new(buffer))
+    }
+
+    fn name(&self, lookup: &Lookup) -> String {
+        self.store_header.name.to_string()
     }
 }
 
@@ -55,7 +60,7 @@ impl Model for Store {
 #[repr(C, packed)]
 #[derive(Debug, Copy, Clone, Serialize)]
 pub struct StoreHeader {
-    pub header: Header,
+    pub header: Header<4, 4>,
     //  (0=Store, 1=Tavern, 2=Inn, 3=Temple, 5=Container)
     pub store_type: i32,
     pub name: FixedCharSlice<4>,
