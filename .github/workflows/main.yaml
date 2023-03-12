@@ -1,0 +1,38 @@
+name: main
+on:
+  push:
+    branches:
+    - master
+    tags:
+    - "*"
+  pull_request:
+jobs:
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3.0.2
+      with:
+        set-safe-directory: true
+    - uses: actions/setup-python@v2
+    - uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+    - uses: pre-commit/action@v2.0.0
+  build_and_test:
+    name: Rust project
+    runs-on: ${{ matrix.os.name }}
+    strategy:
+      matrix:
+        os:
+          - name: windows-latest
+          - name: macos-latest
+          - name: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3.0.2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --release
