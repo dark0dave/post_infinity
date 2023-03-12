@@ -1,11 +1,15 @@
 use std::rc::Rc;
 
+use serde::Serialize;
+
 use crate::common::feature_block::FeatureBlock;
-use crate::utils::copy_buff_to_struct;
-use crate::{model::Model, utils::copy_transmute_buff};
+use crate::common::fixed_char_array::FixedCharSlice;
+use crate::common::fixed_char_nd_array::FixedCharNDArray;
+use crate::model::Model;
+use crate::resources::utils::{copy_buff_to_struct, copy_transmute_buff};
 
 //https://gibberlings3.github.io/iesdp/file_formats/ie_formats/itm_v1.htm
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct Item {
     pub header: ItemHeader,
     pub extended_headers: Vec<ItemExtendedHeader>,
@@ -30,25 +34,25 @@ impl Model for Item {
             equiping_feature_blocks,
         }
     }
-    fn create_as_rc(buffer: &[u8]) -> Rc<dyn Model> {
+    fn create_as_box(buffer: &[u8]) -> Rc<dyn Model> {
         Rc::new(Self::new(buffer))
     }
 }
 
 //https://gibberlings3.github.io/iesdp/file_formats/ie_formats/itm_v1.htm#itmv1_Header
 #[repr(C, packed)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Serialize)]
 pub struct ItemHeader {
-    signature: [u8; 4],
-    version: [u8; 4],
-    unidentified_item_name: [i8; 4],
-    identified_item_name: [i8; 4],
-    replacement_item: [i8; 8],
+    signature: FixedCharSlice<4>,
+    version: FixedCharSlice<4>,
+    unidentified_item_name: FixedCharSlice<4>,
+    identified_item_name: FixedCharSlice<4>,
+    replacement_item: FixedCharSlice<8>,
     // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/itm_v1.htm#Header_Flags
     type_flags: u32,
     category: u16,
     usability: u32,
-    item_animation: [u8; 2],
+    item_animation: FixedCharSlice<2>,
     min_level: u16,
     min_strength: u16,
     min_strengthbonus: u8,
@@ -64,13 +68,13 @@ pub struct ItemHeader {
     min_charisma: u16,
     base_value: u32,
     max_stackable: u16,
-    item_icon: [u8; 8],
+    item_icon: FixedCharSlice<8>,
     lore: u16,
-    ground_icon: [u8; 8],
+    ground_icon: FixedCharSlice<8>,
     base_weight: u32,
-    item_description_generic: [i8; 4],
-    item_description_identified: [i8; 4],
-    description_icon: [i8; 8],
+    item_description_generic: FixedCharSlice<4>,
+    item_description_identified: FixedCharSlice<4>,
+    description_icon: FixedCharSlice<8>,
     enchantment: u32,
     offset_to_extended_headers: i32,
     count_of_extended_headers: i16,
@@ -81,13 +85,13 @@ pub struct ItemHeader {
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/itm_v1.htm#itmv1_Extended_Header
 #[repr(C, packed)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Serialize)]
 pub struct ItemExtendedHeader {
     attack_type: u8, // Note zero is very bad here
     id_required: u8,
     location: u8,
     alternative_dice_sides: u8,
-    use_icon: [u8; 8],
+    use_icon: FixedCharSlice<8>,
     target_type: u8,
     target_count: u8,
     range: u16,
@@ -106,9 +110,9 @@ pub struct ItemExtendedHeader {
     feature_blocks_index: u16,
     max_charges: u16,
     charge_depletion_behaviour: u16,
-    flags: [u8; 4],
-    projectile_animation: [u8; 2],
-    melee_animation: [[u8; 2]; 3],
+    flags: FixedCharSlice<4>,
+    projectile_animation: FixedCharSlice<2>,
+    melee_animation: FixedCharNDArray<2, 3>,
     is_arrow: u16,
     is_bolt: u16,
     is_bullet: u16,

@@ -1,10 +1,7 @@
-use std::{fmt::Debug, rc::Rc, usize};
+use std::{fmt::Debug, usize};
 
-use crate::{
-    common::{fixed_char_array::FixedCharSlice, varriable_char_array::VarriableCharArray},
-    model::Model,
-    utils::{copy_buff_to_struct, copy_transmute_buff},
-};
+use crate::common::{fixed_char_array::FixedCharSlice, varriable_char_array::VarriableCharArray};
+use crate::resources::utils::{copy_buff_to_struct, copy_transmute_buff};
 
 use super::resources::types::ResourceType;
 
@@ -16,8 +13,8 @@ pub struct Key {
     pub resource_entries: Vec<ResourceIndex>,
 }
 
-impl Model for Key {
-    fn new(buffer: &[u8]) -> Self {
+impl Key {
+    pub fn new(buffer: &[u8]) -> Self {
         let header = copy_buff_to_struct::<KeyHeader>(buffer, 0);
 
         let start = usize::try_from(header.offset_to_bif_entries).unwrap_or(0);
@@ -42,10 +39,6 @@ impl Model for Key {
             bif_entries,
             resource_entries,
         }
-    }
-
-    fn create_as_rc(buffer: &[u8]) -> Rc<dyn Model> {
-        Rc::new(Self::new(buffer))
     }
 }
 
@@ -81,14 +74,10 @@ impl BiffIndex {
     fn try_from(header: &BiffIndexHeader, buffer: &[u8]) -> Option<Self> {
         let start = usize::try_from(header.offset_to_file_name).unwrap_or(0);
         let end = start + usize::try_from(header.file_name_length).unwrap_or(0);
-        if let Some(buff) = buffer.get(start..end) {
-            Some(BiffIndex {
-                header: *header,
-                name: VarriableCharArray(buff.to_vec()),
-            })
-        } else {
-            None
-        }
+        buffer.get(start..end).map(|buff| BiffIndex {
+            header: *header,
+            name: VarriableCharArray(buff.to_vec()),
+        })
     }
 }
 

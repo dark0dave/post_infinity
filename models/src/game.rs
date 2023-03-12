@@ -1,13 +1,11 @@
 use std::{mem::size_of, rc::Rc};
 
-use crate::{
-    common::fixed_char_array::FixedCharSlice,
-    creature::Creature,
-    model::Model,
-    utils::{copy_buff_to_struct, copy_transmute_buff},
-};
+use serde::Serialize;
 
-#[derive(Debug)]
+use crate::resources::utils::{copy_buff_to_struct, copy_transmute_buff};
+use crate::{common::fixed_char_array::FixedCharSlice, creature::Creature, model::Model};
+
+#[derive(Debug, Serialize)]
 pub struct Game {
     pub header: BGEEGameHeader,
     pub party_npcs: Vec<Npc>,
@@ -81,14 +79,14 @@ impl Model for Game {
             familiar_extra,
         }
     }
-    fn create_as_rc(buffer: &[u8]) -> Rc<dyn Model> {
+    fn create_as_box(buffer: &[u8]) -> Rc<dyn Model> {
         Rc::new(Self::new(buffer))
     }
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/gam_v2.0.htm#GAMEV2_0_Header
 #[repr(C, packed)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Serialize)]
 pub struct BGEEGameHeader {
     pub signature: FixedCharSlice<4>,
     pub version: FixedCharSlice<4>,
@@ -114,7 +112,7 @@ pub struct BGEEGameHeader {
     bit8: Storm Increasing
     bits 9->15 unused
     */
-    pub weather_bitfield: [u8; 2],
+    pub weather_bitfield: FixedCharSlice<2>,
     pub offset_to_npc_structs_for_party_members: i32,
     pub count_of_npc_structs_for_party_members: i32,
     pub offset_to_party_inventory: i32,
@@ -123,14 +121,14 @@ pub struct BGEEGameHeader {
     pub count_of_npc_structs_for_npcs: i32,
     pub offset_to_global_namespace_variables: i32,
     pub count_of_global_namespace_variables: i32,
-    pub main_area: [u8; 8],
+    pub main_area: FixedCharSlice<8>,
     pub offset_to_familiar_extra: i32,
     pub count_of_journal_entries: i32,
     pub offset_to_journal_entries: i32,
     pub party_reputation: i32,
-    pub current_area: [u8; 8],
-    pub gui_flags: [u8; 4],
-    pub loading_progress: [u8; 4],
+    pub current_area: FixedCharSlice<8>,
+    pub gui_flags: FixedCharSlice<4>,
+    pub loading_progress: FixedCharSlice<4>,
     pub offset_to_familar: i32,
     pub offset_to_stored_locations: i32,
     pub count_of_stored_locations: i32,
@@ -139,13 +137,13 @@ pub struct BGEEGameHeader {
     pub count_of_pocket_plane_locations: i32,
     // EE fields
     pub zoom_level: u32,
-    pub random_encounter_area: [u8; 8],
-    pub current_world_map: [u8; 8],
+    pub random_encounter_area: FixedCharSlice<8>,
+    pub current_world_map: FixedCharSlice<8>,
     pub familiar_owner: u32,
     pub random_encounter_script: [u8; 20],
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Serialize)]
 pub struct Npc {
     pub game_npc: GameNPC,
     pub creature: Creature,
@@ -169,7 +167,7 @@ fn generate_npcs(buffer: &[u8], start: usize, count: usize) -> Vec<Npc> {
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/gam_v2.0.htm#GAMEV2_0_NPC
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
 pub struct GameNPC {
     pub character_selection: u16,
     // x0-0x5 = player_x_fill, 0x_ffff = not in party
@@ -227,7 +225,7 @@ pub struct GameNPC {
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/gam_v2.0.htm#GAMEV2_0_Stats
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
 pub struct CharacterKillStats {
     pub most_powerful_vanquished_name: u32,
     pub most_powerful_vanquished_xp_reward: u32,
@@ -253,7 +251,7 @@ pub struct CharacterKillStats {
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/gam_v2.0.htm#GAMEV2_0_Variable
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
 pub struct GlobalVarriables {
     pub name: [i8; 32],
     /*
@@ -274,9 +272,9 @@ pub struct GlobalVarriables {
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/gam_v2.0.htm#GAMEV2_0_Journal
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
 pub struct JournalEntries {
-    pub journal_text: [u8; 4],
+    pub journal_text: FixedCharSlice<4>,
     // seconds
     pub time: u32,
     pub current_chapter_number: u8,
@@ -295,7 +293,7 @@ pub struct JournalEntries {
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/gam_v2.0.htm#GAMEV2_0_Familiar
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
 pub struct Familiar {
     pub lawful_good_familiar: FixedCharSlice<8>,
     pub lawful_neutral_familiar: FixedCharSlice<8>,
@@ -321,7 +319,7 @@ pub struct Familiar {
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/gam_v2.0.htm#GAMEV2_0_Stored
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/gam_v2.0.htm#GAMEV2_0_PocketPlane
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
 pub struct Location {
     pub area: [i8; 8],
     pub x_coordinate: i16,
@@ -330,14 +328,13 @@ pub struct Location {
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/gam_v2.0.htm#GAMEV2_0_FamiliarExtra
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
 pub struct FamiliarExtra {
     pub data: [i8; 8],
 }
 
 #[cfg(test)]
 mod tests {
-
     use super::*;
     use std::{
         fs::File,
@@ -546,7 +543,7 @@ mod tests {
         assert_eq!(
             journal.first(),
             Some(&JournalEntries {
-                journal_text: [41, 133, 0, 0],
+                journal_text: FixedCharSlice([41, 133, 0, 0]),
                 time: 31595,
                 current_chapter_number: 1,
                 read_by_character: 255,
@@ -557,7 +554,7 @@ mod tests {
         assert_eq!(
             journal.last(),
             Some(&JournalEntries {
-                journal_text: [63, 124, 1, 0],
+                journal_text: FixedCharSlice([63, 124, 1, 0]),
                 time: 24711890,
                 current_chapter_number: 6,
                 read_by_character: 255,

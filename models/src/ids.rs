@@ -1,5 +1,7 @@
 use std::rc::Rc;
 
+use serde::Serialize;
+
 use crate::{
     common::{
         fixed_char_array::FixedCharSlice,
@@ -7,17 +9,17 @@ use crate::{
         varriable_char_array::{VarriableCharArray, DEFAULT},
     },
     model::Model,
-    utils::row_parser,
+    resources::utils::row_parser,
 };
 
 //https://gibberlings3.github.io/iesdp/file_formats/ie_formats/ids.htm
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct Ids {
     pub header: CustomHeader<3, 4>,
     pub data_entries: Vec<DataEntry>,
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Serialize)]
 pub struct DataEntry {
     pub value: VarriableCharArray,
     pub identifier: VarriableCharArray,
@@ -55,7 +57,7 @@ impl Model for Ids {
         }
     }
 
-    fn create_as_rc(buffer: &[u8]) -> std::rc::Rc<dyn Model> {
+    fn create_as_box(buffer: &[u8]) -> std::rc::Rc<dyn Model> {
         Rc::new(Self::new(buffer))
     }
 }

@@ -1,12 +1,11 @@
 use std::rc::Rc;
 
-use crate::{
-    common::fixed_char_array::FixedCharSlice,
-    model::Model,
-    utils::{copy_buff_to_struct, copy_transmute_buff},
-};
+use serde::Serialize;
 
-#[derive(Debug, PartialEq, Eq)]
+use crate::resources::utils::{copy_buff_to_struct, copy_transmute_buff};
+use crate::{common::fixed_char_array::FixedCharSlice, model::Model};
+
+#[derive(Debug, PartialEq, Eq, Serialize)]
 pub struct ItemTable {
     pub helmet: Option<ItemReferenceTable>,
     pub armor: Option<ItemReferenceTable>,
@@ -115,7 +114,7 @@ impl ItemTable {
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/cre_v1.htm#CREV1_0_Item
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
 pub struct ItemReferenceTable {
     pub resource_name: FixedCharSlice<8>,
     // Item expiration time - item creation hour (replace with drained item)
@@ -138,14 +137,14 @@ impl Model for ItemReferenceTable {
     fn new(buffer: &[u8]) -> Self {
         copy_buff_to_struct::<Self>(buffer, 0)
     }
-    fn create_as_rc(buffer: &[u8]) -> Rc<dyn Model> {
+    fn create_as_box(buffer: &[u8]) -> Rc<dyn Model> {
         Rc::new(Self::new(buffer))
     }
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/cre_v1.htm#CREV1_0_ItemSlots
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
 struct ItemSlotTable {
     helmet: i16,
     armor: i16,
@@ -194,7 +193,7 @@ impl Model for ItemSlotTable {
     fn new(buffer: &[u8]) -> Self {
         copy_buff_to_struct::<Self>(buffer, 0)
     }
-    fn create_as_rc(buffer: &[u8]) -> Rc<dyn Model> {
+    fn create_as_box(buffer: &[u8]) -> Rc<dyn Model> {
         Rc::new(Self::new(buffer))
     }
 }

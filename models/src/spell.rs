@@ -1,14 +1,15 @@
 use std::rc::Rc;
 
+use serde::Serialize;
+
 use crate::common::feature_block::FeatureBlock;
 use crate::common::fixed_char_array::FixedCharSlice;
+use crate::common::signed_fixed_char_array::SignedFixedCharSlice;
 use crate::model::Model;
-use crate::utils::copy_buff_to_struct;
-
-use super::utils::copy_transmute_buff;
+use crate::resources::utils::{copy_buff_to_struct, copy_transmute_buff};
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/spl_v1.htm
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct Spell {
     pub header: SpellHeader,
     pub extended_headers: Vec<SpellExtendedHeader>,
@@ -34,25 +35,25 @@ impl Model for Spell {
             equiping_feature_blocks,
         }
     }
-    fn create_as_rc(buffer: &[u8]) -> Rc<dyn Model> {
+    fn create_as_box(buffer: &[u8]) -> Rc<dyn Model> {
         Rc::new(Self::new(buffer))
     }
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/spl_v1.htm#splv1_Header
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
 pub struct SpellHeader {
     signature: FixedCharSlice<4>,
     version: FixedCharSlice<4>,
     unidentified_spell_name: i32,
     identified_spell_name: i32,
-    completion_sound: [i8; 8],
+    completion_sound: FixedCharSlice<8>,
     // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/spl_v2.htm#Header_Flags
     flags: u32,
     spell_type: u16,
     exclusion_flags: u32,
-    casting_graphics: [u8; 2],
+    casting_graphics: FixedCharSlice<2>,
     min_level: u8,
     primary_spell_school: u8,
     min_strength: u8,
@@ -69,13 +70,13 @@ pub struct SpellHeader {
     min_charisma: u16,
     spell_level: u32,
     max_stackable: u16,
-    spellbook_icon: [u8; 8],
+    spellbook_icon: FixedCharSlice<8>,
     lore: u16,
-    ground_icon: [u8; 8],
+    ground_icon: FixedCharSlice<8>,
     base_weight: u32,
-    spell_description_generic: [i8; 4],
-    spell_description_identified: [i8; 4],
-    description_icon: [i8; 8],
+    spell_description_generic: SignedFixedCharSlice<4>,
+    spell_description_identified: SignedFixedCharSlice<4>,
+    description_icon: SignedFixedCharSlice<8>,
     enchantment: u32,
     offset_to_extended_headers: i32,
     count_of_extended_headers: i16,
@@ -86,12 +87,12 @@ pub struct SpellHeader {
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/spl_v1.htm#splv1_Extended_Header
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
 pub struct SpellExtendedHeader {
     spell_form: u8,
     freindly: u8,
     location: u16,
-    memorised_icon: [u8; 8],
+    memorised_icon: FixedCharSlice<8>,
     target_type: u8,
     target_count: u8,
     range: u16,
@@ -139,11 +140,11 @@ mod tests {
                 version: "V1  ".into(),
                 unidentified_spell_name: 14260,
                 identified_spell_name: 9999999,
-                completion_sound: [67, 65, 83, 95, 77, 48, 51, 0],
+                completion_sound: FixedCharSlice([67, 65, 83, 95, 77, 48, 51, 0]),
                 flags: 0,
                 spell_type: 1,
                 exclusion_flags: 0,
-                casting_graphics: [18, 0],
+                casting_graphics: FixedCharSlice([18, 0]),
                 min_level: 0,
                 primary_spell_school: 2,
                 min_strength: 0,
@@ -160,13 +161,13 @@ mod tests {
                 min_charisma: 0,
                 spell_level: 9,
                 max_stackable: 1,
-                spellbook_icon: [83, 80, 87, 73, 57, 48, 53, 67],
+                spellbook_icon: FixedCharSlice([83, 80, 87, 73, 57, 48, 53, 67]),
                 lore: 0,
-                ground_icon: [0, 0, 114, 98, 0, 0, 85, 110],
+                ground_icon: FixedCharSlice([0, 0, 114, 98, 0, 0, 85, 110]),
                 base_weight: 0,
-                spell_description_generic: [-1, -1, -1, -1],
-                spell_description_identified: [127, -106, -104, 0],
-                description_icon: [0, 0, 0, 104, -122, 64, 0, 5],
+                spell_description_generic: SignedFixedCharSlice([-1, -1, -1, -1]),
+                spell_description_identified: SignedFixedCharSlice([127, -106, -104, 0]),
+                description_icon: SignedFixedCharSlice([0, 0, 0, 104, -122, 64, 0, 5]),
                 enchantment: 0,
                 offset_to_extended_headers: 114,
                 count_of_extended_headers: 1,

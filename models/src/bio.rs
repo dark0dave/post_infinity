@@ -1,8 +1,10 @@
 use std::rc::Rc;
 
+use serde::Serialize;
+
 use crate::{common::varriable_char_array::VarriableCharArray, model::Model};
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct Biography(pub VarriableCharArray);
 
 impl Model for Biography {
@@ -10,7 +12,7 @@ impl Model for Biography {
         Self(VarriableCharArray(buffer.to_vec()))
     }
 
-    fn create_as_rc(buffer: &[u8]) -> Rc<dyn Model> {
+    fn create_as_box(buffer: &[u8]) -> Rc<dyn Model> {
         Rc::new(Self::new(buffer))
     }
 }

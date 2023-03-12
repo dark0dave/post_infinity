@@ -1,13 +1,15 @@
 use std::rc::Rc;
 
+use serde::Serialize;
+
+use crate::resources::utils::copy_buff_to_struct;
 use crate::{
     common::{fixed_char_array::FixedCharSlice, header::Header},
     creature::Creature,
     model::Model,
-    utils::copy_buff_to_struct,
 };
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct ExpandedCharacter {
     pub character: BGCharacter,
     pub creature: Creature,
@@ -28,13 +30,13 @@ impl Model for ExpandedCharacter {
         }
     }
 
-    fn create_as_rc(buffer: &[u8]) -> Rc<dyn Model> {
+    fn create_as_box(buffer: &[u8]) -> Rc<dyn Model> {
         Rc::new(Self::new(buffer))
     }
 }
 
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
 pub struct BGCharacter {
     pub header: Header,
     pub name: FixedCharSlice<32>,
