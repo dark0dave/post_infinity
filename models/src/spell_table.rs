@@ -1,12 +1,12 @@
 use std::mem::size_of;
 
-use crate::{
-    common::fixed_char_array::FixedCharSlice,
-    utils::{copy_buff_to_struct, copy_transmute_buff},
-};
+use serde::Serialize;
+
+use crate::common::fixed_char_array::FixedCharSlice;
+use crate::resources::utils::{copy_buff_to_struct, copy_transmute_buff};
 
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
 pub struct KnownSpells {
     pub spell_name: FixedCharSlice<8>,
     pub spell_level: u16,
@@ -14,7 +14,7 @@ pub struct KnownSpells {
 }
 
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
 pub struct SpellMemorizationInfo {
     pub spell_level: u16,
     pub number_of_spells_memorizable: u16,
@@ -25,13 +25,13 @@ pub struct SpellMemorizationInfo {
 }
 
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
 pub struct SpellMemorizationTable {
     pub spell_name: FixedCharSlice<8>,
     pub memorised: u32,
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Serialize)]
 pub struct MemorizedSpells {
     pub spell_memorization_info: SpellMemorizationInfo,
     pub spell_memorization_table: Vec<SpellMemorizationTable>,

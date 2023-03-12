@@ -1,11 +1,13 @@
 use std::rc::Rc;
 
+use serde::Serialize;
+
 use crate::common::fixed_char_array::FixedCharSlice;
 use crate::model::Model;
-use crate::utils::{copy_buff_to_struct, copy_transmute_buff};
+use crate::resources::utils::{copy_buff_to_struct, copy_transmute_buff};
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/dlg_v1.htm
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct Dialog {
     pub header: DialogHeader,
     pub state_tables: Vec<StateTable>,
@@ -49,14 +51,14 @@ impl Model for Dialog {
         }
     }
 
-    fn create_as_rc(buffer: &[u8]) -> Rc<dyn Model> {
+    fn create_as_box(buffer: &[u8]) -> Rc<dyn Model> {
         Rc::new(Self::new(buffer))
     }
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/dlg_v1.htm#formDLGV1_Header
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
 pub struct DialogHeader {
     pub signature: FixedCharSlice<4>,
     pub version: FixedCharSlice<4>,
@@ -70,12 +72,12 @@ pub struct DialogHeader {
     pub count_of_transition_triggers: i32,
     pub offset_to_action_table: i32,
     pub count_of_action_tables: i32,
-    pub flags: [u8; 4],
+    pub flags: FixedCharSlice<4>,
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/dlg_v1.htm#formDLGV1_State
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
 pub struct StateTable {
     pub actor_response_text: FixedCharSlice<4>,
     pub index_of_the_first_transition: u32,
@@ -85,9 +87,9 @@ pub struct StateTable {
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/dlg_v1.htm#formDLGV1_Transition
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
 pub struct Transition {
-    pub flags: [u8; 4],
+    pub flags: FixedCharSlice<4>,
     pub player_character_text: FixedCharSlice<4>,
     pub journal_text: FixedCharSlice<4>,
     pub index_of_transitions_trigger: u32,
@@ -98,7 +100,7 @@ pub struct Transition {
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/dlg_v1.htm#formDLGV1_StateTrigger
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
 pub struct StateTrigger {
     pub offset_to_start_of_file: u32,
     pub length_in_bytes: u32,
@@ -106,7 +108,7 @@ pub struct StateTrigger {
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/dlg_v1.htm#formDLGV1_TransTrigger
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
 pub struct TransitionTrigger {
     pub offset_to_start_of_file: u32,
     pub length_in_bytes: u32,
@@ -114,7 +116,7 @@ pub struct TransitionTrigger {
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/dlg_v1.htm#formDLGV1_Action
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
 pub struct ActionTable {
     pub offset_to_start_of_file: u32,
     pub length_in_bytes: u32,

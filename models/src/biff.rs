@@ -1,11 +1,10 @@
 use core::mem::size_of;
 use std::{collections::HashMap, fmt::Debug, rc::Rc};
 
+use crate::resources::utils::{copy_buff_to_struct, copy_transmute_buff};
 use crate::{
-    common::fixed_char_array::FixedCharSlice,
-    model::Model,
+    common::fixed_char_array::FixedCharSlice, from_buffer, model::Model,
     resources::types::ResourceType,
-    utils::{copy_buff_to_struct, copy_transmute_buff, from_buffer},
 };
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/bif_v1.htm
@@ -18,7 +17,7 @@ pub struct Biff {
 
 impl Biff {
     // TODO: Pass option to process only resources needed, make this part of init and make new from Resource
-    pub fn new(buffer: &[u8], process_tiles: bool) -> Self {
+    pub fn new(buffer: &[u8]) -> Self {
         let header = copy_buff_to_struct::<Header>(buffer, 0);
 
         let start = header.offset_to_file_entries as usize;
@@ -38,19 +37,20 @@ impl Biff {
             }
         }
 
-        let tileset_entries = if process_tiles {
-            let start = start + count * size_of::<FilesetEntryHeader>();
-            let count = header.count_of_tileset_entries as usize;
-            copy_transmute_buff::<TilesetEntry>(buffer, start, count)
-        } else {
-            vec![]
-        };
-
         Biff {
             header,
             fileset_entries,
-            tileset_entries,
+            tileset_entries: vec![],
         }
+    }
+
+    pub fn populate_tiles(&mut self, buffer: &[u8]) {
+        let start = self.header.offset_to_file_entries as usize;
+        let count = self.header.count_of_fileset_entries as usize;
+
+        let start = start + count * size_of::<FilesetEntryHeader>();
+        let count = self.header.count_of_tileset_entries as usize;
+        self.tileset_entries = copy_transmute_buff::<TilesetEntry>(buffer, start, count);
     }
 }
 

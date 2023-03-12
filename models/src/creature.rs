@@ -1,15 +1,18 @@
 use std::rc::Rc;
 
+use serde::Serialize;
+
+use crate::common::fixed_char_nd_array::FixedCharNDArray;
+use crate::resources::utils::{copy_buff_to_struct, copy_transmute_buff};
 use crate::{
     common::fixed_char_array::FixedCharSlice,
     effect_v2::EffectV2Body,
     item_table::ItemTable,
     model::Model,
     spell_table::{generate_spell_memorization, KnownSpells, MemorizedSpells},
-    utils::{copy_buff_to_struct, copy_transmute_buff},
 };
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Serialize)]
 pub struct Creature {
     pub header: BGEECreature,
     pub item_slot_table: ItemTable,
@@ -54,14 +57,14 @@ impl Model for Creature {
             effects,
         }
     }
-    fn create_as_rc(buffer: &[u8]) -> Rc<dyn Model> {
+    fn create_as_box(buffer: &[u8]) -> Rc<dyn Model> {
         Rc::new(Self::new(buffer))
     }
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/cre_v1.htm
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
 pub struct BGEECreature {
     pub signature: FixedCharSlice<4>,
     pub version: FixedCharSlice<4>,
@@ -90,8 +93,8 @@ pub struct BGEECreature {
     // 0 = v1, 1 = v2
     pub effstructure: u8,
 
-    pub small_portrait: [u8; 8],
-    pub large_portrait: [u8; 8],
+    pub small_portrait: FixedCharSlice<8>,
+    pub large_portrait: FixedCharSlice<8>,
     pub reputation: u8,
     pub hide_in_shadows: u8,
     pub nac_1: i16,
@@ -100,7 +103,7 @@ pub struct BGEECreature {
     pub nac_mod_missile: i16,
     pub nac_mod_piercing: i16,
     pub nac_mod_slashing: i16,
-    pub thac0: [u8; 1],
+    pub thac0: u8,
     pub attacks: u8,
     pub save_death: u8,
     pub save_wands: u8,
@@ -138,7 +141,7 @@ pub struct BGEECreature {
     pub proficiency_spiked: u8,
     pub proficiency_axes: u8,
     pub proficiency_missiles: u8,
-    pub unused_proficencies: [u8; 7],
+    pub unused_proficencies: FixedCharSlice<7>,
 
     pub nightmare_mode: u8,
     pub translucency: u8,
@@ -148,10 +151,10 @@ pub struct BGEECreature {
     pub turn_undead_level: u8,
     pub tracking_skill: u8,
     // The following entry applies to BG1, BG2 and BGEE
-    pub tracking: [u8; 32],
+    pub tracking: FixedCharSlice<32>,
     // Strrefs pertaining to the u8acter.
     // Most are connected with the sound-set (see SOUNDOFF.IDS (BG1) and SNDSLOT.IDS for (BG2)).
-    pub strrefs: [[i8; 4]; 100],
+    pub strrefs: FixedCharNDArray<4, 100>,
 
     pub level_first_class: u8,
     pub level_second_class: u8,
@@ -174,11 +177,11 @@ pub struct BGEECreature {
     pub morale_recovery_time: u16,
 
     pub kit: u32,
-    pub override_script: [u8; 8],
-    pub class_script: [u8; 8],
-    pub race_script: [u8; 8],
-    pub general_script: [u8; 8],
-    pub default_script: [u8; 8],
+    pub override_script: FixedCharSlice<8>,
+    pub class_script: FixedCharSlice<8>,
+    pub race_script: FixedCharSlice<8>,
+    pub general_script: FixedCharSlice<8>,
+    pub default_script: FixedCharSlice<8>,
 
     pub enemy_ally: u8,
     pub general: u8,
@@ -188,7 +191,7 @@ pub struct BGEECreature {
     pub gender: u8,
 
     // object.ids references
-    pub object_references: [u8; 5],
+    pub object_references: FixedCharSlice<5>,
 
     pub alignment: u8,
 
@@ -196,7 +199,7 @@ pub struct BGEECreature {
     pub local_actor_enumeration: u16,
 
     // death variable: sprite_is_dead on death
-    pub death_variable: [u8; 32],
+    pub death_variable: FixedCharSlice<32>,
     pub offset_to_known_spells: i32,
     pub count_of_known_spells: i32,
     pub offset_to_spell_memorization_info: i32,

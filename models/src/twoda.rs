@@ -2,21 +2,23 @@ use std::{rc::Rc, vec};
 
 use std::fmt::Debug;
 
+use serde::Serialize;
+
 use crate::common::fixed_char_array::FixedCharSlice;
 use crate::common::header::CustomHeader;
 use crate::common::varriable_char_array::{VarriableCharArray, DEFAULT};
 use crate::model::Model;
-use crate::utils::row_parser;
+use crate::resources::utils::row_parser;
 
 //https://gibberlings3.github.io/iesdp/file_formats/ie_formats/2da.htm
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct TwoDA {
     pub header: CustomHeader<3, 4>,
     pub default_value: VarriableCharArray,
     pub data_entries: DataEntry,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct DataEntry {
     pub data_entry_headers: Vec<VarriableCharArray>,
     pub values: Vec<Vec<VarriableCharArray>>,
@@ -58,7 +60,7 @@ impl Model for TwoDA {
         }
     }
 
-    fn create_as_rc(buffer: &[u8]) -> std::rc::Rc<dyn Model> {
+    fn create_as_box(buffer: &[u8]) -> std::rc::Rc<dyn Model> {
         Rc::new(Self::new(buffer))
     }
 }

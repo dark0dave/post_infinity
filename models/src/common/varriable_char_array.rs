@@ -1,8 +1,10 @@
 use std::fmt::Display;
 
+use serde::Serialize;
+
 pub const DEFAULT: &VarriableCharArray = &VarriableCharArray(vec![]);
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Serialize)]
 pub struct VarriableCharArray(pub Vec<u8>);
 
 impl Display for VarriableCharArray {

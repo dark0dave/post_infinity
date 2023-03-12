@@ -1,13 +1,15 @@
 use std::rc::Rc;
 
+use serde::Serialize;
+
+use crate::resources::utils::{copy_buff_to_struct, copy_transmute_buff};
 use crate::{
     common::{fixed_char_array::FixedCharSlice, header::Header},
     model::Model,
-    utils::{copy_buff_to_struct, copy_transmute_buff},
 };
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/sto_v1.htm
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct Store {
     pub store_header: StoreHeader,
     pub items_for_sale: Vec<ItemsForSale>,
@@ -44,14 +46,14 @@ impl Model for Store {
             items_purchased_here,
         }
     }
-    fn create_as_rc(buffer: &[u8]) -> Rc<dyn Model> {
+    fn create_as_box(buffer: &[u8]) -> Rc<dyn Model> {
         Rc::new(Self::new(buffer))
     }
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/sto_v1.htm#storv1_0_Header
 #[repr(C, packed)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Serialize)]
 pub struct StoreHeader {
     pub header: Header,
     //  (0=Store, 1=Tavern, 2=Inn, 3=Temple, 5=Container)
@@ -86,7 +88,7 @@ pub struct StoreHeader {
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/sto_v1.htm#storv1_0_Sale
 #[repr(C, packed)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Serialize)]
 pub struct ItemsForSale {
     pub filename_of_item: [i8; 8],
     pub item_expiration_time: i16,
@@ -101,7 +103,7 @@ pub struct ItemsForSale {
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/sto_v1.htm#storv1_0_Drink
 #[repr(C, packed)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Serialize)]
 pub struct DrinksForSale {
     pub rumour_resource: [i8; 8],
     pub drink_name: FixedCharSlice<4>,
@@ -111,12 +113,12 @@ pub struct DrinksForSale {
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/sto_v1.htm#storv1_0_Cure
 #[repr(C, packed)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Serialize)]
 pub struct CuresForSale {
     pub filename_of_spell: [i8; 8],
     pub spell_price: i32,
 }
 
 #[repr(C, packed)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Serialize)]
 pub struct ItemsPurchasedHere(i32);

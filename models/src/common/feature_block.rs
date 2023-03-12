@@ -1,5 +1,9 @@
+use serde::Serialize;
+
+use super::fixed_char_array::FixedCharSlice;
+
 #[repr(C, packed)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Serialize)]
 pub struct FeatureBlock {
     pub opcode_number: u16,
     pub target_type: u8,
@@ -11,10 +15,10 @@ pub struct FeatureBlock {
     pub duration: u32,
     pub propability_1: u8,
     pub propability_2: u8,
-    pub resource: [u8; 8],
+    pub resource: FixedCharSlice<8>,
     pub dice_thrown_max_level: u32,
     pub dice_sides_min_level: u32,
-    pub saving_throw_type: [u8; 4],
+    pub saving_throw_type: FixedCharSlice<4>,
     pub saving_throw_bonus: u32,
     pub stacking_id: u32,
 }
