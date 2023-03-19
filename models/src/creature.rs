@@ -157,8 +157,9 @@ pub struct BGEECreature {
     pub tracking_skill: u8,
     // The following entry applies to BG1, BG2 and BGEE
     pub tracking: FixedCharSlice<32>,
-    // Strrefs pertaining to the u8acter.
+    // Strrefs pertaining to the character.
     // Most are connected with the sound-set (see SOUNDOFF.IDS (BG1) and SNDSLOT.IDS for (BG2)).
+    // This is broken, it should be 100 u32s
     pub strrefs: FixedCharNDArray<4, 100>,
 
     pub level_first_class: u8,
