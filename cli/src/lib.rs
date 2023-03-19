@@ -3,6 +3,7 @@ use std::{
     fs::{self, File},
     io::{BufReader, Read},
     path::Path,
+    process::exit,
 };
 
 use args::Args;
@@ -54,7 +55,7 @@ fn get_model_from_file(path: &Path) -> Vec<Biff> {
         }
     } else {
         println!("Processed {:#?}", from_buffer(&buffer, resource_type));
-        todo!("Handle other resources")
+        exit(0)
     }
 }
 
