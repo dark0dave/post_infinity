@@ -1,5 +1,6 @@
 use std::{fmt::Debug, usize};
 
+use crate::common::header::Header;
 use crate::common::{fixed_char_array::FixedCharSlice, varriable_char_array::VarriableCharArray};
 use crate::resources::utils::{copy_buff_to_struct, copy_transmute_buff};
 
@@ -46,8 +47,7 @@ impl Key {
 #[repr(C, packed)]
 #[derive(Debug, Copy, Clone)]
 pub struct KeyHeader {
-    signature: FixedCharSlice<4>,
-    version: FixedCharSlice<4>,
+    header: Header<4, 4>,
     count_of_bif_entries: i32,
     count_of_resource_entries: i32,
     offset_to_bif_entries: i32,

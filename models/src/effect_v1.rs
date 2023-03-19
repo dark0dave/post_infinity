@@ -5,6 +5,7 @@ use serde::Serialize;
 use crate::common::fixed_char_array::FixedCharSlice;
 use crate::model::Model;
 use crate::resources::utils::copy_buff_to_struct;
+use crate::tlk::Lookup;
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/eff_v1.htm#effv1_Header
 #[derive(Debug, Serialize)]
@@ -33,7 +34,11 @@ impl Model for EffectV1 {
         copy_buff_to_struct::<EffectV1>(buffer, 0)
     }
 
-    fn create_as_box(buffer: &[u8]) -> Rc<dyn Model> {
+    fn create_as_rc(buffer: &[u8]) -> Rc<dyn Model> {
         Rc::new(Self::new(buffer))
+    }
+
+    fn name(&self, lookup: &Lookup) -> String {
+        todo!()
     }
 }

@@ -1,6 +1,6 @@
 use std::fmt::{Debug, Display};
 
-use serde::{ser::SerializeSeq, Serialize, Serializer};
+use serde::{Serialize, Serializer};
 
 use super::varriable_char_array::VarriableCharArray;
 
@@ -70,11 +70,7 @@ impl<const N: usize> Serialize for FixedCharSlice<N> {
     where
         S: Serializer,
     {
-        let mut seq = serializer.serialize_seq(Some({ self.0 }.len())).unwrap();
-        for i in self.0 {
-            seq.serialize_element(&i).unwrap();
-        }
-        seq.end()
+        serializer.collect_str(&format!("{}", self))
     }
 }
 

@@ -3,6 +3,7 @@ use std::rc::Rc;
 use serde::Serialize;
 
 use crate::resources::utils::copy_buff_to_struct;
+use crate::tlk::Lookup;
 use crate::{
     common::{fixed_char_array::FixedCharSlice, header::Header},
     creature::Creature,
@@ -30,15 +31,19 @@ impl Model for ExpandedCharacter {
         }
     }
 
-    fn create_as_box(buffer: &[u8]) -> Rc<dyn Model> {
+    fn create_as_rc(buffer: &[u8]) -> Rc<dyn Model> {
         Rc::new(Self::new(buffer))
+    }
+
+    fn name(&self, lookup: &Lookup) -> String {
+        self.character.name.to_string().replace(' ', "_")
     }
 }
 
 #[repr(C, packed)]
 #[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
 pub struct BGCharacter {
-    pub header: Header,
+    pub header: Header<4, 4>,
     pub name: FixedCharSlice<32>,
     pub offset_to_cre_structure: i32,
     pub length_of_the_cre_structure: i32,

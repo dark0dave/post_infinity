@@ -1,8 +1,10 @@
-use std::{mem::size_of, rc::Rc};
+use std::rc::Rc;
 
 use serde::Serialize;
 
+use crate::common::header::Header;
 use crate::resources::utils::{copy_buff_to_struct, copy_transmute_buff};
+use crate::tlk::Lookup;
 use crate::{common::fixed_char_array::FixedCharSlice, model::Model};
 
 #[derive(Debug, Serialize)]
@@ -16,30 +18,29 @@ impl Model for WorldMap {
         let world_map_header = copy_buff_to_struct::<WorldMapHeader>(buffer, 0);
 
         let count = usize::try_from(world_map_header.count_of_worldmap_entries).unwrap_or(0);
-        let world_map_entries: Vec<WorldMapEntry> = (0..count)
-            .into_iter()
-            .map(|counter| {
-                let start = size_of::<WorldMapEntryUnlinked>() * counter
-                    + usize::try_from(world_map_header.offset_to_worldmap_entries).unwrap_or(0);
-                let world_map_entry = copy_buff_to_struct::<WorldMapEntryUnlinked>(buffer, start);
+        let start = usize::try_from(world_map_header.offset_to_worldmap_entries).unwrap_or(0);
+        let world_map_entries: Vec<WorldMapEntry> =
+            copy_transmute_buff::<WorldMapEntryUnlinked>(buffer, start, count)
+                .iter()
+                .map(|world_map_entry| {
+                    let start =
+                        usize::try_from(world_map_entry.offset_to_area_entries).unwrap_or(0);
+                    let count = usize::try_from(world_map_entry.count_of_area_entries).unwrap_or(0);
+                    let area_entries = copy_transmute_buff::<AreaEntry>(buffer, start, count);
 
-                let start = usize::try_from(world_map_entry.offset_to_area_entries).unwrap_or(0);
-                let count = usize::try_from(world_map_entry.count_of_area_entries).unwrap_or(0);
-                let area_entries = copy_transmute_buff::<AreaEntry>(buffer, start, count);
+                    let start =
+                        usize::try_from(world_map_entry.offset_to_area_link_entries).unwrap_or(0);
+                    let count =
+                        usize::try_from(world_map_entry.count_of_area_link_entries).unwrap_or(0);
+                    let area_link_entries = copy_transmute_buff::<AreaLink>(buffer, start, count);
 
-                let start =
-                    usize::try_from(world_map_entry.offset_to_area_link_entries).unwrap_or(0);
-                let count =
-                    usize::try_from(world_map_entry.count_of_area_link_entries).unwrap_or(0);
-                let area_link_entries = copy_transmute_buff::<AreaLink>(buffer, start, count);
-
-                WorldMapEntry {
-                    world_map_entry,
-                    area_entries,
-                    area_link_entries,
-                }
-            })
-            .collect();
+                    WorldMapEntry {
+                        world_map_entry: *world_map_entry,
+                        area_entries,
+                        area_link_entries,
+                    }
+                })
+                .collect();
 
         Self {
             world_map_header,
@@ -47,8 +48,12 @@ impl Model for WorldMap {
         }
     }
 
-    fn create_as_box(buffer: &[u8]) -> Rc<dyn Model> {
+    fn create_as_rc(buffer: &[u8]) -> Rc<dyn Model> {
         Rc::new(Self::new(buffer))
+    }
+
+    fn name(&self, lookup: &Lookup) -> String {
+        todo!()
     }
 }
 
@@ -56,8 +61,7 @@ impl Model for WorldMap {
 #[repr(C, packed)]
 #[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
 pub struct WorldMapHeader {
-    pub signature: FixedCharSlice<4>,
-    pub version: FixedCharSlice<4>,
+    pub header: Header<4, 4>,
     pub count_of_worldmap_entries: i32,
     pub offset_to_worldmap_entries: i32,
 }

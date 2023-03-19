@@ -3,6 +3,7 @@ use std::rc::Rc;
 use serde::Serialize;
 
 use crate::resources::utils::{copy_buff_to_struct, copy_transmute_buff};
+use crate::tlk::Lookup;
 use crate::{common::fixed_char_array::FixedCharSlice, model::Model};
 
 #[derive(Debug, PartialEq, Eq, Serialize)]
@@ -137,8 +138,12 @@ impl Model for ItemReferenceTable {
     fn new(buffer: &[u8]) -> Self {
         copy_buff_to_struct::<Self>(buffer, 0)
     }
-    fn create_as_box(buffer: &[u8]) -> Rc<dyn Model> {
+    fn create_as_rc(buffer: &[u8]) -> Rc<dyn Model> {
         Rc::new(Self::new(buffer))
+    }
+
+    fn name(&self, lookup: &Lookup) -> String {
+        self.resource_name.to_string()
     }
 }
 
@@ -193,8 +198,12 @@ impl Model for ItemSlotTable {
     fn new(buffer: &[u8]) -> Self {
         copy_buff_to_struct::<Self>(buffer, 0)
     }
-    fn create_as_box(buffer: &[u8]) -> Rc<dyn Model> {
+    fn create_as_rc(buffer: &[u8]) -> Rc<dyn Model> {
         Rc::new(Self::new(buffer))
+    }
+
+    fn name(&self, lookup: &Lookup) -> String {
+        todo!()
     }
 }
 

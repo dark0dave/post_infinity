@@ -3,7 +3,9 @@ use std::rc::Rc;
 use serde::Serialize;
 
 use crate::common::fixed_char_nd_array::FixedCharNDArray;
+use crate::common::header::Header;
 use crate::resources::utils::{copy_buff_to_struct, copy_transmute_buff};
+use crate::tlk::Lookup;
 use crate::{
     common::fixed_char_array::FixedCharSlice,
     effect_v2::EffectV2Body,
@@ -57,8 +59,12 @@ impl Model for Creature {
             effects,
         }
     }
-    fn create_as_box(buffer: &[u8]) -> Rc<dyn Model> {
+    fn create_as_rc(buffer: &[u8]) -> Rc<dyn Model> {
         Rc::new(Self::new(buffer))
+    }
+
+    fn name(&self, lookup: &Lookup) -> String {
+        self.header.dialog_ref.to_string()
     }
 }
 
@@ -66,8 +72,7 @@ impl Model for Creature {
 #[repr(C, packed)]
 #[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
 pub struct BGEECreature {
-    pub signature: FixedCharSlice<4>,
-    pub version: FixedCharSlice<4>,
+    pub header: Header<4, 4>,
     pub long_creature_name: FixedCharSlice<4>,
     pub short_creature_name: FixedCharSlice<4>,
 
@@ -226,12 +231,9 @@ mod tests {
 
     #[test]
     fn valid_simple_creature_file_header_parsed() {
-        let file = File::open("fixtures/dbeggar.cre").unwrap();
-
-        let mut reader = BufReader::new(file);
+        let file = File::open("fixtures/dbeggar.cre").expect("Fixture missing");
         let mut buffer = Vec::new();
-
-        reader
+        BufReader::new(file)
             .read_to_end(&mut buffer)
             .expect("Could not read to buffer");
 
@@ -256,12 +258,9 @@ mod tests {
 
     #[test]
     fn valid_creature_file_header_parsed() {
-        let file = File::open("fixtures/cutmelis.cre").unwrap();
-
-        let mut reader = BufReader::new(file);
+        let file = File::open("fixtures/cutmelis.cre").expect("Fixture missing");
         let mut buffer = Vec::new();
-
-        reader
+        BufReader::new(file)
             .read_to_end(&mut buffer)
             .expect("Could not read to buffer");
 

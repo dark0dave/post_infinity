@@ -5,17 +5,18 @@ use serde::Serialize;
 use crate::{
     common::{
         fixed_char_array::FixedCharSlice,
-        header::CustomHeader,
+        header::Header,
         varriable_char_array::{VarriableCharArray, DEFAULT},
     },
     model::Model,
     resources::utils::row_parser,
+    tlk::Lookup,
 };
 
 //https://gibberlings3.github.io/iesdp/file_formats/ie_formats/ids.htm
 #[derive(Debug, Serialize)]
 pub struct Ids {
-    pub header: CustomHeader<3, 4>,
+    pub header: Header<3, 4>,
     pub data_entries: Vec<DataEntry>,
 }
 
@@ -27,16 +28,15 @@ pub struct DataEntry {
 
 impl Model for Ids {
     fn new(buffer: &[u8]) -> Self {
-        // Parse Headers
         let (headers, mut end) = row_parser(buffer, 0);
 
         let signature = headers.first().unwrap_or(DEFAULT);
-        let header = CustomHeader {
+        let header = Header {
             signature: FixedCharSlice::<3>::try_from(signature).unwrap_or_default(),
             version: FixedCharSlice::<4>::try_from(headers.last().unwrap_or(signature))
                 .unwrap_or_default(),
         };
-        // Parse Values
+
         let mut data_entries = vec![];
         while end < buffer.len() {
             let (row, row_end) = row_parser(buffer, end);
@@ -57,8 +57,12 @@ impl Model for Ids {
         }
     }
 
-    fn create_as_box(buffer: &[u8]) -> std::rc::Rc<dyn Model> {
+    fn create_as_rc(buffer: &[u8]) -> std::rc::Rc<dyn Model> {
         Rc::new(Self::new(buffer))
+    }
+
+    fn name(&self, lookup: &Lookup) -> String {
+        todo!()
     }
 }
 
@@ -82,7 +86,7 @@ mod tests {
 
         assert_eq!(
             item.header,
-            CustomHeader {
+            Header {
                 version: "V1.0".into(),
                 signature: "IDS".into(),
             }

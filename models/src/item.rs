@@ -5,8 +5,10 @@ use serde::Serialize;
 use crate::common::feature_block::FeatureBlock;
 use crate::common::fixed_char_array::FixedCharSlice;
 use crate::common::fixed_char_nd_array::FixedCharNDArray;
+use crate::common::header::Header;
 use crate::model::Model;
 use crate::resources::utils::{copy_buff_to_struct, copy_transmute_buff};
+use crate::tlk::Lookup;
 
 //https://gibberlings3.github.io/iesdp/file_formats/ie_formats/itm_v1.htm
 #[derive(Debug, Serialize)]
@@ -34,8 +36,35 @@ impl Model for Item {
             equiping_feature_blocks,
         }
     }
-    fn create_as_box(buffer: &[u8]) -> Rc<dyn Model> {
+    fn create_as_rc(buffer: &[u8]) -> Rc<dyn Model> {
         Rc::new(Self::new(buffer))
+    }
+
+    fn name(&self, lookup: &Lookup) -> String {
+        let name = if self.header.identified_item_name > -1
+            && self.header.identified_item_name < lookup.data_entries.len() as i32
+        {
+            lookup
+                .data_entries
+                .get(self.header.identified_item_name as usize)
+                .unwrap()
+                .strings
+                .to_string()
+        } else if self.header.unidentified_item_name > -1
+            && self.header.unidentified_item_name < lookup.data_entries.len() as i32
+        {
+            lookup
+                .data_entries
+                .get(self.header.unidentified_item_name as usize)
+                .unwrap()
+                .strings
+                .to_string()
+        } else {
+            format!("{}", { self.header.identified_item_name })
+        }
+        .to_ascii_lowercase()
+        .replace(' ', "_");
+        format!("{}.spl", name)
     }
 }
 
@@ -43,10 +72,9 @@ impl Model for Item {
 #[repr(C, packed)]
 #[derive(Debug, Copy, Clone, Serialize)]
 pub struct ItemHeader {
-    signature: FixedCharSlice<4>,
-    version: FixedCharSlice<4>,
-    unidentified_item_name: FixedCharSlice<4>,
-    identified_item_name: FixedCharSlice<4>,
+    header: Header<4, 4>,
+    unidentified_item_name: i32,
+    identified_item_name: i32,
     replacement_item: FixedCharSlice<8>,
     // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/itm_v1.htm#Header_Flags
     type_flags: u32,
@@ -72,8 +100,8 @@ pub struct ItemHeader {
     lore: u16,
     ground_icon: FixedCharSlice<8>,
     base_weight: u32,
-    item_description_generic: FixedCharSlice<4>,
-    item_description_identified: FixedCharSlice<4>,
+    item_description_generic: i32,
+    item_description_identified: i32,
     description_icon: FixedCharSlice<8>,
     enchantment: u32,
     offset_to_extended_headers: i32,
@@ -138,6 +166,7 @@ mod tests {
             .read_to_end(&mut buffer)
             .expect("Could not read to buffer");
         let item = Item::new(&buffer);
+        assert_eq!({ item.header.identified_item_name }, -1);
         assert_eq!({ item.header.max_stackable }, 1);
         assert_eq!({ item.extended_headers[0].attack_type }, 3);
         assert_eq!({ item.extended_headers[0].max_charges }, 2);

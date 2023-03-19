@@ -1,6 +1,6 @@
 use std::{
     mem::{size_of, ManuallyDrop},
-    ptr,
+    ptr, vec,
 };
 
 use crate::common::varriable_char_array::VarriableCharArray;
@@ -39,6 +39,21 @@ pub fn copy_transmute_buff<T>(buffer: &[u8], start: usize, count: usize) -> Vec<
 
 const CARRAGE_RETURN: u8 = 0xD;
 const NEW_LINE: u8 = 0xA;
+
+pub fn dumb_row_parser(buffer: &[u8]) -> Vec<VarriableCharArray> {
+    buffer
+        .iter()
+        .fold(vec![], |mut acc: Vec<VarriableCharArray>, x: &u8| {
+            match x {
+                x if x == &NEW_LINE || x == &CARRAGE_RETURN => {
+                    acc.push(VarriableCharArray(vec![32]))
+                }
+                x if acc.last().is_some() => acc.last_mut().unwrap().0.push(*x),
+                _ => acc.push(VarriableCharArray(vec![*x])),
+            }
+            acc
+        })
+}
 
 pub fn row_parser(buffer: &[u8], row_start: usize) -> (Vec<VarriableCharArray>, usize) {
     if let Some(end) = buffer

@@ -12,9 +12,10 @@ use models::{
     from_buffer,
     key::Key,
     resources::types::{extention_to_resource_type, ResourceType},
+    tlk::Lookup,
 };
 
-pub fn from_file(path: &Path) -> Vec<u8> {
+fn from_file(path: &Path) -> Vec<u8> {
     let file = File::open(path).unwrap_or_else(|_| panic!("Could not open file: {:#?}", path));
     let mut reader = BufReader::new(file);
     let mut buffer = Vec::new();
@@ -22,6 +23,11 @@ pub fn from_file(path: &Path) -> Vec<u8> {
         .read_to_end(&mut buffer)
         .expect("Could not read to buffer");
     buffer
+}
+
+fn parse_tlk_file(path: &Path) -> Lookup {
+    let buffer = from_file(path);
+    Lookup::new(&buffer)
 }
 
 fn parse_key_file(path: &Path, buffer: &[u8]) -> Vec<Biff> {
@@ -59,9 +65,10 @@ fn get_model_from_file(path: &Path) -> Vec<Biff> {
     }
 }
 
-pub fn read_files(args: &Args) -> Vec<Biff> {
+pub fn read_files(args: &Args) -> (Vec<Biff>, Option<Lookup>) {
     let dir_or_file = &args.resource_file_or_dir;
-    if dir_or_file.is_dir() {
+
+    let biffs = if dir_or_file.is_dir() {
         let paths = fs::read_dir(dir_or_file).expect("Could not read files in directory");
         paths
             .into_iter()
@@ -72,5 +79,19 @@ pub fn read_files(args: &Args) -> Vec<Biff> {
             .collect()
     } else {
         get_model_from_file(dir_or_file)
-    }
+    };
+
+    let lookup = match args.process_tlk {
+        true if dir_or_file.parent().is_some() => {
+            let game_directory = dir_or_file.parent().unwrap();
+            let tlk_path = game_directory
+                .join("lang")
+                .join(args.game_lang.clone())
+                .join("dialog.tlk");
+            Some(parse_tlk_file(&tlk_path))
+        }
+        _ => None,
+    };
+
+    (biffs, lookup)
 }
