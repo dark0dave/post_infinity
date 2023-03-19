@@ -73,8 +73,8 @@ impl Model for Creature {
 #[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
 pub struct BGEECreature {
     pub header: Header<4, 4>,
-    pub long_creature_name: FixedCharSlice<4>,
-    pub short_creature_name: FixedCharSlice<4>,
+    pub long_creature_name: u32,
+    pub short_creature_name: u32,
 
     // see CRE_FLAG_* above for possible flags
     pub flags: u32,
