@@ -46,6 +46,7 @@ impl<const N: usize> Display for SignedFixedCharSlice<{ N }> {
                 slice::from_raw_parts({ self.0 }.as_ptr() as *const u8, { self.0 }.len())
             })
             .unwrap_or_default()
+            .replace('\0', "")
         )
     }
 }
@@ -87,7 +88,7 @@ mod tests {
             SignedFixedCharSlice::<7>::try_from(from)
                 .unwrap_or_default()
                 .to_string(),
-            "BALDUR\0"
+            "BALDUR"
         )
     }
 

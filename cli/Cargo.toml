@@ -7,5 +7,6 @@ edition = "2021"
 
 [dependencies]
 clap = { version = "4.0", features = ["derive"] }
+erased-serde = "0.3"
 models = { path = "../models" }
 serde_json = "1.0"
