@@ -15,6 +15,8 @@ use models::{
     tlk::Lookup,
 };
 
+use erased_serde::Serializer;
+
 fn from_file(path: &Path) -> Vec<u8> {
     let file = File::open(path).unwrap_or_else(|_| panic!("Could not open file: {:#?}", path));
     let mut reader = BufReader::new(file);
@@ -52,17 +54,27 @@ fn get_model_from_file(path: &Path) -> Vec<Biff> {
         .unwrap_or_default()
         .to_ascii_lowercase();
     let resource_type = extention_to_resource_type(&extention);
+
     // Non resource types
     if resource_type == ResourceType::NotFound {
-        match extention.as_str() {
+        return match extention.as_str() {
             "key" => parse_key_file(path, &buffer),
             "biff" => vec![Biff::new(&from_file(path))],
+            "json" => panic!(),
             _ => panic!("Unprocessable file type: {:?}", path.as_os_str()),
-        }
-    } else {
-        println!("Processed {:#?}", from_buffer(&buffer, resource_type));
-        exit(0)
+        };
     }
+
+    let buffer = from_buffer(&buffer, resource_type).expect("Could not parse file");
+    let file_name = Path::new(path.file_stem().unwrap_or_default()).with_extension("json");
+    if let Ok(file) = File::create(file_name) {
+        let mut json = serde_json::Serializer::new(file);
+        let mut format = <dyn Serializer>::erase(&mut json);
+        if let Err(err) = buffer.erased_serialize(&mut format) {
+            panic!("{}", err);
+        }
+    }
+    exit(0)
 }
 
 pub fn read_files(args: &Args) -> (Vec<Biff>, Option<Lookup>) {

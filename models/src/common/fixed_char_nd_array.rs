@@ -38,6 +38,7 @@ impl<const N: usize, const M: usize> Display for FixedCharNDArray<N, M> {
                 .map(|array| format!("{}", array))
                 .reduce(|a, b| format!("{}, {}", a, b))
                 .unwrap_or_default()
+                .replace('\0', "")
         )
     }
 }
@@ -74,7 +75,7 @@ mod tests {
     #[test]
     fn valid_longer_from_bytes() {
         let from = "BALDUR".as_bytes();
-        assert_eq!(FixedCharNDArray::<7, 1>::from(from).to_string(), "BALDUR\0")
+        assert_eq!(FixedCharNDArray::<7, 1>::from(from).to_string(), "BALDUR")
     }
 
     #[test]
@@ -97,7 +98,7 @@ mod tests {
         let from = "BALDURBALDURBALDUR".as_bytes();
         assert_eq!(
             FixedCharNDArray::<7, 3>::from(from).to_string(),
-            "BALDURB, ALDURBA, LDUR\0\0\0"
+            "BALDURB, ALDURBA, LDUR"
         )
     }
 

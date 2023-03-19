@@ -39,7 +39,9 @@ impl<const N: usize> Display for FixedCharSlice<{ N }> {
         write!(
             f,
             "{}",
-            std::str::from_utf8(&{ self.0 }).unwrap_or_default()
+            std::str::from_utf8(&{ self.0 })
+                .unwrap_or_default()
+                .replace('\0', "")
         )
     }
 }
@@ -96,7 +98,7 @@ mod tests {
             FixedCharSlice::<7>::try_from(from)
                 .unwrap_or_default()
                 .to_string(),
-            "BALDUR\0"
+            "BALDUR"
         )
     }
 
