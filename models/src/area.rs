@@ -105,7 +105,7 @@ impl Model for Area {
         Rc::new(Self::new(buffer))
     }
 
-    fn name(&self, lookup: &Lookup) -> String {
+    fn name(&self, _lookup: &Lookup) -> String {
         self.header.area_wed.to_string().replace(".WED", ".ARE")
     }
 }

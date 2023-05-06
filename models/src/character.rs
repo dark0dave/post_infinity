@@ -35,7 +35,7 @@ impl Model for ExpandedCharacter {
         Rc::new(Self::new(buffer))
     }
 
-    fn name(&self, lookup: &Lookup) -> String {
+    fn name(&self, _lookup: &Lookup) -> String {
         todo!()
     }
 }
@@ -44,7 +44,7 @@ impl Model for ExpandedCharacter {
 #[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
 pub struct BGCharacter {
     pub header: Header<4, 4>,
-    pub name: u32,
+    pub name: FixedCharSlice<32>,
     pub offset_to_cre_structure: i32,
     pub length_of_the_cre_structure: i32,
     pub index_into_slots_ids_for_quick_weapon_1: i16,

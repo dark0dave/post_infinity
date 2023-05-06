@@ -52,7 +52,7 @@ impl Model for WorldMap {
         Rc::new(Self::new(buffer))
     }
 
-    fn name(&self, lookup: &Lookup) -> String {
+    fn name(&self, _lookup: &Lookup) -> String {
         todo!()
     }
 }

@@ -51,7 +51,7 @@ impl Model for Store {
         Rc::new(Self::new(buffer))
     }
 
-    fn name(&self, lookup: &Lookup) -> String {
+    fn name(&self, _lookup: &Lookup) -> String {
         self.store_header.name.to_string()
     }
 }

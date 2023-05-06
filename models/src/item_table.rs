@@ -142,7 +142,7 @@ impl Model for ItemReferenceTable {
         Rc::new(Self::new(buffer))
     }
 
-    fn name(&self, lookup: &Lookup) -> String {
+    fn name(&self, _lookup: &Lookup) -> String {
         self.resource_name.to_string()
     }
 }
@@ -202,7 +202,7 @@ impl Model for ItemSlotTable {
         Rc::new(Self::new(buffer))
     }
 
-    fn name(&self, lookup: &Lookup) -> String {
+    fn name(&self, _lookup: &Lookup) -> String {
         todo!()
     }
 }

@@ -63,7 +63,7 @@ impl Model for Creature {
         Rc::new(Self::new(buffer))
     }
 
-    fn name(&self, lookup: &Lookup) -> String {
+    fn name(&self, _lookup: &Lookup) -> String {
         self.header.dialog_ref.to_string()
     }
 }
