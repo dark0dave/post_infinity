@@ -71,7 +71,6 @@ pub struct EffectV2Body {
     pub target_x_coordinate: i32,
     pub target_y_coordinate: i32,
     pub parent_resource_type: u32,
-    // ALLCAPS for this feild
     pub parent_resource: FixedCharSlice<8>,
     pub parent_resource_flags: FixedCharSlice<4>,
     pub projectile: u32,
@@ -81,8 +80,9 @@ pub struct EffectV2Body {
     pub first_apply: u32,
     // https://gibberlings3.github.io/iesdp/files/2da/2da_bgee/msectype.htm
     pub secondary_type: u32,
+    // Drop last u8 breaks BGEE parsing
     #[serde(skip_serializing)]
-    _unknown_2: [u32; 15],
+    _unknown_2: [u32; 14],
 }
 
 #[cfg(test)]
@@ -156,7 +156,7 @@ mod tests {
                     caster_level: 0,
                     first_apply: 0,
                     secondary_type: 0,
-                    _unknown_2: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
+                    _unknown_2: [0; 14],
                 },
             }
         )

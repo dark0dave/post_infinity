@@ -48,18 +48,14 @@ impl Model for Game {
         let start: usize = usize::try_from(header.offset_to_familar).unwrap_or(0);
         let familiar = copy_buff_to_struct::<Familiar>(buffer, start);
 
-        let exists =
-            usize::try_from(familiar.offset_to_familiar_resources).unwrap_or(0) - buffer.len();
-        let familiar_extra = if exists > 0 {
-            let start: usize = usize::try_from(familiar.offset_to_familiar_resources).unwrap_or(0);
-            let count: usize = exists / size_of::<FamiliarExtra>();
-            if count > 0 {
+        let familiar_extra = match usize::try_from(familiar.offset_to_familiar_resources) {
+            Ok(offset) if offset < buffer.len() => {
+                let start: usize =
+                    usize::try_from(familiar.offset_to_familiar_resources).unwrap_or(0);
+                let count: usize = (buffer.len() - offset) / size_of::<FamiliarExtra>();
                 copy_transmute_buff::<FamiliarExtra>(buffer, start, count)
-            } else {
-                vec![]
             }
-        } else {
-            vec![]
+            _ => vec![],
         };
 
         let start: usize = usize::try_from(header.offset_to_stored_locations).unwrap_or(0);
