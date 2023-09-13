@@ -18,9 +18,7 @@ cargo run <path to chitin.key> / or target file
 
 Example:
 
-<video controls>
-  <source src="docs/example.webm" type="video/webm">
-</video>
+[example.webm](https://github.com/dark0dave/post_infinity/assets/52840419/5d5974ad-83fe-4abd-b5fd-18c1b94ff49a)
 
 ```
 cargo run models/fixtures/gate1.spl
