@@ -9,7 +9,7 @@ pub struct Biography(pub VarriableCharArray);
 
 impl Model for Biography {
     fn new(buffer: &[u8]) -> Self {
-        Self(VarriableCharArray(buffer.to_vec()))
+        Self(VarriableCharArray(buffer.into()))
     }
 
     fn create_as_rc(buffer: &[u8]) -> Rc<dyn Model> {

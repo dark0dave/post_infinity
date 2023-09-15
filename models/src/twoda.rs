@@ -6,7 +6,7 @@ use serde::Serialize;
 
 use crate::common::fixed_char_array::FixedCharSlice;
 use crate::common::header::Header;
-use crate::common::varriable_char_array::{VarriableCharArray, DEFAULT};
+use crate::common::varriable_char_array::VarriableCharArray;
 use crate::model::Model;
 use crate::resources::utils::row_parser;
 use crate::tlk::Lookup;
@@ -46,13 +46,22 @@ impl Model for TwoDA {
             }
             end = row_end;
         }
+
+        let signature = if let Some(_) = headers.first() {
+            FixedCharSlice::<3>::from(&buffer[0..3])
+        } else {
+            FixedCharSlice::<3>::default()
+        };
+        let version = match headers.last() {
+            Some(x) if FixedCharSlice::<4>::try_from(x).is_ok() => {
+                FixedCharSlice::<4>::try_from(x).unwrap()
+            }
+            _ => FixedCharSlice::<4>::from(signature.0.as_ref()),
+        };
+        let header = Header { signature, version };
+
         Self {
-            header: Header {
-                signature: FixedCharSlice::<3>::try_from(headers.first().unwrap_or(DEFAULT))
-                    .unwrap_or_else(|_| "2DA".into()),
-                version: FixedCharSlice::<4>::try_from(headers.last().unwrap_or(DEFAULT))
-                    .unwrap_or_default(),
-            },
+            header,
             default_value: default_values.first().unwrap().clone(),
             data_entries: DataEntry {
                 data_entry_headers,
@@ -72,8 +81,6 @@ impl Model for TwoDA {
 
 #[cfg(test)]
 mod tests {
-
-    use crate::common::varriable_char_array::DEFAULT;
 
     use super::*;
     use std::{
@@ -102,12 +109,12 @@ mod tests {
             item.data_entries
                 .data_entry_headers
                 .first()
-                .unwrap_or(DEFAULT)
+                .unwrap()
                 .to_string(),
             "VALUE"
         );
         let last_values = item.data_entries.values.last().unwrap();
-        assert_eq!(last_values.first().unwrap_or(DEFAULT).to_string(), "SHAMAN");
-        assert_eq!(last_values.last().unwrap_or(DEFAULT).to_string(), "-1");
+        assert_eq!(last_values.first().unwrap().to_string(), "SHAMAN");
+        assert_eq!(last_values.last().unwrap().to_string(), "-1");
     }
 }
