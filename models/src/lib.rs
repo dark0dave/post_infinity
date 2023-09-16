@@ -90,5 +90,6 @@ pub fn from_buffer(buffer: &[u8], resource_type: ResourceType) -> Option<Rc<dyn 
         // Skipping sounds/ out of dialog text
         ResourceType::FileTypeSrc => None,
         ResourceType::NotFound => None,
+        _ => None,
     }
 }

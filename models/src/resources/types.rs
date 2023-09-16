@@ -40,7 +40,7 @@ pub enum ResourceType {
     FileTypePvrz = 0x0404,
     FileTypeGlsl = 0x0405,
     FileTypeMenu = 0x0408,
-    //FileTypeMenu2 = 0x0409,
+    FileTypeMenu2 = 0x0409,
     FileTypeTtf = 0x040a,
     FileTypePng = 0x040b,
     FileTypeBah = 0x044c,
