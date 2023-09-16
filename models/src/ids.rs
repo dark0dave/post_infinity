@@ -4,9 +4,7 @@ use serde::Serialize;
 
 use crate::{
     common::{
-        fixed_char_array::FixedCharSlice,
-        header::Header,
-        varriable_char_array::{VarriableCharArray, DEFAULT},
+        fixed_char_array::FixedCharSlice, header::Header, varriable_char_array::VarriableCharArray,
     },
     model::Model,
     resources::utils::row_parser,
@@ -30,12 +28,18 @@ impl Model for Ids {
     fn new(buffer: &[u8]) -> Self {
         let (headers, mut end) = row_parser(buffer, 0);
 
-        let signature = headers.first().unwrap_or(DEFAULT);
-        let header = Header {
-            signature: FixedCharSlice::<3>::try_from(signature).unwrap_or_default(),
-            version: FixedCharSlice::<4>::try_from(headers.last().unwrap_or(signature))
-                .unwrap_or_default(),
+        let signature = if let Some(_) = headers.first() {
+            FixedCharSlice::<3>::from(&buffer[0..3])
+        } else {
+            FixedCharSlice::<3>::default()
         };
+        let version = match headers.last() {
+            Some(x) if FixedCharSlice::<4>::try_from(x).is_ok() => {
+                FixedCharSlice::<4>::try_from(x).unwrap()
+            }
+            _ => FixedCharSlice::<4>::from(signature.0.as_ref()),
+        };
+        let header = Header { signature, version };
 
         let mut data_entries = vec![];
         while end < buffer.len() {

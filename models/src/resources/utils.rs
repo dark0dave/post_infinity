@@ -1,6 +1,8 @@
 use std::{
     mem::{size_of, ManuallyDrop},
-    ptr, vec,
+    ptr,
+    rc::Rc,
+    vec,
 };
 
 use crate::common::varriable_char_array::VarriableCharArray;
@@ -41,18 +43,23 @@ const CARRAGE_RETURN: u8 = 0xD;
 const NEW_LINE: u8 = 0xA;
 
 pub fn dumb_row_parser(buffer: &[u8]) -> Vec<VarriableCharArray> {
-    buffer
-        .iter()
-        .fold(vec![], |mut acc: Vec<VarriableCharArray>, x: &u8| {
-            match x {
-                x if x == &NEW_LINE || x == &CARRAGE_RETURN => {
-                    acc.push(VarriableCharArray(vec![32]))
-                }
-                x if acc.last().is_some() => acc.last_mut().unwrap().0.push(*x),
-                _ => acc.push(VarriableCharArray(vec![*x])),
+    let mut acc = vec![];
+    let mut pos = 0;
+    for (i, x) in buffer.iter().enumerate() {
+        if x == &NEW_LINE || x == &CARRAGE_RETURN {
+            if pos < i {
+                acc.push(VarriableCharArray(buffer.get(pos..i).unwrap().into()))
             }
-            acc
-        })
+            acc.push(VarriableCharArray(Rc::new([32])));
+            pos = i;
+        }
+    }
+    if pos < buffer.len() {
+        acc.push(VarriableCharArray(
+            buffer.get(pos..buffer.len()).unwrap().into(),
+        ))
+    }
+    acc
 }
 
 pub fn row_parser(buffer: &[u8], row_start: usize) -> (Vec<VarriableCharArray>, usize) {
@@ -70,7 +77,7 @@ pub fn row_parser(buffer: &[u8], row_start: usize) -> (Vec<VarriableCharArray>, 
                 if buff.is_empty() {
                     return None;
                 }
-                Some(VarriableCharArray(buff.to_vec()))
+                Some(VarriableCharArray(buff.into()))
             })
             .collect();
 

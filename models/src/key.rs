@@ -76,7 +76,7 @@ impl BiffIndex {
         let end = start + usize::try_from(header.file_name_length).unwrap_or(0);
         buffer.get(start..end).map(|buff| BiffIndex {
             header: *header,
-            name: VarriableCharArray(buff.to_vec()),
+            name: VarriableCharArray(buff.into()),
         })
     }
 }

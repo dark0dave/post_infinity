@@ -1,11 +1,12 @@
-use std::fmt::{Debug, Display};
+use std::{
+    fmt::{Debug, Display},
+    rc::Rc,
+};
 
 use serde::{Serialize, Serializer};
 
-pub const DEFAULT: &VarriableCharArray = &VarriableCharArray(vec![]);
-
 #[derive(PartialEq, Eq)]
-pub struct VarriableCharArray(pub Vec<u8>);
+pub struct VarriableCharArray(pub Rc<[u8]>);
 
 impl Display for VarriableCharArray {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -27,11 +28,10 @@ impl Debug for VarriableCharArray {
 
 impl From<&str> for VarriableCharArray {
     fn from(value: &str) -> Self {
-        Self(value.as_bytes().to_vec())
+        Self(value.as_bytes().into())
     }
 }
 
-// TODO: Make this less expensive
 impl Clone for VarriableCharArray {
     fn clone(&self) -> Self {
         Self(self.0.clone())
@@ -44,5 +44,19 @@ impl Serialize for VarriableCharArray {
         S: Serializer,
     {
         serializer.collect_str(&format!("{}", self))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn strips_nulls_and_returns() {
+        let from = "BALDUR\0";
+        let expected = "BALDUR";
+        assert_eq!(
+            VarriableCharArray(from.as_bytes().into()).to_string(),
+            expected
+        )
     }
 }

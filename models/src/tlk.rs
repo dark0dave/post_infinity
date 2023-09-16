@@ -79,7 +79,7 @@ impl TLKDataEntry {
             + usize::try_from(entry.offset_of_this_string_relative_to_the_strings_section)
                 .unwrap_or(0);
         let buff_end = buff_start + usize::try_from(entry.length_of_this_string).unwrap_or(0);
-        let strings = VarriableCharArray(buffer.get(buff_start..buff_end).unwrap().to_vec());
+        let strings = VarriableCharArray(buffer.get(buff_start..buff_end).unwrap().into());
 
         TLKDataEntry {
             entry: *entry,
