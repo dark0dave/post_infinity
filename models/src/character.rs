@@ -1,16 +1,15 @@
 use std::rc::Rc;
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
-use crate::resources::utils::copy_buff_to_struct;
+use crate::common::fixed_char_array::FixedCharSlice;
+use crate::common::signed_fixed_char_array::SignedFixedCharSlice;
+use crate::resources::utils::{copy_buff_to_struct, to_u8_slice};
 use crate::tlk::Lookup;
-use crate::{
-    common::{fixed_char_array::FixedCharSlice, header::Header},
-    creature::Creature,
-    model::Model,
-};
+use crate::{common::header::Header, creature::Creature, model::Model};
 
-#[derive(Debug, Serialize)]
+#[repr(C)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct ExpandedCharacter {
     pub character: BGCharacter,
     pub creature: Creature,
@@ -38,10 +37,17 @@ impl Model for ExpandedCharacter {
     fn name(&self, _lookup: &Lookup) -> String {
         todo!()
     }
+
+    fn to_bytes(&self) -> Vec<u8> {
+        let mut out = vec![];
+        out.extend(to_u8_slice(&self.character).to_vec());
+        out.extend(self.creature.to_bytes());
+        out
+    }
 }
 
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
 pub struct BGCharacter {
     pub header: Header<4, 4>,
     pub name: FixedCharSlice<32>,
@@ -55,9 +61,9 @@ pub struct BGCharacter {
     pub show_quick_weapon_2: i16,
     pub show_quick_weapon_3: i16,
     pub show_quick_weapon_4: i16,
-    pub quick_spell_1_resource: [i8; 8],
-    pub quick_spell_2_resource: [i8; 8],
-    pub quick_spell_3_resource: [i8; 8],
+    pub quick_spell_1_resource: SignedFixedCharSlice<8>,
+    pub quick_spell_2_resource: SignedFixedCharSlice<8>,
+    pub quick_spell_3_resource: SignedFixedCharSlice<8>,
     pub index_into_slot_ids_for_quick_item_1: i16,
     pub index_into_slot_ids_for_quick_item_2: i16,
     pub index_into_slot_ids_for_quick_item_3: i16,

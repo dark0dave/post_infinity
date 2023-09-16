@@ -1,27 +1,34 @@
 use std::{mem::size_of, rc::Rc};
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::common::header::Header;
-use crate::resources::utils::copy_buff_to_struct;
+use crate::resources::utils::{copy_buff_to_struct, to_u8_slice};
 use crate::tlk::Lookup;
 use crate::{common::fixed_char_array::FixedCharSlice, model::Model};
 
-#[derive(Debug, PartialEq, Eq, Serialize)]
+// https://gibberlings3.github.io/iesdp/file_formats/ie_formats/eff_v2.htm
+#[repr(C, packed)]
+#[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct EffectV2 {
-    // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/eff_v2.htm
-    pub effect_v2_header: Header<4, 4>,
+    pub header: Header<4, 4>,
+    #[serde(flatten)]
     pub body: EffectV2Body,
 }
 
 impl Model for EffectV2 {
     fn new(buffer: &[u8]) -> Self {
-        let effect_v2_header = copy_buff_to_struct::<Header<4, 4>>(buffer, 0);
-        let body = copy_buff_to_struct::<EffectV2Body>(buffer, size_of::<Header<4, 4>>());
-        Self {
-            effect_v2_header,
-            body,
-        }
+        let header = copy_buff_to_struct::<Header<4, 4>>(buffer, 0);
+        // There is one weird file in BG1, to do with Opcode 67
+        let tmp = if buffer.len() < 272 {
+            let mut temp = buffer.to_vec();
+            temp.extend([0 as u8]);
+            temp
+        } else {
+            buffer.to_vec()
+        };
+        let body = copy_buff_to_struct::<EffectV2Body>(&tmp, size_of::<Header<4, 4>>());
+        Self { header, body }
     }
 
     fn create_as_rc(buffer: &[u8]) -> Rc<dyn Model> {
@@ -31,13 +38,36 @@ impl Model for EffectV2 {
     fn name(&self, _lookup: &Lookup) -> String {
         todo!()
     }
+
+    fn to_bytes(&self) -> Vec<u8> {
+        let mut out = to_u8_slice(&self.header).to_vec();
+        out.extend(to_u8_slice(&self.body).to_vec());
+        out
+    }
+}
+
+// https://gibberlings3.github.io/iesdp/file_formats/ie_formats/cre_v1.htm#CREV1_0_Effects
+#[repr(C, packed)]
+#[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct EffectV2WithOutSubHeader {
+    pub header: Header<4, 4>,
+    #[serde(flatten)]
+    pub body: EffectV2BodyWithOutHeader,
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/eff_v2.htm#effv2_Body
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
 pub struct EffectV2Body {
+    #[serde(flatten)]
     pub header: Header<4, 4>,
+    #[serde(flatten)]
+    pub body: EffectV2BodyWithOutHeader,
+}
+
+#[repr(C, packed)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
+pub struct EffectV2BodyWithOutHeader {
     pub opcode_number: u32,
     pub target_type: u32,
     pub power: u32,
@@ -53,9 +83,9 @@ pub struct EffectV2Body {
     pub dice_sides: u32,
     pub saving_throw_type: u32,
     pub saving_throw_bonus: u32,
-    pub speacial: u32,
+    pub special: u32,
     pub primary_spell_school: u32,
-    #[serde(skip_serializing)]
+    #[serde(skip)]
     _unknown_1: u32,
     pub parent_resource_lowest_affected_level: u32,
     pub parent_resource_highest_affected_level: u32,
@@ -80,9 +110,8 @@ pub struct EffectV2Body {
     pub first_apply: u32,
     // https://gibberlings3.github.io/iesdp/files/2da/2da_bgee/msectype.htm
     pub secondary_type: u32,
-    // Drop last u8 breaks BGEE parsing
-    #[serde(skip_serializing)]
-    _unknown_2: [u32; 14],
+    #[serde(skip)]
+    _unknown_2: [u32; 15],
 }
 
 #[cfg(test)]
@@ -93,6 +122,12 @@ mod tests {
         fs::File,
         io::{BufReader, Read},
     };
+
+    #[test]
+    fn valid_sizes() {
+        assert_eq!(std::mem::size_of::<EffectV2>(), 272);
+        assert_eq!(std::mem::size_of::<EffectV2WithOutSubHeader>(), 264)
+    }
 
     #[test]
     fn valid_simple_creature_file_header_parsed() {
@@ -107,7 +142,7 @@ mod tests {
         assert_eq!(
             EffectV2::new(&buffer),
             EffectV2 {
-                effect_v2_header: Header {
+                header: Header {
                     signature: "EFF ".into(),
                     version: "V2.0".into(),
                 },
@@ -116,47 +151,49 @@ mod tests {
                         signature: "EFF ".into(),
                         version: "V2.0".into(),
                     },
-                    opcode_number: 98,
-                    target_type: 2,
-                    power: 0,
-                    parameter_1: 6,
-                    parameter_2: 4,
-                    timing_mode: 0,
-                    timing: 0,
-                    duration: 120,
-                    probability_1: 100,
-                    probability_2: 0,
-                    resource_1: FixedCharSlice::default(),
-                    dice_thrown: 0,
-                    dice_sides: 0,
-                    saving_throw_type: 0,
-                    saving_throw_bonus: 0,
-                    speacial: 0,
-                    primary_spell_school: 0,
-                    _unknown_1: 0,
-                    parent_resource_lowest_affected_level: 0,
-                    parent_resource_highest_affected_level: 0,
-                    dispel_resistance: 0,
-                    parameter_3: 5,
-                    parameter_4: 0,
-                    parameter_5: 0,
-                    time_applied_ticks: 0,
-                    resource_2: FixedCharSlice::default(),
-                    resource_3: FixedCharSlice::default(),
-                    caster_x_coordinate: -1,
-                    caster_y_coordinate: -1,
-                    target_x_coordinate: -1,
-                    target_y_coordinate: -1,
-                    parent_resource_type: 0,
-                    parent_resource: FixedCharSlice::default(),
-                    parent_resource_flags: FixedCharSlice::default(),
-                    projectile: 0,
-                    parent_resource_slot: -1,
-                    variable_name: "".into(),
-                    caster_level: 0,
-                    first_apply: 0,
-                    secondary_type: 0,
-                    _unknown_2: [0; 14],
+                    body: EffectV2BodyWithOutHeader {
+                        opcode_number: 98,
+                        target_type: 2,
+                        power: 0,
+                        parameter_1: 6,
+                        parameter_2: 4,
+                        timing_mode: 0,
+                        timing: 0,
+                        duration: 120,
+                        probability_1: 100,
+                        probability_2: 0,
+                        resource_1: FixedCharSlice::default(),
+                        dice_thrown: 0,
+                        dice_sides: 0,
+                        saving_throw_type: 0,
+                        saving_throw_bonus: 0,
+                        special: 0,
+                        primary_spell_school: 0,
+                        _unknown_1: 0,
+                        parent_resource_lowest_affected_level: 0,
+                        parent_resource_highest_affected_level: 0,
+                        dispel_resistance: 0,
+                        parameter_3: 5,
+                        parameter_4: 0,
+                        parameter_5: 0,
+                        time_applied_ticks: 0,
+                        resource_2: FixedCharSlice::default(),
+                        resource_3: FixedCharSlice::default(),
+                        caster_x_coordinate: -1,
+                        caster_y_coordinate: -1,
+                        target_x_coordinate: -1,
+                        target_y_coordinate: -1,
+                        parent_resource_type: 0,
+                        parent_resource: FixedCharSlice::default(),
+                        parent_resource_flags: FixedCharSlice::default(),
+                        projectile: 0,
+                        parent_resource_slot: -1,
+                        variable_name: "".into(),
+                        caster_level: 0,
+                        first_apply: 0,
+                        secondary_type: 0,
+                        _unknown_2: [0; 15],
+                    }
                 },
             }
         )

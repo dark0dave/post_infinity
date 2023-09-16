@@ -1,6 +1,6 @@
 use std::fmt::{Debug, Display};
 
-use serde::{ser::SerializeSeq, Serialize, Serializer};
+use serde::{de::Visitor, ser::SerializeSeq, Deserialize, Serialize, Serializer};
 
 use super::fixed_char_array::FixedCharSlice;
 
@@ -54,6 +54,7 @@ impl<const N: usize, const M: usize> Serialize for FixedCharNDArray<N, M> {
     where
         S: Serializer,
     {
+        // TODO: Fix this crap
         let mut seq = serializer.serialize_seq(Some({ self.0 }.len())).unwrap();
         for char_slice in self.0 {
             let _ = seq.serialize_element(&char_slice);
@@ -62,8 +63,42 @@ impl<const N: usize, const M: usize> Serialize for FixedCharNDArray<N, M> {
     }
 }
 
+struct FixedCharNDArrayVisitor<const N: usize, const M: usize>;
+
+impl<'de, const N: usize, const M: usize> Visitor<'de> for FixedCharNDArrayVisitor<N, M> {
+    type Value = FixedCharNDArray<N, M>;
+
+    fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(formatter, "struct FixedCharNDArray")
+    }
+
+    fn visit_seq<A>(self, mut seq: A) -> Result<Self::Value, A::Error>
+    where
+        A: serde::de::SeqAccess<'de>,
+    {
+        let mut destination = FixedCharNDArray::<N, M>::default();
+        let mut counter = 0;
+        while let Ok(Some(item)) = seq.next_element::<FixedCharSlice<N>>() {
+            destination.0[counter] = item;
+            counter += 1;
+        }
+        Ok(destination)
+    }
+}
+
+impl<'de, const N: usize, const M: usize> Deserialize<'de> for FixedCharNDArray<N, M> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        deserializer.deserialize_seq(FixedCharNDArrayVisitor)
+    }
+}
+
 #[cfg(test)]
 mod tests {
+
+    use std::io::{BufReader, Read, Seek, SeekFrom, Write};
 
     use super::*;
     #[test]
@@ -109,5 +144,25 @@ mod tests {
             FixedCharNDArray::<5, 4>::from(from).to_string(),
             "BALDU, RBALD, URBAL, DURBA"
         )
+    }
+
+    #[test]
+    fn deserialize_serialize_deserialize() {
+        let from = "BALDUR".as_bytes();
+        let expected = FixedCharNDArray::<3, 2>::from(from);
+        let value = serde_json::to_string(&expected).unwrap();
+
+        let mut file = tempfile::tempfile().unwrap();
+        file.write_all(value.as_bytes()).unwrap();
+
+        file.seek(SeekFrom::Start(0)).unwrap();
+        let mut buffer = Vec::new();
+        let mut reader = BufReader::new(file);
+        reader
+            .read_to_end(&mut buffer)
+            .expect("Could not read to buffer");
+
+        let result: FixedCharNDArray<3, 2> = serde_json::from_slice(&buffer).unwrap();
+        assert_eq!(expected, result)
     }
 }

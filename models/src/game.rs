@@ -1,19 +1,23 @@
 use std::{mem::size_of, rc::Rc};
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::common::header::Header;
 use crate::common::signed_fixed_char_array::SignedFixedCharSlice;
-use crate::resources::utils::{copy_buff_to_struct, copy_transmute_buff};
+use crate::resources::utils::{
+    copy_buff_to_struct, copy_transmute_buff, to_u8_slice, vec_to_u8_slice,
+};
 use crate::tlk::Lookup;
 use crate::{common::fixed_char_array::FixedCharSlice, creature::Creature, model::Model};
 
-#[derive(Debug, Serialize)]
+// https://gibberlings3.github.io/iesdp/file_formats/ie_formats/gam_v2.0.htm
+#[repr(C)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Game {
     pub header: BGEEGameHeader,
     pub party_npcs: Vec<Npc>,
     pub non_party_npcs: Vec<Npc>,
-    pub global_varriables: Vec<GlobalVarriables>,
+    pub global_variables: Vec<GlobalVariables>,
     pub journal_entries: Vec<JournalEntries>,
     pub familiar: Familiar,
     pub stored_locations: Vec<Location>,
@@ -38,7 +42,7 @@ impl Model for Game {
         let start: usize =
             usize::try_from(header.offset_to_global_namespace_variables).unwrap_or(0);
         let count: usize = usize::try_from(header.count_of_global_namespace_variables).unwrap_or(0);
-        let global_varriables = copy_transmute_buff::<GlobalVarriables>(buffer, start, count);
+        let global_varriables = copy_transmute_buff::<GlobalVariables>(buffer, start, count);
 
         let start: usize = usize::try_from(header.offset_to_journal_entries).unwrap_or(0);
         let count: usize = usize::try_from(header.count_of_journal_entries).unwrap_or(0);
@@ -70,7 +74,7 @@ impl Model for Game {
             header,
             party_npcs,
             non_party_npcs,
-            global_varriables,
+            global_variables: global_varriables,
             journal_entries,
             familiar,
             stored_locations,
@@ -85,11 +89,24 @@ impl Model for Game {
     fn name(&self, _lookup: &Lookup) -> String {
         "BALDUR.GAM".to_string()
     }
+
+    fn to_bytes(&self) -> Vec<u8> {
+        let mut out = to_u8_slice(&self.header).to_vec();
+        out.extend(vec_to_u8_slice(&self.party_npcs));
+        out.extend(vec_to_u8_slice(&self.non_party_npcs));
+        out.extend(vec_to_u8_slice(&self.global_variables));
+        out.extend(vec_to_u8_slice(&self.journal_entries));
+        out.extend(to_u8_slice(&self.familiar));
+        out.extend(vec_to_u8_slice(&self.stored_locations));
+        out.extend(vec_to_u8_slice(&self.pocket_plane_locations));
+        out.extend(vec_to_u8_slice(&self.familiar_extra));
+        out
+    }
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/gam_v2.0.htm#GAMEV2_0_Header
 #[repr(C, packed)]
-#[derive(Debug, Copy, Clone, Serialize)]
+#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 pub struct BGEEGameHeader {
     pub header: Header<4, 4>,
     pub game_time: u32,
@@ -145,7 +162,7 @@ pub struct BGEEGameHeader {
     pub random_encounter_script: [u8; 20],
 }
 
-#[derive(Debug, PartialEq, Eq, Serialize)]
+#[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Npc {
     pub game_npc: GameNPC,
     pub creature: Creature,
@@ -169,7 +186,7 @@ fn generate_npcs(buffer: &[u8], start: usize, count: usize) -> Vec<Npc> {
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/gam_v2.0.htm#GAMEV2_0_NPC
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
 pub struct GameNPC {
     pub character_selection: u16,
     // x0-0x5 = player_x_fill, 0x_ffff = not in party
@@ -227,7 +244,7 @@ pub struct GameNPC {
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/gam_v2.0.htm#GAMEV2_0_Stats
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
 pub struct CharacterKillStats {
     pub most_powerful_vanquished_name: SignedFixedCharSlice<4>,
     pub most_powerful_vanquished_xp_reward: u32,
@@ -253,9 +270,9 @@ pub struct CharacterKillStats {
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/gam_v2.0.htm#GAMEV2_0_Variable
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
-pub struct GlobalVarriables {
-    pub name: [i8; 32],
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
+pub struct GlobalVariables {
+    pub name: SignedFixedCharSlice<32>,
     /*
       bit 0: int
       bit 1: float
@@ -264,17 +281,17 @@ pub struct GlobalVarriables {
       bit 4: strref
       bit 5: dword
     */
-    pub varriable_type: [i8; 2],
+    pub variable_type: i16,
     pub resource_value: i16,
     pub dword_value: i32,
     pub int_value: i32,
     pub double_value: i64,
-    pub script_name_value: [i8; 32],
+    pub script_name_value: SignedFixedCharSlice<32>,
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/gam_v2.0.htm#GAMEV2_0_Journal
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
 pub struct JournalEntries {
     pub journal_text: FixedCharSlice<4>,
     // seconds
@@ -295,7 +312,7 @@ pub struct JournalEntries {
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/gam_v2.0.htm#GAMEV2_0_Familiar
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
 pub struct Familiar {
     pub lawful_good_familiar: FixedCharSlice<8>,
     pub lawful_neutral_familiar: FixedCharSlice<8>,
@@ -307,21 +324,21 @@ pub struct Familiar {
     pub chaotic_neutral_familiar: FixedCharSlice<8>,
     pub chaotic_evil_familiar: FixedCharSlice<8>,
     pub offset_to_familiar_resources: i32,
-    pub lg_familiar_spell_count: [u32; 9],
-    pub ln_familiar_spell_count: [u32; 9],
-    pub cg_familiar_spell_count: [u32; 9],
-    pub ng_familiar_spell_count: [u32; 9],
-    pub tn_familiar_spell_count: [u32; 9],
-    pub ne_familiar_spell_count: [u32; 9],
-    pub le_familiar_spell_count: [u32; 9],
-    pub cn_familiar_spell_count: [u32; 9],
-    pub ce_familiar_spell_count: [u32; 9],
+    pub lg_familiar_spell_count: FixedCharSlice<9>,
+    pub ln_familiar_spell_count: FixedCharSlice<9>,
+    pub cg_familiar_spell_count: FixedCharSlice<9>,
+    pub ng_familiar_spell_count: FixedCharSlice<9>,
+    pub tn_familiar_spell_count: FixedCharSlice<9>,
+    pub ne_familiar_spell_count: FixedCharSlice<9>,
+    pub le_familiar_spell_count: FixedCharSlice<9>,
+    pub cn_familiar_spell_count: FixedCharSlice<9>,
+    pub ce_familiar_spell_count: FixedCharSlice<9>,
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/gam_v2.0.htm#GAMEV2_0_Stored
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/gam_v2.0.htm#GAMEV2_0_PocketPlane
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
 pub struct Location {
     pub area: [i8; 8],
     pub x_coordinate: i16,
@@ -330,7 +347,7 @@ pub struct Location {
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/gam_v2.0.htm#GAMEV2_0_FamiliarExtra
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
 pub struct FamiliarExtra {
     pub data: [i8; 8],
 }

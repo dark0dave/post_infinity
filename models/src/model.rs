@@ -14,4 +14,5 @@ pub trait Model: Debug + Serialize {
     fn new(buffer: &[u8]) -> Self
     where
         Self: Sized;
+    fn to_bytes(&self) -> Vec<u8>;
 }

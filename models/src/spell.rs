@@ -1,17 +1,19 @@
 use std::rc::Rc;
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::common::feature_block::FeatureBlock;
 use crate::common::fixed_char_array::FixedCharSlice;
 use crate::common::header::Header;
 use crate::common::signed_fixed_char_array::SignedFixedCharSlice;
 use crate::model::Model;
-use crate::resources::utils::{copy_buff_to_struct, copy_transmute_buff};
+use crate::resources::utils::{
+    copy_buff_to_struct, copy_transmute_buff, to_u8_slice, vec_to_u8_slice,
+};
 use crate::tlk::Lookup;
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/spl_v1.htm
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Spell {
     pub header: SpellHeader,
     pub extended_headers: Vec<SpellExtendedHeader>,
@@ -27,7 +29,7 @@ impl Model for Spell {
         let extended_headers = copy_transmute_buff::<SpellExtendedHeader>(buffer, start, count);
 
         let start = usize::try_from(header.offset_to_feature_block_table).unwrap_or(0);
-        let count = usize::try_from(extended_headers[0].count_of_feature_blocks).unwrap_or(0);
+        let count = (buffer.len() - start) / std::mem::size_of::<SpellFeatureBlock>();
         let equipping_feature_blocks =
             copy_transmute_buff::<SpellFeatureBlock>(buffer, start, count);
 
@@ -59,11 +61,18 @@ impl Model for Spell {
         };
         format!("{}.spl", name)
     }
+
+    fn to_bytes(&self) -> Vec<u8> {
+        let mut out = to_u8_slice(&self.header).to_vec();
+        out.extend(vec_to_u8_slice(&self.extended_headers));
+        out.extend(vec_to_u8_slice(&self.equipping_feature_blocks));
+        out
+    }
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/spl_v1.htm#splv1_Header
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
 pub struct SpellHeader {
     header: Header<4, 4>,
     unidentified_spell_name: i32,
@@ -107,7 +116,7 @@ pub struct SpellHeader {
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/spl_v1.htm#splv1_Extended_Header
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
 pub struct SpellExtendedHeader {
     spell_form: u8,
     friendly: u8,

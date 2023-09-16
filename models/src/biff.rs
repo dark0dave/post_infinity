@@ -7,6 +7,7 @@ use crate::resources::utils::{copy_buff_to_struct, copy_transmute_buff};
 use crate::{from_buffer, model::Model, resources::types::ResourceType};
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/bif_v1.htm
+#[repr(C)]
 #[derive(Debug)]
 pub struct Biff {
     pub header: BiffHeader,

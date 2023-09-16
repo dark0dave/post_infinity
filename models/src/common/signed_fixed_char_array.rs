@@ -3,7 +3,7 @@ use std::{
     slice,
 };
 
-use serde::{Serialize, Serializer};
+use serde::{de::Visitor, Deserialize, Serialize, Serializer};
 
 #[repr(C, packed)]
 #[derive(PartialEq, Eq, Copy, Clone)]
@@ -24,6 +24,20 @@ impl<const N: usize> From<&[i8]> for SignedFixedCharSlice<N> {
                 break;
             }
             destination[counter] = i8::from_le(*byte);
+        }
+        Self(destination)
+    }
+}
+
+impl<const N: usize> From<&[u8]> for SignedFixedCharSlice<N> {
+    fn from(value: &[u8]) -> Self {
+        let mut destination = [0; N];
+        for (counter, byte) in value.iter().enumerate() {
+            if counter >= destination.len() {
+                // TODO: Throw a warning here
+                break;
+            }
+            destination[counter] = i8::try_from(*byte).unwrap_or(0);
         }
         Self(destination)
     }
@@ -62,12 +76,46 @@ impl<const N: usize> Serialize for SignedFixedCharSlice<N> {
     where
         S: Serializer,
     {
-        serializer.collect_str(&format!("{}", self))
+        serializer.collect_seq(self.0)
+    }
+}
+
+struct SignedFixedCharSliceVisitor<const N: usize>;
+
+impl<'de, const N: usize> Visitor<'de> for SignedFixedCharSliceVisitor<N> {
+    type Value = SignedFixedCharSlice<N>;
+
+    fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(formatter, "struct SignedFixedCharSlice")
+    }
+
+    fn visit_seq<A>(self, mut seq: A) -> Result<Self::Value, A::Error>
+    where
+        A: serde::de::SeqAccess<'de>,
+    {
+        let mut destination = [0; N];
+        let mut counter = 0;
+        while let Ok(Some(item)) = seq.next_element::<i8>() {
+            destination[counter] = item;
+            counter += 1;
+        }
+        Ok(SignedFixedCharSlice(destination))
+    }
+}
+
+impl<'de, const N: usize> Deserialize<'de> for SignedFixedCharSlice<N> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        deserializer.deserialize_seq(SignedFixedCharSliceVisitor)
     }
 }
 
 #[cfg(test)]
 mod tests {
+
+    use std::io::{BufReader, Read, Seek, SeekFrom, Write};
 
     use super::*;
     #[test]
@@ -101,5 +149,24 @@ mod tests {
                 .to_string(),
             "BALDU"
         )
+    }
+
+    #[test]
+    fn deserialize_serialize_deserialize() {
+        let expected = SignedFixedCharSlice::<6>::from("BALDUR");
+        let value = serde_json::to_string(&expected).unwrap();
+
+        let mut file = tempfile::tempfile().unwrap();
+        file.write_all(value.as_bytes()).unwrap();
+
+        file.seek(SeekFrom::Start(0)).unwrap();
+        let mut buffer = vec![];
+        let mut reader = BufReader::new(file);
+        reader
+            .read_to_end(&mut buffer)
+            .expect("Could not read to buffer");
+
+        let result: SignedFixedCharSlice<6> = serde_json::from_slice(&buffer).unwrap();
+        assert_eq!(expected, result)
     }
 }

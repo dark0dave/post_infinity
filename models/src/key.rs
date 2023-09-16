@@ -1,12 +1,13 @@
 use std::{fmt::Debug, usize};
 
 use crate::common::header::Header;
-use crate::common::{fixed_char_array::FixedCharSlice, varriable_char_array::VarriableCharArray};
+use crate::common::{fixed_char_array::FixedCharSlice, variable_char_array::VariableCharArray};
 use crate::resources::utils::{copy_buff_to_struct, copy_transmute_buff};
 
 use super::resources::types::ResourceType;
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/key_v1.htm
+#[repr(C)]
 #[derive(Debug)]
 pub struct Key {
     pub header: KeyHeader,
@@ -67,7 +68,7 @@ pub struct BiffIndexHeader {
 #[derive(Debug)]
 pub struct BiffIndex {
     pub header: BiffIndexHeader,
-    pub name: VarriableCharArray,
+    pub name: VariableCharArray,
 }
 
 impl BiffIndex {
@@ -76,7 +77,7 @@ impl BiffIndex {
         let end = start + usize::try_from(header.file_name_length).unwrap_or(0);
         buffer.get(start..end).map(|buff| BiffIndex {
             header: *header,
-            name: VarriableCharArray(buff.into()),
+            name: VariableCharArray(buff.into()),
         })
     }
 }

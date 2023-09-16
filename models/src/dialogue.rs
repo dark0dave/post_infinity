@@ -1,17 +1,20 @@
 use std::rc::Rc;
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::common::fixed_char_array::FixedCharSlice;
 use crate::common::header::Header;
 use crate::model::Model;
-use crate::resources::utils::{copy_buff_to_struct, copy_transmute_buff};
+use crate::resources::utils::{
+    copy_buff_to_struct, copy_transmute_buff, to_u8_slice, vec_to_u8_slice,
+};
 use crate::tlk::Lookup;
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/dlg_v1.htm
-#[derive(Debug, Serialize)]
-pub struct Dialog {
-    pub header: DialogHeader,
+#[repr(C)]
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Dialogue {
+    pub header: DialogueHeader,
     pub state_tables: Vec<StateTable>,
     pub transitions: Vec<Transition>,
     pub state_triggers: Vec<StateTrigger>,
@@ -19,9 +22,9 @@ pub struct Dialog {
     pub action_tables: Vec<ActionTable>,
 }
 
-impl Model for Dialog {
+impl Model for Dialogue {
     fn new(buffer: &[u8]) -> Self {
-        let header = copy_buff_to_struct::<DialogHeader>(buffer, 0);
+        let header = copy_buff_to_struct::<DialogueHeader>(buffer, 0);
 
         let start = usize::try_from(header.offset_to_state_table).unwrap_or(0);
         let count = usize::try_from(header.count_of_state_tables).unwrap_or(0);
@@ -60,12 +63,22 @@ impl Model for Dialog {
     fn name(&self, _lookup: &Lookup) -> String {
         todo!()
     }
+
+    fn to_bytes(&self) -> Vec<u8> {
+        let mut out = to_u8_slice(&self.header).to_vec();
+        out.extend(vec_to_u8_slice(&self.state_tables));
+        out.extend(vec_to_u8_slice(&self.transitions));
+        out.extend(vec_to_u8_slice(&self.state_triggers));
+        out.extend(vec_to_u8_slice(&self.transition_triggers));
+        out.extend(vec_to_u8_slice(&self.action_tables));
+        out
+    }
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/dlg_v1.htm#formDLGV1_Header
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
-pub struct DialogHeader {
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
+pub struct DialogueHeader {
     pub header: Header<4, 4>,
     pub count_of_state_tables: i32,
     pub offset_to_state_table: i32,
@@ -82,7 +95,7 @@ pub struct DialogHeader {
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/dlg_v1.htm#formDLGV1_State
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
 pub struct StateTable {
     pub actor_response_text: FixedCharSlice<4>,
     pub index_of_the_first_transition: u32,
@@ -92,7 +105,7 @@ pub struct StateTable {
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/dlg_v1.htm#formDLGV1_Transition
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
 pub struct Transition {
     pub flags: FixedCharSlice<4>,
     pub player_character_text: FixedCharSlice<4>,
@@ -105,7 +118,7 @@ pub struct Transition {
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/dlg_v1.htm#formDLGV1_StateTrigger
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
 pub struct StateTrigger {
     pub offset_to_start_of_file: u32,
     pub length_in_bytes: u32,
@@ -113,7 +126,7 @@ pub struct StateTrigger {
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/dlg_v1.htm#formDLGV1_TransTrigger
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
 pub struct TransitionTrigger {
     pub offset_to_start_of_file: u32,
     pub length_in_bytes: u32,
@@ -121,7 +134,7 @@ pub struct TransitionTrigger {
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/dlg_v1.htm#formDLGV1_Action
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
 pub struct ActionTable {
     pub offset_to_start_of_file: u32,
     pub length_in_bytes: u32,
@@ -146,7 +159,7 @@ mod tests {
             .read_to_end(&mut buffer)
             .expect("Could not read to buffer");
 
-        let dialog = Dialog::new(&buffer);
+        let dialog = Dialogue::new(&buffer);
         assert_eq!(dialog.state_tables.len(), 58);
         assert_eq!(dialog.transitions.len(), 103);
         assert_eq!(dialog.state_triggers.len(), 7);

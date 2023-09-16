@@ -2,33 +2,39 @@ use std::{rc::Rc, vec};
 
 use std::fmt::Debug;
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::common::fixed_char_array::FixedCharSlice;
 use crate::common::header::Header;
-use crate::common::varriable_char_array::VarriableCharArray;
+use crate::common::variable_char_array::VariableCharArray;
 use crate::model::Model;
-use crate::resources::utils::row_parser;
+use crate::resources::utils::{row_parser, to_u8_slice, vec_to_u8_slice};
 use crate::tlk::Lookup;
 
 //https://gibberlings3.github.io/iesdp/file_formats/ie_formats/2da.htm
-#[derive(Debug, Serialize)]
+#[repr(C)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct TwoDA {
     pub header: Header<3, 4>,
-    pub default_value: VarriableCharArray,
+    pub default_value: VariableCharArray,
     pub data_entries: DataEntry,
-}
-
-#[derive(Debug, Serialize)]
-pub struct DataEntry {
-    pub data_entry_headers: Vec<VarriableCharArray>,
-    pub values: Vec<Vec<VarriableCharArray>>,
 }
 
 impl Model for TwoDA {
     fn new(buffer: &[u8]) -> Self {
         // Parse Headers
         let (headers, end) = row_parser(buffer, 0);
+
+        let signature = if headers.first().is_some() {
+            FixedCharSlice::<3>::from(&buffer[0..3])
+        } else {
+            FixedCharSlice::<3>::default()
+        };
+        let version = match headers.last() {
+            Some(x) => FixedCharSlice::<4>::from(x.0.as_ref()),
+            _ => FixedCharSlice::<4>::from(signature.0.as_ref()),
+        };
+        let header = Header { signature, version };
 
         // Parse Default Value
         let (default_values, end) = row_parser(buffer, end);
@@ -46,20 +52,6 @@ impl Model for TwoDA {
             }
             end = row_end;
         }
-
-        let signature = if let Some(_) = headers.first() {
-            FixedCharSlice::<3>::from(&buffer[0..3])
-        } else {
-            FixedCharSlice::<3>::default()
-        };
-        let version = match headers.last() {
-            Some(x) if FixedCharSlice::<4>::try_from(x).is_ok() => {
-                FixedCharSlice::<4>::try_from(x).unwrap()
-            }
-            _ => FixedCharSlice::<4>::from(signature.0.as_ref()),
-        };
-        let header = Header { signature, version };
-
         Self {
             header,
             default_value: default_values.first().unwrap().clone(),
@@ -70,13 +62,30 @@ impl Model for TwoDA {
         }
     }
 
-    fn create_as_rc(buffer: &[u8]) -> std::rc::Rc<dyn Model> {
+    fn create_as_rc(buffer: &[u8]) -> Rc<dyn Model> {
         Rc::new(Self::new(buffer))
     }
 
     fn name(&self, _lookup: &Lookup) -> String {
         todo!()
     }
+
+    fn to_bytes(&self) -> Vec<u8> {
+        let mut out = to_u8_slice(&self.header).to_vec();
+        out.extend(to_u8_slice(&self.default_value));
+        out.extend(vec_to_u8_slice(&self.data_entries.data_entry_headers));
+        for row in &self.data_entries.values {
+            out.extend(vec_to_u8_slice(row));
+        }
+        out
+    }
+}
+
+#[repr(C)]
+#[derive(Debug, Serialize, Deserialize)]
+pub struct DataEntry {
+    pub data_entry_headers: Vec<VariableCharArray>,
+    pub values: Vec<Vec<VariableCharArray>>,
 }
 
 #[cfg(test)]

@@ -1,9 +1,9 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use super::fixed_char_array::FixedCharSlice;
 
 #[repr(C, packed)]
-#[derive(Debug, Copy, Clone, Serialize, PartialEq, Eq)]
+#[derive(Debug, Copy, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct FeatureBlock {
     pub opcode_number: u16,
     pub target_type: u8,

@@ -1,38 +1,39 @@
 use std::rc::Rc;
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::common::fixed_char_nd_array::FixedCharNDArray;
 use crate::common::header::Header;
-use crate::resources::utils::{copy_buff_to_struct, copy_transmute_buff};
+use crate::effect_v2::EffectV2WithOutSubHeader;
+use crate::item_table::ItemReferenceTable;
+use crate::resources::utils::{
+    copy_buff_to_struct, copy_transmute_buff, to_u8_slice, vec_to_u8_slice,
+};
 use crate::tlk::Lookup;
 use crate::{
     common::fixed_char_array::FixedCharSlice,
-    effect_v2::EffectV2Body,
-    item_table::ItemTable,
+    item_table::ItemSlots,
     model::Model,
-    spell_table::{generate_spell_memorization, KnownSpells, MemorizedSpells},
+    spell_table::{KnownSpells, SpellMemorizationInfo, SpellMemorizationTable},
 };
 
-#[derive(Debug, PartialEq, Eq, Serialize)]
+// https://gibberlings3.github.io/iesdp/file_formats/ie_formats/cre_v1.htm
+#[repr(C)]
+#[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Creature {
+    #[serde(flatten)]
     pub header: BGEECreature,
-    pub item_slot_table: ItemTable,
     pub known_spells: Vec<KnownSpells>,
-    pub memorized_spells: Vec<MemorizedSpells>,
-    pub effects: Vec<EffectV2Body>,
+    pub memorized_spell_info: Vec<SpellMemorizationInfo>,
+    pub memorized_spells: Vec<SpellMemorizationTable>,
+    pub effects: Vec<EffectV2WithOutSubHeader>,
+    pub item_table: Vec<ItemReferenceTable>,
+    pub item_slots: ItemSlots,
 }
 
 impl Model for Creature {
     fn new(buffer: &[u8]) -> Self {
         let header = copy_buff_to_struct::<BGEECreature>(buffer, 0);
-
-        let item_slot_table = ItemTable::generate(
-            buffer,
-            usize::try_from(header.offset_to_items).unwrap_or(0),
-            usize::try_from(header.count_of_items).unwrap_or(0),
-            usize::try_from(header.offset_to_item_slots).unwrap_or(0),
-        );
 
         let start = usize::try_from(header.offset_to_known_spells).unwrap_or(0);
         let count = usize::try_from(header.count_of_known_spells).unwrap_or(0);
@@ -40,23 +41,32 @@ impl Model for Creature {
 
         let start = usize::try_from(header.offset_to_spell_memorization_info).unwrap_or(0);
         let count = usize::try_from(header.count_of_spell_memorization_info).unwrap_or(0);
-        let memorized_spells = generate_spell_memorization(
-            buffer,
-            start,
-            count,
-            usize::try_from(header.offset_to_memorized_spell_table).unwrap_or(0),
-        );
+        let memorized_spell_info =
+            copy_transmute_buff::<SpellMemorizationInfo>(buffer, start, count);
+
+        let start = usize::try_from(header.offset_to_memorized_spell_table).unwrap_or(0);
+        let count = usize::try_from(header.count_of_memorized_spell_table).unwrap_or(0);
+        let memorized_spells = copy_transmute_buff::<SpellMemorizationTable>(buffer, start, count);
 
         let start = usize::try_from(header.offset_to_effects).unwrap_or(0);
         let count = usize::try_from(header.count_of_effects).unwrap_or(0);
-        let effects = copy_transmute_buff::<EffectV2Body>(buffer, start, count);
+        let effects = copy_transmute_buff::<EffectV2WithOutSubHeader>(buffer, start, count);
+
+        let start = usize::try_from(header.offset_to_items).unwrap_or(0);
+        let count = usize::try_from(header.count_of_items).unwrap_or(0);
+        let item_table = copy_transmute_buff::<ItemReferenceTable>(buffer, start, count);
+
+        let start = usize::try_from(header.offset_to_item_slots).unwrap_or(0);
+        let item_slots = copy_buff_to_struct::<ItemSlots>(buffer, start);
 
         Creature {
             header,
-            item_slot_table,
             known_spells,
+            memorized_spell_info,
             memorized_spells,
             effects,
+            item_table,
+            item_slots,
         }
     }
     fn create_as_rc(buffer: &[u8]) -> Rc<dyn Model> {
@@ -66,11 +76,23 @@ impl Model for Creature {
     fn name(&self, _lookup: &Lookup) -> String {
         self.header.dialog_ref.to_string()
     }
+
+    fn to_bytes(&self) -> Vec<u8> {
+        let mut out = vec![];
+        out.extend(to_u8_slice(&self.header).to_vec());
+        out.extend(vec_to_u8_slice(&self.known_spells));
+        out.extend(vec_to_u8_slice(&self.memorized_spell_info));
+        out.extend(vec_to_u8_slice(&self.memorized_spells));
+        out.extend(vec_to_u8_slice(&self.effects));
+        out.extend(vec_to_u8_slice(&self.item_table));
+        out.extend(to_u8_slice(&self.item_slots).to_vec());
+        out
+    }
 }
 
-// https://gibberlings3.github.io/iesdp/file_formats/ie_formats/cre_v1.htm
+// https://gibberlings3.github.io/iesdp/file_formats/ie_formats/cre_v1.htm#CREV1_0_Header
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
 pub struct BGEECreature {
     pub header: Header<4, 4>,
     pub long_creature_name: u32,

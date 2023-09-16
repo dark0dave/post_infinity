@@ -5,7 +5,18 @@ use std::{
     vec,
 };
 
-use crate::common::varriable_char_array::VarriableCharArray;
+use crate::common::variable_char_array::VariableCharArray;
+
+pub fn vec_to_u8_slice<T: Sized>(p: &[T]) -> Vec<u8> {
+    p.iter()
+        .flat_map(|item| to_u8_slice(item))
+        .copied()
+        .collect()
+}
+
+pub fn to_u8_slice<T: Sized>(p: &T) -> &[u8] {
+    unsafe { return core::slice::from_raw_parts((p as *const T) as *const u8, size_of::<T>()) }
+}
 
 pub fn copy_buff_to_struct<T>(buffer: &[u8], start: usize) -> T {
     let end: usize = start + size_of::<T>();
@@ -42,27 +53,28 @@ pub fn copy_transmute_buff<T>(buffer: &[u8], start: usize, count: usize) -> Vec<
 const CARRAGE_RETURN: u8 = 0xD;
 const NEW_LINE: u8 = 0xA;
 
-pub fn dumb_row_parser(buffer: &[u8]) -> Vec<VarriableCharArray> {
+pub fn dumb_row_parser(buffer: &[u8]) -> Vec<VariableCharArray> {
     let mut acc = vec![];
     let mut pos = 0;
     for (i, x) in buffer.iter().enumerate() {
         if x == &NEW_LINE || x == &CARRAGE_RETURN {
             if pos < i {
-                acc.push(VarriableCharArray(buffer.get(pos..i).unwrap().into()))
+                acc.push(VariableCharArray(buffer.get(pos..i).unwrap().into()))
             }
-            acc.push(VarriableCharArray(Rc::new([32])));
+            acc.push(VariableCharArray(Rc::new([32])));
             pos = i;
         }
     }
     if pos < buffer.len() {
-        acc.push(VarriableCharArray(
+        acc.push(VariableCharArray(
             buffer.get(pos..buffer.len()).unwrap().into(),
         ))
     }
     acc
 }
 
-pub fn row_parser(buffer: &[u8], row_start: usize) -> (Vec<VarriableCharArray>, usize) {
+// TODO: Fix this absolute trash
+pub fn row_parser(buffer: &[u8], row_start: usize) -> (Vec<VariableCharArray>, usize) {
     if let Some(end) = buffer
         .get(row_start..)
         .unwrap_or_default()
@@ -77,7 +89,7 @@ pub fn row_parser(buffer: &[u8], row_start: usize) -> (Vec<VarriableCharArray>, 
                 if buff.is_empty() {
                     return None;
                 }
-                Some(VarriableCharArray(buff.into()))
+                Some(VariableCharArray(buff.into()))
             })
             .collect();
 
