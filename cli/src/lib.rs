@@ -11,11 +11,23 @@ use models::{
     biff::Biff,
     from_buffer,
     key::Key,
+    model::Model,
     resources::types::{extention_to_resource_type, ResourceType},
     tlk::Lookup,
 };
 
 use erased_serde::Serializer;
+
+fn write_file(path: &Path, model: std::rc::Rc<dyn Model>) {
+    let file_name = Path::new(path.file_stem().unwrap_or_default()).with_extension("json");
+    if let Ok(file) = File::create(file_name) {
+        let mut json = serde_json::Serializer::new(file);
+        let mut format = <dyn Serializer>::erase(&mut json);
+        if let Err(err) = model.erased_serialize(&mut format) {
+            panic!("{}", err);
+        }
+    }
+}
 
 fn from_file(path: &Path) -> Vec<u8> {
     let file = File::open(path).unwrap_or_else(|_| panic!("Could not open file: {:#?}", path));
@@ -45,7 +57,7 @@ fn parse_key_file(path: &Path, buffer: &[u8]) -> Vec<Biff> {
         .collect()
 }
 
-fn get_model_from_file(path: &Path) -> Vec<Biff> {
+fn get_model_from_file(path: &Path, json: bool) -> Vec<Biff> {
     let buffer = from_file(path);
     let extention = path
         .extension()
@@ -65,14 +77,11 @@ fn get_model_from_file(path: &Path) -> Vec<Biff> {
         };
     }
 
-    let buffer = from_buffer(&buffer, resource_type).expect("Could not parse file");
-    let file_name = Path::new(path.file_stem().unwrap_or_default()).with_extension("json");
-    if let Ok(file) = File::create(file_name) {
-        let mut json = serde_json::Serializer::new(file);
-        let mut format = <dyn Serializer>::erase(&mut json);
-        if let Err(err) = buffer.erased_serialize(&mut format) {
-            panic!("{}", err);
-        }
+    let model = from_buffer(&buffer, resource_type).expect("Could not parse file");
+    if json {
+        write_file(path, model);
+    } else {
+        println!("{:?}", model);
     }
     exit(0)
 }
@@ -86,11 +95,11 @@ pub fn read_files(args: &Args) -> (Vec<Biff>, Option<Lookup>) {
             .into_iter()
             .flat_map(|path| {
                 let file = path.unwrap().path();
-                get_model_from_file(&file)
+                get_model_from_file(&file, args.json)
             })
             .collect()
     } else {
-        get_model_from_file(dir_or_file)
+        get_model_from_file(dir_or_file, args.json)
     };
 
     let lookup = match args.process_tlk {
