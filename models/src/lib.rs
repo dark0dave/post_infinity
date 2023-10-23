@@ -2,6 +2,7 @@ use std::rc::Rc;
 
 use model::Model;
 use resources::types::ResourceType;
+use tlk::Lookup;
 
 use crate::{
     area::Area, bio::Biography, character::ExpandedCharacter, creature::Creature, dialog::Dialog,
@@ -82,6 +83,7 @@ pub fn from_buffer(buffer: &[u8], resource_type: ResourceType) -> Option<Rc<dyn 
         // Skipping graphic data
         ResourceType::FileTypePvrz => None,
         ResourceType::FileTypeGlsl => None,
+        ResourceType::FileTypeTlk => Some(Lookup::create_as_rc(buffer)),
         ResourceType::FileTypeMenu => None,
         ResourceType::FileTypeTtf => None,
         ResourceType::FileTypePng => todo!(),

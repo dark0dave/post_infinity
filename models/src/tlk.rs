@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use serde::Serialize;
 
 use crate::{
@@ -5,34 +7,52 @@ use crate::{
         header::Header, signed_fixed_char_array::SignedFixedCharSlice,
         varriable_char_array::VarriableCharArray,
     },
+    model::Model,
     resources::utils::{copy_buff_to_struct, copy_transmute_buff},
 };
+
+// This is hard coded by the file format
+const START: usize = 18;
 
 #[derive(Debug, Serialize)]
 pub struct Lookup {
     pub header: TLKHeader,
-    pub data_entries: Vec<TLKDataEntry>,
+    pub entries: Vec<TLKEntry>,
+    pub strings: Vec<VarriableCharArray>,
 }
 
-impl Lookup {
-    pub fn new(buffer: &[u8]) -> Self {
+impl Model for Lookup {
+    fn new(buffer: &[u8]) -> Self {
         let header = copy_buff_to_struct::<TLKHeader>(buffer, 0);
 
-        // This is hard coded by the file format
-        let start = 18;
         let count = usize::try_from(header.count_of_entries).unwrap_or(0);
-        let entries = copy_transmute_buff::<TLKEntry>(buffer, start, count);
+        let entries = copy_transmute_buff::<TLKEntry>(buffer, START, count);
 
         let start = usize::try_from(header.offset_to_strings).unwrap_or(0);
-        let data_entries = entries
+        let strings = entries
             .iter()
-            .map(|entry| TLKDataEntry::new(start, entry, buffer))
+            .map(|entry| {
+                let buff_start = start
+                    + usize::try_from(entry.offset_of_this_string_relative_to_the_strings_section)
+                        .unwrap_or(0);
+                let buff_end =
+                    buff_start + usize::try_from(entry.length_of_this_string).unwrap_or(0);
+                VarriableCharArray(buffer.get(buff_start..buff_end).unwrap().into())
+            })
             .collect();
-
         Self {
             header,
-            data_entries,
+            entries,
+            strings,
         }
+    }
+
+    fn create_as_rc(buffer: &[u8]) -> Rc<dyn Model> {
+        Rc::new(Self::new(buffer))
+    }
+
+    fn name(&self, _lookup: &Lookup) -> String {
+        todo!()
     }
 }
 
@@ -67,27 +87,6 @@ pub struct TLKEntry {
     pub length_of_this_string: u32,
 }
 
-#[derive(Debug, Clone, Serialize, PartialEq)]
-pub struct TLKDataEntry {
-    pub entry: TLKEntry,
-    pub strings: VarriableCharArray,
-}
-
-impl TLKDataEntry {
-    fn new(start: usize, entry: &TLKEntry, buffer: &[u8]) -> Self {
-        let buff_start = start
-            + usize::try_from(entry.offset_of_this_string_relative_to_the_strings_section)
-                .unwrap_or(0);
-        let buff_end = buff_start + usize::try_from(entry.length_of_this_string).unwrap_or(0);
-        let strings = VarriableCharArray(buffer.get(buff_start..buff_end).unwrap().into());
-
-        TLKDataEntry {
-            entry: *entry,
-            strings,
-        }
-    }
-}
-
 #[cfg(test)]
 mod tests {
 
@@ -118,20 +117,19 @@ mod tests {
                 offset_to_strings: 884018,
             }
         );
-        let entry = lookup.data_entries.get(400).expect("Failed to find entry");
+        let entry = lookup.entries.get(400).expect("Failed to find entry");
         assert_eq!(
             entry,
-            &TLKDataEntry {
-                entry: TLKEntry {
-                    bit_field: 1,
-                    resource_name_of_associated_sound: "".into(),
-                    volume_variance: 0,
-                    pitch_variance: 0,
-                    offset_of_this_string_relative_to_the_strings_section: 49264,
-                    length_of_this_string: 213
-                },
-                strings: " 'Twas some three hundred years hence, but folk still cringe at the mention of the destruction at Ulcaster School. I've not met a soul who claims to know why it occurred, and none that were there are alive to say.".into()
+            &TLKEntry {
+                bit_field: 1,
+                resource_name_of_associated_sound: "".into(),
+                volume_variance: 0,
+                pitch_variance: 0,
+                offset_of_this_string_relative_to_the_strings_section: 49264,
+                length_of_this_string: 213
             }
-        )
+        );
+        let content = lookup.strings.get(400).expect("Failed to find entry");
+        assert_eq!(content.to_string()," 'Twas some three hundred years hence, but folk still cringe at the mention of the destruction at Ulcaster School. I've not met a soul who claims to know why it occurred, and none that were there are alive to say.")
     }
 }

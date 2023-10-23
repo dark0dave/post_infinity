@@ -44,17 +44,15 @@ impl Model for Spell {
     fn name(&self, lookup: &Lookup) -> String {
         let name = if self.header.identified_spell_name > -1 {
             lookup
-                .data_entries
+                .strings
                 .get(self.header.identified_spell_name as usize)
                 .unwrap()
-                .strings
                 .to_string()
         } else if self.header.unidentified_spell_name > -1 {
             lookup
-                .data_entries
+                .strings
                 .get(self.header.unidentified_spell_name as usize)
                 .unwrap()
-                .strings
                 .to_string()
         } else {
             format!("{}", { self.header.identified_spell_name })

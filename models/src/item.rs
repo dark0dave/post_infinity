@@ -42,22 +42,20 @@ impl Model for Item {
 
     fn name(&self, lookup: &Lookup) -> String {
         let name = if self.header.identified_item_name > -1
-            && self.header.identified_item_name < lookup.data_entries.len() as i32
+            && self.header.identified_item_name < lookup.entries.len() as i32
         {
             lookup
-                .data_entries
+                .strings
                 .get(self.header.identified_item_name as usize)
                 .unwrap()
-                .strings
                 .to_string()
         } else if self.header.unidentified_item_name > -1
-            && self.header.unidentified_item_name < lookup.data_entries.len() as i32
+            && self.header.unidentified_item_name < lookup.entries.len() as i32
         {
             lookup
-                .data_entries
+                .strings
                 .get(self.header.unidentified_item_name as usize)
                 .unwrap()
-                .strings
                 .to_string()
         } else {
             format!("{}", { self.header.identified_item_name })
