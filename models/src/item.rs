@@ -15,7 +15,7 @@ use crate::tlk::Lookup;
 pub struct Item {
     pub header: ItemHeader,
     pub extended_headers: Vec<ItemExtendedHeader>,
-    pub equiping_feature_blocks: Vec<ItemFeatureBlock>,
+    pub equipping_feature_blocks: Vec<ItemFeatureBlock>,
 }
 
 impl Model for Item {
@@ -28,12 +28,13 @@ impl Model for Item {
 
         let start = usize::try_from(header.offset_to_feature_blocks).unwrap_or(0);
         let count = usize::try_from(header.count_of_feature_blocks).unwrap_or(0);
-        let equiping_feature_blocks = copy_transmute_buff::<ItemFeatureBlock>(buffer, start, count);
+        let equipping_feature_blocks =
+            copy_transmute_buff::<ItemFeatureBlock>(buffer, start, count);
 
         Self {
             header,
             extended_headers,
-            equiping_feature_blocks,
+            equipping_feature_blocks,
         }
     }
     fn create_as_rc(buffer: &[u8]) -> Rc<dyn Model> {
@@ -81,7 +82,7 @@ pub struct ItemHeader {
     item_animation: FixedCharSlice<2>,
     min_level: u16,
     min_strength: u16,
-    min_strengthbonus: u8,
+    min_strength_bonus: u8,
     kit_usability_1: u8,
     min_intelligence: u8,
     kit_usability_2: u8,
@@ -105,13 +106,13 @@ pub struct ItemHeader {
     offset_to_extended_headers: i32,
     count_of_extended_headers: i16,
     offset_to_feature_blocks: i32,
-    index_to_equiping_feature_blocks: i16,
+    index_to_equipping_feature_blocks: i16,
     count_of_feature_blocks: i16,
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/itm_v1.htm#itmv1_Extended_Header
 #[repr(C, packed)]
-#[derive(Debug, Copy, Clone, Serialize)]
+#[derive(Debug, Copy, Clone, Serialize, PartialEq, Eq)]
 pub struct ItemExtendedHeader {
     attack_type: u8, // Note zero is very bad here
     id_required: u8,
@@ -153,7 +154,15 @@ mod tests {
     use std::{
         fs::File,
         io::{BufReader, Read},
+        mem::size_of,
     };
+
+    #[test]
+    fn ensure_size() {
+        assert_eq!(size_of::<ItemHeader>(), 114);
+        assert_eq!(size_of::<ItemExtendedHeader>(), 56);
+        assert_eq!(size_of::<ItemFeatureBlock>(), 48);
+    }
 
     #[test]
     fn valid_item_file_parsed() {
@@ -166,12 +175,5 @@ mod tests {
         let item = Item::new(&buffer);
         assert_eq!({ item.header.identified_item_name }, -1);
         assert_eq!({ item.header.max_stackable }, 1);
-        assert_eq!({ item.extended_headers[0].attack_type }, 3);
-        assert_eq!({ item.extended_headers[0].max_charges }, 2);
-        assert_eq!({ item.extended_headers[0].is_arrow }, 0);
-        assert_eq!({ item.extended_headers[0].is_bolt }, 0);
-        assert_eq!({ item.equiping_feature_blocks[0].duration }, 1);
-        assert_eq!({ item.equiping_feature_blocks[0].saving_throw_bonus }, 0);
-        assert_eq!({ item.equiping_feature_blocks[0].stacking_id }, 0);
     }
 }

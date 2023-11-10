@@ -15,7 +15,7 @@ use crate::tlk::Lookup;
 pub struct Spell {
     pub header: SpellHeader,
     pub extended_headers: Vec<SpellExtendedHeader>,
-    pub equiping_feature_blocks: Vec<SpellFeatureBlock>,
+    pub equipping_feature_blocks: Vec<SpellFeatureBlock>,
 }
 
 impl Model for Spell {
@@ -26,15 +26,15 @@ impl Model for Spell {
         let count = usize::try_from(header.count_of_extended_headers).unwrap_or(0);
         let extended_headers = copy_transmute_buff::<SpellExtendedHeader>(buffer, start, count);
 
-        let start = usize::try_from(header.offset_to_casting_feature_blocks).unwrap_or(0);
-        let count = usize::try_from(header.count_of_casting_feature_blocks).unwrap_or(0);
-        let equiping_feature_blocks =
+        let start = usize::try_from(header.offset_to_feature_block_table).unwrap_or(0);
+        let count = usize::try_from(extended_headers[0].count_of_feature_blocks).unwrap_or(0);
+        let equipping_feature_blocks =
             copy_transmute_buff::<SpellFeatureBlock>(buffer, start, count);
 
         Self {
             header,
             extended_headers,
-            equiping_feature_blocks,
+            equipping_feature_blocks,
         }
     }
     fn create_as_rc(buffer: &[u8]) -> Rc<dyn Model> {
@@ -78,7 +78,7 @@ pub struct SpellHeader {
     primary_spell_school: u8,
     min_strength: u8,
     secondary_spell_school: u8,
-    min_strenth_bonus: u8,
+    min_strength_bonus: u8,
     kit_usability_1: u8,
     min_intelligence: u8,
     kit_usability_2: u8,
@@ -90,7 +90,7 @@ pub struct SpellHeader {
     min_charisma: u16,
     spell_level: u32,
     max_stackable: u16,
-    spellbook_icon: FixedCharSlice<8>,
+    spell_book_icon: FixedCharSlice<8>,
     lore: u16,
     ground_icon: FixedCharSlice<8>,
     base_weight: u32,
@@ -110,7 +110,7 @@ pub struct SpellHeader {
 #[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
 pub struct SpellExtendedHeader {
     spell_form: u8,
-    freindly: u8,
+    friendly: u8,
     location: u16,
     memorised_icon: FixedCharSlice<8>,
     target_type: u8,
@@ -126,6 +126,7 @@ pub struct SpellExtendedHeader {
     count_of_feature_blocks: i16,
     offset_to_feature_blocks: i16,
     charges: u16,
+    charge_depletion_behaviour: u16,
     projectile: u16,
 }
 
@@ -142,6 +143,13 @@ mod tests {
         fs::File,
         io::{BufReader, Read},
     };
+
+    #[test]
+    fn valid_sizes() {
+        assert_eq!(std::mem::size_of::<SpellHeader>(), 114);
+        assert_eq!(std::mem::size_of::<SpellExtendedHeader>(), 40);
+        assert_eq!(std::mem::size_of::<SpellFeatureBlock>(), 48);
+    }
 
     #[test]
     fn valid_creature_file_item_table_parsed() {
@@ -171,7 +179,7 @@ mod tests {
                 primary_spell_school: 2,
                 min_strength: 0,
                 secondary_spell_school: 6,
-                min_strenth_bonus: 0,
+                min_strength_bonus: 0,
                 kit_usability_1: 0,
                 min_intelligence: 0,
                 kit_usability_2: 0,
@@ -183,7 +191,7 @@ mod tests {
                 min_charisma: 0,
                 spell_level: 9,
                 max_stackable: 1,
-                spellbook_icon: FixedCharSlice([83, 80, 87, 73, 57, 48, 53, 67]),
+                spell_book_icon: FixedCharSlice([83, 80, 87, 73, 57, 48, 53, 67]),
                 lore: 0,
                 ground_icon: FixedCharSlice([0, 0, 114, 98, 0, 0, 85, 110]),
                 base_weight: 0,
@@ -197,6 +205,27 @@ mod tests {
                 offset_to_casting_feature_blocks: 0,
                 count_of_casting_feature_blocks: 0
             }
+        );
+        assert_eq!(
+            spell.equipping_feature_blocks,
+            vec![FeatureBlock {
+                opcode_number: 177,
+                target_type: 1,
+                power: 9,
+                parameter_1: 0,
+                parameter_2: 2,
+                timing_mode: 0,
+                dispel_resistance: 2,
+                duration: 100000,
+                probability_1: 39,
+                probability_2: 0,
+                resource: "balorsu".into(),
+                dice_thrown_max_level: 0,
+                dice_sides_min_level: 0,
+                saving_throw_type: "".into(),
+                saving_throw_bonus: 0,
+                stacking_id: 0
+            }]
         )
     }
 }
