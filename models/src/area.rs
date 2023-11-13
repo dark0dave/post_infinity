@@ -1,15 +1,19 @@
 use std::rc::Rc;
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::common::header::Header;
 use crate::item_table::ItemReferenceTable;
 use crate::model::Model;
-use crate::resources::utils::{copy_buff_to_struct, copy_transmute_buff};
+use crate::resources::utils::{
+    copy_buff_to_struct, copy_transmute_buff, to_u8_slice, vec_to_u8_slice,
+};
 use crate::tlk::Lookup;
-use crate::{common::fixed_char_array::FixedCharSlice, game::GlobalVarriables};
+use crate::{common::fixed_char_array::FixedCharSlice, game::GlobalVariables};
 
-#[derive(Debug, Serialize)]
+// https://gibberlings3.github.io/iesdp/file_formats/ie_formats/are_v1.htm
+#[repr(C)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Area {
     pub header: FileHeader,
     pub actors: Vec<Actor>,
@@ -19,12 +23,17 @@ pub struct Area {
     pub containers: Vec<Container>,
     pub items: Vec<ItemReferenceTable>,
     pub vertices: Vec<Vertice>,
-    pub ambients: Vec<Ambients>,
-    pub variables: Vec<AreaVarriable>,
-    pub tiled_object_flags: Vec<TiledObject>,
+    pub ambients: Vec<Ambient>,
+    pub variables: Vec<AreaVariable>,
+    pub explored_bitmasks: Vec<ExploredBitmask>,
     pub doors: Vec<Door>,
     pub animations: Vec<Animation>,
+    pub automap_notes: Vec<AutomapNotesBGEE>,
     pub tiled_objects: Vec<TiledObject>,
+    pub tiled_object_flags: Vec<TiledObject>,
+    pub projectile_traps: Vec<ProjectileTrap>,
+    pub songs: Vec<SongEntry>,
+    pub rest_interruptions: Vec<RestInterruption>,
 }
 
 impl Model for Area {
@@ -61,11 +70,11 @@ impl Model for Area {
 
         let start = usize::try_from(header.offset_to_ambients).unwrap_or(0);
         let count = usize::try_from(header.count_of_ambients).unwrap_or(0);
-        let ambients = copy_transmute_buff::<Ambients>(buffer, start, count);
+        let ambients = copy_transmute_buff::<Ambient>(buffer, start, count);
 
         let start = usize::try_from(header.offset_to_variables).unwrap_or(0);
         let count = usize::try_from(header.count_of_variables).unwrap_or(0);
-        let variables = copy_transmute_buff::<AreaVarriable>(buffer, start, count);
+        let variables = copy_transmute_buff::<AreaVariable>(buffer, start, count);
 
         let start = usize::try_from(header.offset_to_tiled_object_flags).unwrap_or(0);
         let count = usize::try_from(header.count_of_tiled_object_flags).unwrap_or(0);
@@ -83,6 +92,27 @@ impl Model for Area {
         let count = usize::try_from(header.count_of_tiled_objects).unwrap_or(0);
         let tiled_objects = copy_transmute_buff::<TiledObject>(buffer, start, count);
 
+        let start = usize::try_from(header.offset_to_explored_bitmask).unwrap_or(0);
+        let count = usize::try_from(header.size_of_explored_bitmask).unwrap_or(1)
+            / std::mem::size_of::<ExploredBitmask>();
+        let explored_bitmasks = copy_transmute_buff::<ExploredBitmask>(buffer, start, count);
+
+        let start = usize::try_from(header.offset_to_automap_notes).unwrap_or(0);
+        let count = usize::try_from(header.number_of_entries_in_the_automap_notes).unwrap_or(0);
+        let automap_notes = copy_transmute_buff::<AutomapNotesBGEE>(buffer, start, count);
+
+        let start = usize::try_from(header.offset_to_projectile_traps).unwrap_or(0);
+        let count = usize::try_from(header.number_of_entries_in_the_projectile_traps).unwrap_or(0);
+        let projectile_traps = copy_transmute_buff::<ProjectileTrap>(buffer, start, count);
+
+        let start = usize::try_from(header.offset_to_song_entries).unwrap_or(0);
+        let count = if start > 0 { 0 } else { start + 144 };
+        let songs = copy_transmute_buff::<SongEntry>(buffer, start, count);
+
+        let start = usize::try_from(header.offset_to_rest_interruptions).unwrap_or(0);
+        let count = if start > 0 { 0 } else { start + 228 };
+        let rest_interruptions = copy_transmute_buff::<RestInterruption>(buffer, start, count);
+
         Self {
             header,
             actors,
@@ -98,6 +128,11 @@ impl Model for Area {
             doors,
             animations,
             tiled_objects,
+            explored_bitmasks,
+            automap_notes,
+            projectile_traps,
+            songs,
+            rest_interruptions,
         }
     }
 
@@ -108,11 +143,88 @@ impl Model for Area {
     fn name(&self, _lookup: &Lookup) -> String {
         self.header.area_wed.to_string().replace(".WED", ".ARE")
     }
+
+    fn to_bytes(&self) -> Vec<u8> {
+        let mut out = vec![
+            (1, to_u8_slice(&self.header).to_vec()),
+            (
+                self.header.offset_to_actors as i32,
+                vec_to_u8_slice(&self.actors),
+            ),
+            (
+                self.header.offset_to_regions,
+                vec_to_u8_slice(&self.regions),
+            ),
+            (
+                self.header.offset_to_spawn_points,
+                vec_to_u8_slice(&self.spawn_points),
+            ),
+            (
+                self.header.offset_to_entrances,
+                vec_to_u8_slice(&self.entrances),
+            ),
+            (
+                self.header.offset_to_containers,
+                vec_to_u8_slice(&self.containers),
+            ),
+            (self.header.offset_to_items, vec_to_u8_slice(&self.items)),
+            (
+                self.header.offset_to_vertices,
+                vec_to_u8_slice(&self.vertices),
+            ),
+            (
+                self.header.offset_to_ambients,
+                vec_to_u8_slice(&self.ambients),
+            ),
+            (
+                self.header.offset_to_variables,
+                vec_to_u8_slice(&self.variables),
+            ),
+            (
+                self.header.offset_to_tiled_object_flags as i32,
+                vec_to_u8_slice(&self.tiled_object_flags),
+            ),
+            (
+                self.header.offset_to_explored_bitmask as i32,
+                vec_to_u8_slice(&self.explored_bitmasks),
+            ),
+            (self.header.offset_to_doors, vec_to_u8_slice(&self.doors)),
+            (
+                self.header.offset_to_animations,
+                vec_to_u8_slice(&self.animations),
+            ),
+            (
+                self.header.offset_to_tiled_objects,
+                vec_to_u8_slice(&self.tiled_objects),
+            ),
+            (
+                self.header.offset_to_song_entries,
+                vec_to_u8_slice(&self.songs),
+            ),
+            (
+                self.header.offset_to_rest_interruptions,
+                vec_to_u8_slice(&self.rest_interruptions),
+            ),
+            (
+                self.header.number_of_entries_in_the_automap_notes,
+                vec_to_u8_slice(&self.automap_notes),
+            ),
+            (
+                self.header.number_of_entries_in_the_automap_notes,
+                vec_to_u8_slice(&self.projectile_traps),
+            ),
+        ];
+        out.sort_by(|a, b| a.0.cmp(&b.0));
+        out.into_iter()
+            .filter(|data| data.0 < 1 && !data.1.is_empty())
+            .flat_map(|(_order, data)| data)
+            .collect()
+    }
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/are_v1.htm#formAREAV1_0_Header
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
 pub struct FileHeader {
     pub header: Header<4, 4>,
     pub area_wed: FixedCharSlice<8>,
@@ -164,21 +276,21 @@ pub struct FileHeader {
     pub offset_to_tiled_objects: i32,
     pub offset_to_song_entries: i32,
     pub offset_to_rest_interruptions: i32,
-    pub offset_of_the_automap_note_section: i32,
-    pub number_of_entries_in_the_automap_note_section: i32,
-    pub offset_to_the_projectile_traps_section: i32,
-    pub number_of_entries_in_the_projectile_traps_section: i32,
+    pub offset_to_automap_notes: i32,
+    pub number_of_entries_in_the_automap_notes: i32,
+    pub offset_to_projectile_traps: i32,
+    pub number_of_entries_in_the_projectile_traps: i32,
     // bgee and bg2:tob
     pub rest_movie_day: FixedCharSlice<8>,
     // bgee and bg2:tob
     pub rest_movie_night: FixedCharSlice<8>,
-    #[serde(skip_serializing)]
-    _unused: [u8; 56],
+    #[serde(skip)]
+    _unused: FixedCharSlice<56>,
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/are_v1.htm#formAREAV1_0_Actor
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Deserialize, Serialize)]
 pub struct Actor {
     pub name: FixedCharSlice<32>,
     pub current_x_coordinate: u16,
@@ -188,10 +300,11 @@ pub struct Actor {
     pub flags: u32,
     pub has_been_spawned: u16,
     pub first_letter_of_cre_resref: FixedCharSlice<1>,
-    pub _unused_1: u8,
+    #[serde(skip)]
+    _unused_1: u8,
     pub actor_animation: u32,
     pub actor_orientation: u16,
-    pub unused: u16,
+    _unused: u16,
     pub actor_removal_timer: u32,
     pub movement_restriction_distance: u16,
     pub movement_restriction_distance_move_to_object: u16,
@@ -208,13 +321,13 @@ pub struct Actor {
     // for embedded cre files
     pub offset_to_cre_structure: u32,
     pub size_of_stored_cre_structure: u32,
-    #[serde(skip_serializing)]
-    pub _unused_2: [u8; 128],
+    #[serde(skip)]
+    _unused_2: FixedCharSlice<128>,
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/are_v1.htm#formAREAV1_0_Info
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
 pub struct Region {
     pub name: FixedCharSlice<32>,
     pub region_type: u16,
@@ -241,15 +354,15 @@ pub struct Region {
     pub region_script: FixedCharSlice<8>,
     pub alternative_use_point_x_coordinate: u16,
     pub alternative_use_point_y_coordinate: u16,
-    #[serde(skip_serializing)]
-    pub _unknown_1: u32,
-    #[serde(skip_serializing)]
-    pub _unknown_2: [u8; 32],
+    #[serde(skip)]
+    _unknown_1: u32,
+    #[serde(skip)]
+    _unknown_2: [u8; 32],
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/are_v1.htm#formAREAV1_0_Spawn
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
 pub struct SpawnPoint {
     pub name: FixedCharSlice<32>,
     pub x_coordinate: u16,
@@ -300,25 +413,25 @@ pub struct SpawnPoint {
     pub spawn_weight_of_9th_creature_slot: u8,
     // Offset 0x006c
     pub spawn_weight_of_10th_creature_slot: u8,
-    #[serde(skip_serializing)]
-    pub unused: [u8; 38],
+    #[serde(skip)]
+    _unused: FixedCharSlice<38>,
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/are_v1.htm#formAREAV1_0_Entrance
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
 pub struct Entrance {
     pub name: FixedCharSlice<32>,
     pub x_coordinate: u16,
     pub y_coordinate: u16,
     pub orientation: u16,
-    #[serde(skip_serializing)]
-    pub unused: [u8; 66],
+    #[serde(skip)]
+    _unused: FixedCharSlice<66>,
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/are_v1.htm#formAREAV1_0_Container
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
 pub struct Container {
     pub name: FixedCharSlice<32>,
     pub x_coordinate: u16,
@@ -348,24 +461,24 @@ pub struct Container {
     pub key_item: FixedCharSlice<8>,
     pub break_difficulty: u32,
     pub lockpick_string: FixedCharSlice<4>,
-    #[serde(skip_serializing)]
-    pub unused: [u8; 56],
+    #[serde(skip)]
+    _unused: FixedCharSlice<56>,
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/are_v1.htm#formAREAV1_0_Item
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
 pub struct AreaItem(pub ItemReferenceTable);
 
 // An array of points used to create the outlines of regions and containers. Elements are 16-bit words stored x0, y0, x1, y1 etc.
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
 pub struct Vertice(pub u16);
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/are_v1.htm#formAREAV1_0_Ambient
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
-pub struct Ambients {
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
+pub struct Ambient {
     pub name: FixedCharSlice<32>,
     pub x_coordinate: u16,
     pub y_coordinate: u16,
@@ -385,28 +498,29 @@ pub struct Ambients {
     pub resref_of_sound_9: FixedCharSlice<8>,
     pub resref_of_sound_10: FixedCharSlice<8>,
     pub count_of_sounds: u16,
+    #[serde(skip)]
     _unused_1: u16,
     pub base_time_interval: u32,
     pub base_time_deviation: u32,
     pub ambient_appearence_schedule: u32,
     pub flags: u32,
-    #[serde(skip_serializing)]
-    _unused_2: [u8; 64],
+    #[serde(skip)]
+    _unused_2: FixedCharSlice<64>,
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/are_v1.htm#formAREAV1_0_Variable
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
-pub struct AreaVarriable(pub GlobalVarriables);
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
+pub struct AreaVariable(pub GlobalVariables);
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/are_v1.htm#formAREAV1_0_Explored
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
 pub struct ExploredBitmask(pub u8);
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/are_v1.htm#formAREAV1_0_Door
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
 pub struct Door {
     pub name: FixedCharSlice<32>,
     // Link with WED
@@ -445,12 +559,13 @@ pub struct Door {
     pub travel_trigger_name: FixedCharSlice<24>,
     pub dialog_speaker_name: FixedCharSlice<4>,
     pub dialog_resref: FixedCharSlice<8>,
+    #[serde(skip)]
     _unknown: FixedCharSlice<8>,
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/are_v1.htm#formAREAV1_0_Anim
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
 pub struct Animation {
     pub name: FixedCharSlice<32>,
     pub x_coordinate: u16,
@@ -477,7 +592,7 @@ pub struct Animation {
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/are_v1.htm#formAREAV1_0_Automap
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
 pub struct AutomapNotesBGEE {
     pub x_coordinate: u16,
     pub y_coordinate: u16,
@@ -487,13 +602,13 @@ pub struct AutomapNotesBGEE {
     // bg2
     pub colour: u16,
     pub note_count: u32,
-    #[serde(skip_serializing)]
-    pub unused: [u8; 36],
+    #[serde(skip)]
+    _unused: FixedCharSlice<36>,
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/are_v1.htm#formAREAV1_0_TiledObj
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
 pub struct TiledObject {
     pub name: FixedCharSlice<32>,
     pub tile_id: FixedCharSlice<8>,
@@ -502,13 +617,13 @@ pub struct TiledObject {
     pub count_of_open_search_squares: u16,
     pub count_of_closed_search_squares: u16,
     pub offset_to_closed_search_squares: u32,
-    #[serde(skip_serializing)]
-    pub unused: [u8; 48],
+    #[serde(skip)]
+    _unused: FixedCharSlice<48>,
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/are_v1.htm#formAREAV1_0_ProjTraps
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
 pub struct ProjectileTrap {
     pub projectile_resref: FixedCharSlice<8>,
     pub effect_block_offset: u32,
@@ -525,7 +640,7 @@ pub struct ProjectileTrap {
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/are_v1.htm#formAREAV1_0_Song_entries
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
 pub struct SongEntry {
     pub day_song_reference_number: u32,
     pub night_song_reference_number: u32,
@@ -544,16 +659,16 @@ pub struct SongEntry {
     pub main_night_ambient_2: FixedCharSlice<8>,
     pub main_night_ambient_volume_percent: u32,
     pub reverb_or_unused: u32,
-    #[serde(skip_serializing)]
-    pub unused: [u8; 60],
+    #[serde(skip)]
+    _unused: FixedCharSlice<60>,
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/are_v1.htm#formAREAV1_0_Rest_Interruptions
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
 pub struct RestInterruption {
     pub name: FixedCharSlice<32>,
-    pub interruption_explantion_text: [u32; 10],
+    pub interruption_explanation_text: [u32; 10],
     pub resref_of_creature_to_spawn: [u64; 10],
     pub count_of_creatures_in_spawn_table: u16,
     pub difficulty: u16,
@@ -565,6 +680,6 @@ pub struct RestInterruption {
     pub interruption_point_enabled: u16,
     pub probability_day_per_hour: u16,
     pub probability_night_per_hour: u16,
-    #[serde(skip_serializing)]
-    pub unused: [u8; 56],
+    #[serde(skip)]
+    _unused: FixedCharSlice<56>,
 }

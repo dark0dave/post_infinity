@@ -1,14 +1,15 @@
 use std::rc::Rc;
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::common::fixed_char_array::FixedCharSlice;
 use crate::model::Model;
-use crate::resources::utils::copy_buff_to_struct;
+use crate::resources::utils::{copy_buff_to_struct, to_u8_slice};
 use crate::tlk::Lookup;
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/eff_v1.htm#effv1_Header
-#[derive(Debug, Serialize)]
+#[repr(C)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct EffectV1 {
     pub effect_type: u16,
     pub target_type: u8,
@@ -40,5 +41,9 @@ impl Model for EffectV1 {
 
     fn name(&self, _lookup: &Lookup) -> String {
         todo!()
+    }
+
+    fn to_bytes(&self) -> Vec<u8> {
+        to_u8_slice(&self).to_vec()
     }
 }

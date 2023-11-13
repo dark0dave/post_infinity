@@ -5,9 +5,9 @@ use resources::types::ResourceType;
 use tlk::Lookup;
 
 use crate::{
-    area::Area, bio::Biography, character::ExpandedCharacter, creature::Creature, dialog::Dialog,
-    effect_v2::EffectV2, game::Game, ids::Ids, item::Item, spell::Spell, store::Store,
-    twoda::TwoDA, world_map::WorldMap,
+    area::Area, bio::Biography, character::ExpandedCharacter, creature::Creature,
+    dialogue::Dialogue, effect_v2::EffectV2, game::Game, ids::Ids, item::Item, spell::Spell,
+    store::Store, twoda::TwoDA, world_map::WorldMap,
 };
 
 pub mod area;
@@ -16,7 +16,7 @@ pub mod bio;
 pub mod character;
 pub mod common;
 pub mod creature;
-pub mod dialog;
+pub mod dialogue;
 pub mod effect_v1;
 pub mod effect_v2;
 pub mod game;
@@ -60,7 +60,7 @@ pub fn from_buffer(buffer: &[u8], resource_type: ResourceType) -> Option<Rc<dyn 
         ResourceType::FileTypeIds => Some(Ids::create_as_rc(buffer)),
         ResourceType::FileTypeCre => Some(Creature::create_as_rc(buffer)),
         ResourceType::FileTypeAre => Some(Area::create_as_rc(buffer)),
-        ResourceType::FileTypeDlg => Some(Dialog::create_as_rc(buffer)),
+        ResourceType::FileTypeDlg => Some(Dialogue::create_as_rc(buffer)),
         ResourceType::FileType2da => Some(TwoDA::create_as_rc(buffer)),
         // Game is a slow resource
         ResourceType::FileTypeGam => Some(Game::create_as_rc(buffer)),

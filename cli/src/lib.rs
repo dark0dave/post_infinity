@@ -1,9 +1,10 @@
 pub mod args;
 use std::{
     fs::{self, File},
-    io::{BufReader, Read},
+    io::{BufReader, Read, Write},
     path::Path,
     process::exit,
+    str,
 };
 
 use args::Args;
@@ -13,12 +14,31 @@ use models::{
     key::Key,
     model::Model,
     resources::types::{extention_to_resource_type, ResourceType},
+    spell::Spell,
     tlk::Lookup,
 };
 
 use erased_serde::Serializer;
 
-fn write_file(path: &Path, model: std::rc::Rc<dyn Model>) {
+fn write_file(path: &Path, extension: &str, buffer: &[u8]) {
+    let file_name = Path::new(path.file_stem().unwrap_or_default()).with_extension(extension);
+    if let Ok(mut file) = File::create(file_name) {
+        if let Err(err) = file.write_all(buffer) {
+            println!("Error: {}", err);
+        }
+    }
+}
+
+fn json_back_to_ie_type(path: &Path) {
+    let file_contents = read_file(path);
+    if let Ok(spell) = serde_json::from_slice::<Spell>(&file_contents) {
+        write_file(path, "spl", &spell.to_bytes())
+    } else {
+        panic!("Could not convert back to model")
+    }
+}
+
+fn write_model(path: &Path, model: std::rc::Rc<dyn Model>) {
     let file_name = Path::new(path.file_stem().unwrap_or_default()).with_extension("json");
     if let Ok(file) = File::create(file_name) {
         let mut json = serde_json::Serializer::new(file);
@@ -29,7 +49,7 @@ fn write_file(path: &Path, model: std::rc::Rc<dyn Model>) {
     }
 }
 
-fn from_file(path: &Path) -> Vec<u8> {
+fn read_file(path: &Path) -> Vec<u8> {
     let file = File::open(path).unwrap_or_else(|_| panic!("Could not open file: {:#?}", path));
     let mut reader = BufReader::new(file);
     let mut buffer = Vec::new();
@@ -40,7 +60,7 @@ fn from_file(path: &Path) -> Vec<u8> {
 }
 
 fn parse_tlk_file(path: &Path) -> Lookup {
-    let buffer = from_file(path);
+    let buffer = read_file(path);
     Lookup::new(&buffer)
 }
 
@@ -51,14 +71,14 @@ fn parse_key_file(path: &Path, buffer: &[u8]) -> Vec<Biff> {
     key.bif_entries
         .iter()
         .map(|bif_ref| {
-            let buffer = from_file(&parent.join(bif_ref.name.to_string()).with_extension("bif"));
+            let buffer = read_file(&parent.join(bif_ref.name.to_string()).with_extension("bif"));
             Biff::new(&buffer)
         })
         .collect()
 }
 
 fn get_model_from_file(path: &Path, json: bool) -> Vec<Biff> {
-    let buffer = from_file(path);
+    let buffer = read_file(path);
     let extention = path
         .extension()
         .unwrap_or_default()
@@ -71,15 +91,18 @@ fn get_model_from_file(path: &Path, json: bool) -> Vec<Biff> {
     if resource_type == ResourceType::NotFound {
         return match extention.as_str() {
             "key" => parse_key_file(path, &buffer),
-            "biff" => vec![Biff::new(&from_file(path))],
-            "json" => panic!(),
+            "biff" => vec![Biff::new(&read_file(path))],
+            "json" => {
+                json_back_to_ie_type(&path);
+                exit(0)
+            }
             _ => panic!("Unprocessable file type: {:?}", path.as_os_str()),
         };
     }
 
     let model = from_buffer(&buffer, resource_type).expect("Could not parse file");
     if json {
-        write_file(path, model);
+        write_model(path, model);
     } else {
         println!("{:?}", model);
     }

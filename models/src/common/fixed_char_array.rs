@@ -1,8 +1,6 @@
 use std::fmt::{Debug, Display};
 
-use serde::{Serialize, Serializer};
-
-use super::varriable_char_array::VarriableCharArray;
+use serde::{de::Visitor, Deserialize, Serialize, Serializer};
 
 #[repr(C, packed)]
 #[derive(PartialEq, Eq, Copy, Clone)]
@@ -52,32 +50,51 @@ impl<const N: usize> Debug for FixedCharSlice<{ N }> {
     }
 }
 
-impl<const N: usize> TryFrom<&VarriableCharArray> for FixedCharSlice<N> {
-    type Error = String;
-
-    fn try_from(value: &VarriableCharArray) -> Result<Self, Self::Error> {
-        if value.0.len() != N {
-            return Err(
-                "Attempt to move a larger vector to a smaller destination aborting".to_string(),
-            );
-        }
-        Ok(Self(unsafe {
-            std::ptr::read(value.0.as_ptr() as *const _)
-        }))
-    }
-}
-
 impl<const N: usize> Serialize for FixedCharSlice<N> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
     {
-        serializer.collect_str(&format!("{}", self))
+        serializer.collect_seq(self.0)
+    }
+}
+
+struct FixedCharSliceVisitor<const N: usize>;
+
+impl<'de, const N: usize> Visitor<'de> for FixedCharSliceVisitor<N> {
+    type Value = FixedCharSlice<N>;
+
+    fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(formatter, "struct FixedCharSlice")
+    }
+
+    fn visit_seq<A>(self, mut seq: A) -> Result<Self::Value, A::Error>
+    where
+        A: serde::de::SeqAccess<'de>,
+    {
+        let mut destination = [0; N];
+        let mut counter = 0;
+        while let Ok(Some(item)) = seq.next_element::<u8>() {
+            destination[counter] = item;
+            counter += 1;
+        }
+        Ok(FixedCharSlice(destination))
+    }
+}
+
+impl<'de, const N: usize> Deserialize<'de> for FixedCharSlice<N> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        deserializer.deserialize_seq(FixedCharSliceVisitor)
     }
 }
 
 #[cfg(test)]
 mod tests {
+
+    use std::io::{BufReader, Read, Seek, SeekFrom, Write};
 
     use super::*;
     #[test]
@@ -95,7 +112,7 @@ mod tests {
     fn valid_longer_from_bytes_to_fixed_char_slice() {
         let from = "BALDUR".as_bytes();
         assert_eq!(
-            FixedCharSlice::<7>::try_from(from)
+            FixedCharSlice::<6>::try_from(from)
                 .unwrap_or_default()
                 .to_string(),
             "BALDUR"
@@ -111,5 +128,24 @@ mod tests {
                 .to_string(),
             "BALDU"
         )
+    }
+
+    #[test]
+    fn deserialize_serialize_deserialize() {
+        let expected = FixedCharSlice::<6>::from("BALDUR");
+        let value = serde_json::to_string(&expected).unwrap();
+
+        let mut file = tempfile::tempfile().unwrap();
+        file.write_all(value.as_bytes()).unwrap();
+
+        file.seek(SeekFrom::Start(0)).unwrap();
+        let mut buffer = Vec::new();
+        let mut reader = BufReader::new(file);
+        reader
+            .read_to_end(&mut buffer)
+            .expect("Could not read to buffer");
+
+        let result: FixedCharSlice<6> = serde_json::from_slice(&buffer).unwrap();
+        assert_eq!(expected, result)
     }
 }

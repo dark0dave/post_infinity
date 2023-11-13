@@ -1,24 +1,26 @@
 use std::rc::Rc;
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::{
     common::{
         header::Header, signed_fixed_char_array::SignedFixedCharSlice,
-        varriable_char_array::VarriableCharArray,
+        variable_char_array::VariableCharArray,
     },
     model::Model,
-    resources::utils::{copy_buff_to_struct, copy_transmute_buff},
+    resources::utils::{copy_buff_to_struct, copy_transmute_buff, to_u8_slice, vec_to_u8_slice},
 };
 
 // This is hard coded by the file format
 const START: usize = 18;
 
-#[derive(Debug, Serialize)]
+// https://gibberlings3.github.io/iesdp/file_formats/ie_formats/tlk_v1.htm
+#[repr(C)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Lookup {
     pub header: TLKHeader,
     pub entries: Vec<TLKEntry>,
-    pub strings: Vec<VarriableCharArray>,
+    pub strings: Vec<VariableCharArray>,
 }
 
 impl Model for Lookup {
@@ -37,7 +39,7 @@ impl Model for Lookup {
                         .unwrap_or(0);
                 let buff_end =
                     buff_start + usize::try_from(entry.length_of_this_string).unwrap_or(0);
-                VarriableCharArray(buffer.get(buff_start..buff_end).unwrap().into())
+                VariableCharArray(buffer.get(buff_start..buff_end).unwrap().into())
             })
             .collect();
         Self {
@@ -54,11 +56,18 @@ impl Model for Lookup {
     fn name(&self, _lookup: &Lookup) -> String {
         todo!()
     }
+
+    fn to_bytes(&self) -> Vec<u8> {
+        let mut out = to_u8_slice(&self.header).to_vec();
+        out.extend(vec_to_u8_slice(&self.entries));
+        out.extend(vec_to_u8_slice(&self.strings));
+        out
+    }
 }
 
 //https://gibberlings3.github.io/iesdp/file_formats/ie_formats/tlk_v1.htm#tlkv1_Header
 #[repr(C, packed)]
-#[derive(Debug, Copy, Clone, Serialize, PartialEq)]
+#[derive(Debug, Copy, Clone, Serialize, Deserialize, PartialEq)]
 pub struct TLKHeader {
     pub header: Header<4, 4>,
     pub language_id: i16,
@@ -68,7 +77,7 @@ pub struct TLKHeader {
 
 //https://gibberlings3.github.io/iesdp/file_formats/ie_formats/tlk_v1.htm#tlkv1_Entry
 #[repr(C, packed)]
-#[derive(Debug, Copy, Clone, Serialize, PartialEq)]
+#[derive(Debug, Copy, Clone, Serialize, Deserialize, PartialEq)]
 pub struct TLKEntry {
     /*
         00 - No message data

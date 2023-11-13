@@ -1,17 +1,19 @@
 use std::rc::Rc;
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::common::feature_block::FeatureBlock;
 use crate::common::fixed_char_array::FixedCharSlice;
 use crate::common::fixed_char_nd_array::FixedCharNDArray;
 use crate::common::header::Header;
 use crate::model::Model;
-use crate::resources::utils::{copy_buff_to_struct, copy_transmute_buff};
+use crate::resources::utils::{
+    copy_buff_to_struct, copy_transmute_buff, to_u8_slice, vec_to_u8_slice,
+};
 use crate::tlk::Lookup;
 
 //https://gibberlings3.github.io/iesdp/file_formats/ie_formats/itm_v1.htm
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Item {
     pub header: ItemHeader,
     pub extended_headers: Vec<ItemExtendedHeader>,
@@ -27,7 +29,7 @@ impl Model for Item {
         let extended_headers = copy_transmute_buff::<ItemExtendedHeader>(buffer, start, count);
 
         let start = usize::try_from(header.offset_to_feature_blocks).unwrap_or(0);
-        let count = usize::try_from(header.count_of_feature_blocks).unwrap_or(0);
+        let count = (buffer.len() - start) / std::mem::size_of::<ItemFeatureBlock>();
         let equipping_feature_blocks =
             copy_transmute_buff::<ItemFeatureBlock>(buffer, start, count);
 
@@ -63,13 +65,20 @@ impl Model for Item {
         }
         .to_ascii_lowercase()
         .replace(' ', "_");
-        format!("{}.spl", name)
+        format!("{}.itm", name)
+    }
+
+    fn to_bytes(&self) -> Vec<u8> {
+        let mut out = to_u8_slice(&self.header).to_vec();
+        out.extend(vec_to_u8_slice(&self.extended_headers));
+        out.extend(vec_to_u8_slice(&self.equipping_feature_blocks));
+        out
     }
 }
 
 //https://gibberlings3.github.io/iesdp/file_formats/ie_formats/itm_v1.htm#itmv1_Header
 #[repr(C, packed)]
-#[derive(Debug, Copy, Clone, Serialize)]
+#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 pub struct ItemHeader {
     header: Header<4, 4>,
     unidentified_item_name: i32,
@@ -112,7 +121,7 @@ pub struct ItemHeader {
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/itm_v1.htm#itmv1_Extended_Header
 #[repr(C, packed)]
-#[derive(Debug, Copy, Clone, Serialize, PartialEq, Eq)]
+#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 pub struct ItemExtendedHeader {
     attack_type: u8, // Note zero is very bad here
     id_required: u8,
@@ -175,5 +184,18 @@ mod tests {
         let item = Item::new(&buffer);
         assert_eq!({ item.header.identified_item_name }, -1);
         assert_eq!({ item.header.max_stackable }, 1);
+    }
+
+    #[test]
+    fn sword_file_parse() {
+        let file = File::open("fixtures/sw1h01.itm").unwrap();
+        let mut reader = BufReader::new(file);
+        let mut buffer = Vec::new();
+        reader
+            .read_to_end(&mut buffer)
+            .expect("Could not read to buffer");
+        let item = Item::new(&buffer);
+        assert_eq!(item.extended_headers.len(), 1);
+        assert_eq!(item.equipping_feature_blocks.len(), 4);
     }
 }

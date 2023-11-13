@@ -1,12 +1,9 @@
-use std::mem::size_of;
-
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::common::fixed_char_array::FixedCharSlice;
-use crate::resources::utils::copy_transmute_buff;
 
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
 pub struct KnownSpells {
     pub spell_name: FixedCharSlice<8>,
     pub spell_level: u16,
@@ -14,7 +11,7 @@ pub struct KnownSpells {
 }
 
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
 pub struct SpellMemorizationInfo {
     pub spell_level: u16,
     pub number_of_spells_memorizable: u16,
@@ -25,49 +22,17 @@ pub struct SpellMemorizationInfo {
 }
 
 #[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
 pub struct SpellMemorizationTable {
     pub spell_name: FixedCharSlice<8>,
     pub memorised: u32,
-}
-
-#[derive(Debug, PartialEq, Eq, Serialize)]
-pub struct MemorizedSpells {
-    pub spell_memorization_info: SpellMemorizationInfo,
-    pub spell_memorization_table: Vec<SpellMemorizationTable>,
-}
-// Slow
-pub fn generate_spell_memorization(
-    buffer: &[u8],
-    start: usize,
-    count: usize,
-    spell_table_start: usize,
-) -> Vec<MemorizedSpells> {
-    copy_transmute_buff::<SpellMemorizationInfo>(buffer, start, count)
-        .iter()
-        .map(|spell_memorization_info| {
-            let start = spell_table_start
-                + size_of::<SpellMemorizationTable>()
-                    * usize::try_from(spell_memorization_info.index_to_spell_table).unwrap_or(0);
-            let spell_memorization_table = copy_transmute_buff::<SpellMemorizationTable>(
-                buffer,
-                start,
-                usize::try_from(spell_memorization_info.count_of_memorizable_spell_tables)
-                    .unwrap_or(0),
-            );
-
-            MemorizedSpells {
-                spell_memorization_info: *spell_memorization_info,
-                spell_memorization_table,
-            }
-        })
-        .collect()
 }
 
 #[cfg(test)]
 mod tests {
 
     use crate::{creature::Creature, model::Model};
+    use pretty_assertions::assert_eq;
 
     use super::*;
     use std::{
@@ -85,21 +50,19 @@ mod tests {
             .expect("Could not read to buffer");
 
         let creature = Creature::new(&buffer);
-        let memorized_spells = creature.memorized_spells;
-        let spells = memorized_spells.first().unwrap();
         assert_eq!(
-            spells.spell_memorization_info,
-            SpellMemorizationInfo {
+            creature.memorized_spell_info.first(),
+            Some(&SpellMemorizationInfo {
                 spell_level: 0,
                 number_of_spells_memorizable: 4,
                 number_of_spells_memorizable_after_effects: 4,
                 spell_type: 0,
                 index_to_spell_table: 0,
                 count_of_memorizable_spell_tables: 4,
-            }
+            })
         );
         assert_eq!(
-            spells.spell_memorization_table,
+            creature.memorized_spells,
             vec![
                 SpellMemorizationTable {
                     spell_name: "SPPR103".into(),
@@ -115,6 +78,126 @@ mod tests {
                 },
                 SpellMemorizationTable {
                     spell_name: "SPPR101".into(),
+                    memorised: 1,
+                },
+                SpellMemorizationTable {
+                    spell_name: "SPPR203".into(),
+                    memorised: 1,
+                },
+                SpellMemorizationTable {
+                    spell_name: "SPPR208".into(),
+                    memorised: 1,
+                },
+                SpellMemorizationTable {
+                    spell_name: "SPPR211".into(),
+                    memorised: 1,
+                },
+                SpellMemorizationTable {
+                    spell_name: "SPPR212".into(),
+                    memorised: 1,
+                },
+                SpellMemorizationTable {
+                    spell_name: "SPPR312".into(),
+                    memorised: 1,
+                },
+                SpellMemorizationTable {
+                    spell_name: "SPPR313".into(),
+                    memorised: 1,
+                },
+                SpellMemorizationTable {
+                    spell_name: "SPPR315".into(),
+                    memorised: 1,
+                },
+                SpellMemorizationTable {
+                    spell_name: "SPPR401".into(),
+                    memorised: 1,
+                },
+                SpellMemorizationTable {
+                    spell_name: "SPPR413".into(),
+                    memorised: 1,
+                },
+                SpellMemorizationTable {
+                    spell_name: "SPPR411".into(),
+                    memorised: 1,
+                },
+                SpellMemorizationTable {
+                    spell_name: "SPPR502".into(),
+                    memorised: 1,
+                },
+                SpellMemorizationTable {
+                    spell_name: "SPPR503".into(),
+                    memorised: 1,
+                },
+                SpellMemorizationTable {
+                    spell_name: "SPWI113".into(),
+                    memorised: 1,
+                },
+                SpellMemorizationTable {
+                    spell_name: "SPWI112".into(),
+                    memorised: 1,
+                },
+                SpellMemorizationTable {
+                    spell_name: "SPWI110".into(),
+                    memorised: 1,
+                },
+                SpellMemorizationTable {
+                    spell_name: "SPWI105".into(),
+                    memorised: 1,
+                },
+                SpellMemorizationTable {
+                    spell_name: "SPWI213".into(),
+                    memorised: 1,
+                },
+                SpellMemorizationTable {
+                    spell_name: "SPWI220".into(),
+                    memorised: 1,
+                },
+                SpellMemorizationTable {
+                    spell_name: "SPWI211".into(),
+                    memorised: 1,
+                },
+                SpellMemorizationTable {
+                    spell_name: "SPWI203".into(),
+                    memorised: 1,
+                },
+                SpellMemorizationTable {
+                    spell_name: "SPWI312".into(),
+                    memorised: 1,
+                },
+                SpellMemorizationTable {
+                    spell_name: "SPWI311".into(),
+                    memorised: 1,
+                },
+                SpellMemorizationTable {
+                    spell_name: "SPWI318".into(),
+                    memorised: 1,
+                },
+                SpellMemorizationTable {
+                    spell_name: "SPWI308".into(),
+                    memorised: 1,
+                },
+                SpellMemorizationTable {
+                    spell_name: "SPWI408".into(),
+                    memorised: 1,
+                },
+                SpellMemorizationTable {
+                    spell_name: "SPWI405".into(),
+                    memorised: 1,
+                },
+                SpellMemorizationTable {
+                    spell_name: "SPWI406".into(),
+                    memorised: 1,
+                },
+                SpellMemorizationTable {
+                    spell_name: "SPWI510".into(),
+                    memorised: 1,
+                },
+                SpellMemorizationTable {
+                    spell_name: "SPWI505".into(),
+                    memorised: 1,
+                },
+                SpellMemorizationTable {
+                    spell_name: "SPWI522".into(),
                     memorised: 1,
                 },
             ]
