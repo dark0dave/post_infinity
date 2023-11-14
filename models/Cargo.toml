@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 erased-serde = "0.3"
 serde = { version = "1.0.189", features = ["derive"] }
+flate2 = { version = "1.0.17" }
 
 [dev-dependencies]
 pretty_assertions = "1.3.0"

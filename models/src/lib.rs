@@ -26,6 +26,7 @@ pub mod item_table;
 pub mod key;
 pub mod model;
 pub mod resources;
+pub mod save;
 pub mod spell;
 pub mod spell_table;
 pub mod store;
