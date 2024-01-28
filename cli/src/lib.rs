@@ -14,6 +14,7 @@ use models::{
     key::Key,
     model::Model,
     resources::types::{extention_to_resource_type, ResourceType},
+    save::Save,
     spell::Spell,
     tlk::Lookup,
 };
@@ -92,6 +93,12 @@ fn get_model_from_file(path: &Path, json: bool) -> Vec<Biff> {
         return match extention.as_str() {
             "key" => parse_key_file(path, &buffer),
             "biff" => vec![Biff::new(&read_file(path))],
+            "sav" => {
+                let mut save = Save::new(&buffer);
+                save.decompress();
+                println!("{:#?}", save);
+                exit(0)
+            }
             "json" => {
                 json_back_to_ie_type(&path);
                 exit(0)
