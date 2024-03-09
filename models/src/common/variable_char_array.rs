@@ -5,7 +5,7 @@ use std::{
 
 use serde::{de::Visitor, Deserialize, Serialize, Serializer};
 
-#[derive(PartialEq, Eq)]
+#[derive(PartialEq, Eq, PartialOrd, Ord)]
 pub struct VariableCharArray(pub Rc<[u8]>);
 
 impl Display for VariableCharArray {
@@ -43,28 +43,24 @@ impl Serialize for VariableCharArray {
     where
         S: Serializer,
     {
-        serializer.collect_seq(self.0.iter())
+        serializer.collect_str(self)
     }
 }
 
-struct VarriableCharArrayVisitor;
+struct VariableCharArrayVisitor;
 
-impl<'de> Visitor<'de> for VarriableCharArrayVisitor {
+impl<'de> Visitor<'de> for VariableCharArrayVisitor {
     type Value = VariableCharArray;
 
     fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(formatter, "struct VarriableCharArray")
+        write!(formatter, "struct VariableCharArray")
     }
 
-    fn visit_seq<A>(self, mut seq: A) -> Result<Self::Value, A::Error>
+    fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
     where
-        A: serde::de::SeqAccess<'de>,
+        E: serde::de::Error,
     {
-        let mut destination = Vec::with_capacity(seq.size_hint().unwrap_or(0));
-        while let Ok(Some(item)) = seq.next_element::<u8>() {
-            destination.push(item);
-        }
-        Ok(VariableCharArray(destination.into()))
+        Ok(VariableCharArray::from(v))
     }
 }
 
@@ -73,7 +69,7 @@ impl<'de> Deserialize<'de> for VariableCharArray {
     where
         D: serde::Deserializer<'de>,
     {
-        deserializer.deserialize_seq(VarriableCharArrayVisitor)
+        deserializer.deserialize_str(VariableCharArrayVisitor)
     }
 }
 
