@@ -12,7 +12,7 @@ pub struct Args {
     /// Flag to tlk file
     #[clap(long, short, action=ArgAction::SetFalse)]
     pub process_tlk: bool,
-    /// Flag to tlk file
+    /// Json Output
     #[clap(long, short, action=ArgAction::SetTrue)]
     pub json: bool,
     /// The path to the file to read

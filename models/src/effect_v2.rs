@@ -22,7 +22,7 @@ impl Model for EffectV2 {
         // There is one weird file in BG1, to do with Opcode 67
         let tmp = if buffer.len() < 272 {
             let mut temp = buffer.to_vec();
-            temp.extend([0 as u8]);
+            temp.extend([0_u8]);
             temp
         } else {
             buffer.to_vec()

@@ -49,8 +49,14 @@ pub enum ResourceType {
     FileTypeSrc = 0x0803,
 }
 
-pub fn extention_to_resource_type(extention: &str) -> ResourceType {
-    match extention.to_ascii_lowercase().as_str() {
+impl std::fmt::Display for ResourceType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", resource_type_to_string(*self))
+    }
+}
+
+pub fn extension_to_resource_type(extension: &str) -> ResourceType {
+    match extension.to_ascii_lowercase().as_str() {
         "bmp" => ResourceType::FileTypeBmp,
         "mve" => ResourceType::FileTypeMve,
         "wav" => ResourceType::FileTypeWav,
@@ -94,4 +100,53 @@ pub fn extention_to_resource_type(extention: &str) -> ResourceType {
         "src" => ResourceType::FileTypeSrc,
         _ => ResourceType::NotFound,
     }
+}
+
+pub fn resource_type_to_string(resource_type: ResourceType) -> String {
+    match resource_type {
+        ResourceType::FileTypeBmp => "bmp",
+        ResourceType::FileTypeMve => "mve",
+        ResourceType::FileTypeWav => "wav",
+        ResourceType::FileTypeWfx => "wfx",
+        ResourceType::FileTypePlt => "plt",
+        ResourceType::FileTypeBam => "bam",
+        ResourceType::FileTypeWed => "wed",
+        ResourceType::FileTypeChu => "chu",
+        ResourceType::FileTypeTi => "ti",
+        ResourceType::FileTypeMos => "mos",
+        ResourceType::FileTypeItm => "itm",
+        ResourceType::FileTypeSpl => "spl",
+        ResourceType::FileTypeBcs => "bcs",
+        ResourceType::FileTypeIds => "ids",
+        ResourceType::FileTypeCre => "cre",
+        ResourceType::FileTypeAre => "are",
+        ResourceType::FileTypeDlg => "dlg",
+        ResourceType::FileType2da => "2da",
+        ResourceType::FileTypeGam => "gam",
+        ResourceType::FileTypeSto => "sto",
+        ResourceType::FileTypeWmap => "wmap",
+        ResourceType::FileTypeEff => "eff",
+        ResourceType::FileTypeBs => "ebs",
+        ResourceType::FileTypeChr => "chr",
+        ResourceType::FileTypeVvc => "vvc",
+        ResourceType::FileTypeVef => "vef",
+        ResourceType::FileTypePro => "pro",
+        ResourceType::FileTypeBio => "bio",
+        ResourceType::FileTypeWbm => "wbm",
+        ResourceType::FileTypeFnt => "fnt",
+        ResourceType::FileTypeGui => "gui",
+        ResourceType::FileTypeSql => "sql",
+        ResourceType::FileTypePvrz => "pvrz",
+        ResourceType::FileTypeGlsl => "glsl",
+        ResourceType::FileTypeTlk => "tlk",
+        ResourceType::FileTypeMenu => "enu",
+        ResourceType::FileTypeMenu2 => "nu2",
+        ResourceType::FileTypeTtf => "ttf",
+        ResourceType::FileTypePng => "png",
+        ResourceType::FileTypeBah => "bah",
+        ResourceType::FileTypeIni => "ini",
+        ResourceType::FileTypeSrc => "src",
+        _ => "",
+    }
+    .to_string()
 }
