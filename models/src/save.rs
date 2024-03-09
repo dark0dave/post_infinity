@@ -6,7 +6,7 @@ use crate::{
     common::{header::Header, variable_char_array::VariableCharArray},
     from_buffer,
     model::Model,
-    resources::{types::extention_to_resource_type, utils::copy_buff_to_struct},
+    resources::{types::extension_to_resource_type, utils::copy_buff_to_struct},
 };
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/sav_v1.htm
@@ -45,7 +45,7 @@ impl Save {
             let file_name = file.filename.clone().to_string();
             let uncompresseed_buffer = file.decompress();
             let file_extension = file_name[file_name.len() - 3..].to_string();
-            let file_type = extention_to_resource_type(&file_extension);
+            let file_type = extension_to_resource_type(&file_extension);
             if let Some(model) = from_buffer(&uncompresseed_buffer, file_type) {
                 uncompressed_files.push(model);
             }
@@ -108,7 +108,7 @@ impl File {
             Ok(_) => buff,
             Err(err) => {
                 println!("{}", err);
-                return vec![];
+                vec![]
             }
         }
     }

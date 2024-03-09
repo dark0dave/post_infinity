@@ -55,7 +55,7 @@ impl<const N: usize> Serialize for FixedCharSlice<N> {
     where
         S: Serializer,
     {
-        serializer.collect_seq(self.0)
+        serializer.collect_str(self)
     }
 }
 
@@ -68,17 +68,11 @@ impl<'de, const N: usize> Visitor<'de> for FixedCharSliceVisitor<N> {
         write!(formatter, "struct FixedCharSlice")
     }
 
-    fn visit_seq<A>(self, mut seq: A) -> Result<Self::Value, A::Error>
+    fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
     where
-        A: serde::de::SeqAccess<'de>,
+        E: serde::de::Error,
     {
-        let mut destination = [0; N];
-        let mut counter = 0;
-        while let Ok(Some(item)) = seq.next_element::<u8>() {
-            destination[counter] = item;
-            counter += 1;
-        }
-        Ok(FixedCharSlice(destination))
+        Ok(FixedCharSlice::from(v))
     }
 }
 
@@ -87,7 +81,7 @@ impl<'de, const N: usize> Deserialize<'de> for FixedCharSlice<N> {
     where
         D: serde::Deserializer<'de>,
     {
-        deserializer.deserialize_seq(FixedCharSliceVisitor)
+        deserializer.deserialize_str(FixedCharSliceVisitor)
     }
 }
 

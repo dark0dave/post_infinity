@@ -1,7 +1,7 @@
 pub mod args;
 use std::{
     fs::{self, File},
-    io::{BufReader, Read, Write},
+    io::{self, BufReader, Read, Write},
     path::Path,
     process::exit,
     str,
@@ -13,7 +13,7 @@ use models::{
     from_buffer,
     key::Key,
     model::Model,
-    resources::types::{extention_to_resource_type, ResourceType},
+    resources::types::{extension_to_resource_type, ResourceType},
     save::Save,
     spell::Spell,
     tlk::Lookup,
@@ -39,8 +39,10 @@ fn json_back_to_ie_type(path: &Path) {
     }
 }
 
-fn write_model(path: &Path, model: std::rc::Rc<dyn Model>) {
-    let file_name = Path::new(path.file_stem().unwrap_or_default()).with_extension("json");
+fn write_model(path: &Path, model: std::rc::Rc<dyn Model>, resource_type: ResourceType) {
+    let file_name = Path::new(path.file_stem().unwrap_or_default())
+        .with_extension(format!("{}.json", resource_type));
+    println!("{:?}", file_name);
     if let Ok(file) = File::create(file_name) {
         let mut json = serde_json::Serializer::new(file);
         let mut format = <dyn Serializer>::erase(&mut json);
@@ -86,7 +88,7 @@ fn get_model_from_file(path: &Path, json: bool) -> Vec<Biff> {
         .to_str()
         .unwrap_or_default()
         .to_ascii_lowercase();
-    let resource_type = extention_to_resource_type(&extention);
+    let resource_type = extension_to_resource_type(&extention);
 
     // Non resource types
     if resource_type == ResourceType::NotFound {
@@ -100,7 +102,7 @@ fn get_model_from_file(path: &Path, json: bool) -> Vec<Biff> {
                 exit(0)
             }
             "json" => {
-                json_back_to_ie_type(&path);
+                json_back_to_ie_type(path);
                 exit(0)
             }
             _ => panic!("Unprocessable file type: {:?}", path.as_os_str()),
@@ -109,9 +111,11 @@ fn get_model_from_file(path: &Path, json: bool) -> Vec<Biff> {
 
     let model = from_buffer(&buffer, resource_type).expect("Could not parse file");
     if json {
-        write_model(path, model);
+        write_model(path, model, resource_type);
     } else {
-        println!("{:?}", model);
+        let print = &mut serde_json::Serializer::new(io::stdout());
+        let mut format = <dyn Serializer>::erase(print);
+        model.erased_serialize(&mut format).unwrap();
     }
     exit(0)
 }

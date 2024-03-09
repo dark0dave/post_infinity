@@ -76,7 +76,7 @@ impl<const N: usize> Serialize for SignedFixedCharSlice<N> {
     where
         S: Serializer,
     {
-        serializer.collect_seq(self.0)
+        serializer.collect_str(self)
     }
 }
 
@@ -88,18 +88,11 @@ impl<'de, const N: usize> Visitor<'de> for SignedFixedCharSliceVisitor<N> {
     fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(formatter, "struct SignedFixedCharSlice")
     }
-
-    fn visit_seq<A>(self, mut seq: A) -> Result<Self::Value, A::Error>
+    fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
     where
-        A: serde::de::SeqAccess<'de>,
+        E: serde::de::Error,
     {
-        let mut destination = [0; N];
-        let mut counter = 0;
-        while let Ok(Some(item)) = seq.next_element::<i8>() {
-            destination[counter] = item;
-            counter += 1;
-        }
-        Ok(SignedFixedCharSlice(destination))
+        Ok(SignedFixedCharSlice::from(v))
     }
 }
 
@@ -108,7 +101,7 @@ impl<'de, const N: usize> Deserialize<'de> for SignedFixedCharSlice<N> {
     where
         D: serde::Deserializer<'de>,
     {
-        deserializer.deserialize_seq(SignedFixedCharSliceVisitor)
+        deserializer.deserialize_str(SignedFixedCharSliceVisitor)
     }
 }
 
