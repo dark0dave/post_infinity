@@ -21,8 +21,7 @@ Example:
 [example.webm](https://github.com/dark0dave/post_infinity/assets/52840419/5d5974ad-83fe-4abd-b5fd-18c1b94ff49a)
 
 ```
-cargo run models/fixtures/gate1.spl
-cat gate1.json
+post_infinity models/fixtures/gate1.spl
 {
   "header": {
     "header": {

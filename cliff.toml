@@ -11,6 +11,7 @@ header = ""
 # template for the changelog body
 # https://tera.netlify.app/docs
 body = """
+
 ### Changelog
 {% for group, commits in commits | group_by(attribute="group") %}
     \n#### {{ group | striptags | trim | upper_first }}:
@@ -20,6 +21,7 @@ body = """
             {{ commit.message }} ([{{ commit.id | truncate(length=7, end="") }}](https://github.com/dark0dave/post_infinity/commit/{{ commit.id }}) by [{{ commit.author.name }}](https://github.com/{{ commit.author.name }}))
     {%- endfor -%}
 {% endfor %}
+
 """
 # remove the leading and trailing whitespace from the template
 trim = true
