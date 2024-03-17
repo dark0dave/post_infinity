@@ -10,12 +10,11 @@ use std::{
 use args::Args;
 use models::{
     biff::Biff,
-    from_buffer,
+    from_buffer, from_json,
     key::Key,
     model::Model,
     resources::types::{extension_to_resource_type, ResourceType},
     save::Save,
-    spell::Spell,
     tlk::Lookup,
 };
 
@@ -31,18 +30,26 @@ fn write_file(path: &Path, extension: &str, buffer: &[u8]) {
 }
 
 fn json_back_to_ie_type(path: &Path) {
+    let extension = path
+        .file_name()
+        .unwrap_or_default()
+        .to_str()
+        .unwrap_or_default()
+        .split(".")
+        .nth(1)
+        .unwrap_or_default()
+        .to_ascii_lowercase();
+
+    let resource_type = extension_to_resource_type(&extension);
     let file_contents = read_file(path);
-    if let Ok(spell) = serde_json::from_slice::<Spell>(&file_contents) {
-        write_file(path, "spl", &spell.to_bytes())
-    } else {
-        panic!("Could not convert back to model")
-    }
+    let out = from_json(&file_contents, resource_type);
+    write_file(path, &extension, &out);
 }
 
 fn write_model(path: &Path, model: std::rc::Rc<dyn Model>, resource_type: ResourceType) {
     let file_name = Path::new(path.file_stem().unwrap_or_default())
         .with_extension(format!("{}.json", resource_type));
-    println!("{:?}", file_name);
+    println!("Saved as {:#?}", file_name);
     if let Ok(file) = File::create(file_name) {
         let mut json = serde_json::Serializer::new(file);
         let mut format = <dyn Serializer>::erase(&mut json);

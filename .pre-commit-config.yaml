@@ -15,9 +15,14 @@ repos:
   rev: 3.0.0
   hooks:
     - id: git-dirty
+    - id: forbid-binary
+      exclude: >
+        (?x)^(
+          models/fixtures/.*?|docs/.*?
+        )$
 
 - repo: https://github.com/commitizen-tools/commitizen
-  rev: v3.18.0
+  rev: v3.18.4
   hooks:
     - id: commitizen
       stages: [commit-msg]
