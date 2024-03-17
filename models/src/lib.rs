@@ -96,3 +96,69 @@ pub fn from_buffer(buffer: &[u8], resource_type: ResourceType) -> Option<Rc<dyn 
         _ => None,
     }
 }
+
+pub fn from_json(buffer: &[u8], resource_type: ResourceType) -> Vec<u8> {
+    let model: Rc<dyn Model> = match resource_type {
+        // I am skipping image files
+        ResourceType::FileTypeBmp => todo!(),
+        ResourceType::FileTypeMve => todo!(),
+        // I am skipping music files
+        ResourceType::FileTypeWav => todo!(),
+        // Skipping play back sounds
+        ResourceType::FileTypeWfx => todo!(),
+        // Skipping
+        ResourceType::FileTypePlt => todo!(),
+        // I am skipping image files
+        ResourceType::FileTypeBam => todo!(),
+        // I am skipping texture files
+        ResourceType::FileTypeWed => todo!(),
+        // I am skipping GUI defs
+        ResourceType::FileTypeChu => todo!(),
+        ResourceType::FileTypeTi => todo!(),
+        // I am skipping compress graphic files
+        ResourceType::FileTypeMos => todo!(),
+        ResourceType::FileTypeItm => Rc::new(serde_json::from_slice::<Item>(buffer).unwrap()),
+        ResourceType::FileTypeSpl => Rc::new(serde_json::from_slice::<Spell>(buffer).unwrap()),
+        // I am ignoring scripting files
+        ResourceType::FileTypeBcs => todo!(),
+        ResourceType::FileTypeIds => Rc::new(serde_json::from_slice::<Ids>(buffer).unwrap()),
+        ResourceType::FileTypeCre => Rc::new(serde_json::from_slice::<Creature>(buffer).unwrap()),
+        ResourceType::FileTypeAre => Rc::new(serde_json::from_slice::<Area>(buffer).unwrap()),
+        ResourceType::FileTypeDlg => Rc::new(serde_json::from_slice::<Dialogue>(buffer).unwrap()),
+        ResourceType::FileType2da => Rc::new(serde_json::from_slice::<TwoDA>(buffer).unwrap()),
+        // Game is a slow resource
+        ResourceType::FileTypeGam => Rc::new(serde_json::from_slice::<Game>(buffer).unwrap()),
+        ResourceType::FileTypeSto => Rc::new(serde_json::from_slice::<Store>(buffer).unwrap()),
+        ResourceType::FileTypeWmap => Rc::new(serde_json::from_slice::<WorldMap>(buffer).unwrap()),
+        ResourceType::FileTypeEff => Rc::new(serde_json::from_slice::<EffectV2>(buffer).unwrap()),
+        ResourceType::FileTypeBs => todo!(),
+        ResourceType::FileTypeChr => {
+            Rc::new(serde_json::from_slice::<ExpandedCharacter>(buffer).unwrap())
+        }
+        // I am skipping spell casting graphics
+        ResourceType::FileTypeVvc => todo!(),
+        // Skip visual effects
+        ResourceType::FileTypeVef => todo!(),
+        // I am skipping projectiles
+        ResourceType::FileTypePro => todo!(),
+        ResourceType::FileTypeBio => Rc::new(serde_json::from_slice::<Biography>(buffer).unwrap()),
+        ResourceType::FileTypeWbm => todo!(),
+        ResourceType::FileTypeFnt => todo!(),
+        ResourceType::FileTypeGui => todo!(),
+        ResourceType::FileTypeSql => todo!(),
+        // Skipping graphic data
+        ResourceType::FileTypePvrz => todo!(),
+        ResourceType::FileTypeGlsl => todo!(),
+        ResourceType::FileTypeTlk => Rc::new(serde_json::from_slice::<Lookup>(buffer).unwrap()),
+        ResourceType::FileTypeMenu => todo!(),
+        ResourceType::FileTypeTtf => todo!(),
+        ResourceType::FileTypePng => todo!(),
+        ResourceType::FileTypeBah => todo!(),
+        ResourceType::FileTypeIni => todo!(),
+        // Skipping sounds/ out of dialog text
+        ResourceType::FileTypeSrc => todo!(),
+        ResourceType::NotFound => todo!(),
+        _ => todo!(),
+    };
+    model.to_bytes()
+}
