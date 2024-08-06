@@ -1,16 +1,16 @@
 use std::rc::Rc;
 
+use binrw::{io::Cursor, BinRead, BinReaderExt, BinWrite};
 use serde::{Deserialize, Serialize};
 
-use crate::resources::utils::{copy_buff_to_struct, to_u8_slice};
+use crate::common::resref::Resref;
+use crate::model::Model;
 use crate::tlk::Lookup;
-use crate::{common::fixed_char_array::FixedCharSlice, model::Model};
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/cre_v1.htm#CREV1_0_Item
-#[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct ItemReferenceTable {
-    pub resource_name: FixedCharSlice<8>,
+    pub resource_name: Resref,
     // Item expiration time - item creation hour (replace with drained item)
     pub item_expiration_time_hour: u8,
     /*
@@ -29,71 +29,74 @@ pub struct ItemReferenceTable {
 
 impl Model for ItemReferenceTable {
     fn new(buffer: &[u8]) -> Self {
-        copy_buff_to_struct::<Self>(buffer, 0)
+        let mut reader = Cursor::new(buffer);
+        reader.read_le().unwrap()
     }
     fn create_as_rc(buffer: &[u8]) -> Rc<dyn Model> {
         Rc::new(Self::new(buffer))
     }
 
     fn name(&self, _lookup: &Lookup) -> String {
-        self.resource_name.to_string()
+        self.resource_name.0.clone()
     }
 
     fn to_bytes(&self) -> Vec<u8> {
-        to_u8_slice(&self).to_vec()
+        let mut writer = Cursor::new(Vec::new());
+        self.write_le(&mut writer).unwrap();
+        writer.into_inner()
     }
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/cre_v1.htm#CREV1_0_ItemSlots
-#[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct ItemSlots {
-    helmet: i16,
-    armor: i16,
-    shield: i16,
-    gloves: i16,
-    left_ring: i16,
-    right_ring: i16,
-    amulet: i16,
-    belt: i16,
-    boots: i16,
-    weapon_1: i16,
-    weapon_2: i16,
-    weapon_3: i16,
-    weapon_4: i16,
-    quiver_1: i16,
-    quiver_2: i16,
-    quiver_3: i16,
-    // Cannot be accesed from gui
-    quiver_4: i16,
-    cloak: i16,
-    quick_item_1: i16,
-    quick_item_2: i16,
-    quick_item_3: i16,
-    inventory_item_1: i16,
-    inventory_item_2: i16,
-    inventory_item_3: i16,
-    inventory_item_4: i16,
-    inventory_item_5: i16,
-    inventory_item_6: i16,
-    inventory_item_7: i16,
-    inventory_item_8: i16,
-    inventory_item_9: i16,
-    inventory_item_10: i16,
-    inventory_item_11: i16,
-    inventory_item_12: i16,
-    inventory_item_13: i16,
-    inventory_item_14: i16,
-    inventory_item_15: i16,
-    inventory_item_16: i16,
-    magic_weapon: i16,
-    weapon_slot_selected: i16,
-    weapon_ability_selected: i16,
+    helmet: u16,
+    armor: u16,
+    shield: u16,
+    gloves: u16,
+    left_ring: u16,
+    right_ring: u16,
+    amulet: u16,
+    belt: u16,
+    boots: u16,
+    weapon_1: u16,
+    weapon_2: u16,
+    weapon_3: u16,
+    weapon_4: u16,
+    quiver_1: u16,
+    quiver_2: u16,
+    quiver_3: u16,
+    // Cannot be accessed from gui
+    quiver_4: u16,
+    cloak: u16,
+    quick_item_1: u16,
+    quick_item_2: u16,
+    quick_item_3: u16,
+    inventory_item_1: u16,
+    inventory_item_2: u16,
+    inventory_item_3: u16,
+    inventory_item_4: u16,
+    inventory_item_5: u16,
+    inventory_item_6: u16,
+    inventory_item_7: u16,
+    inventory_item_8: u16,
+    inventory_item_9: u16,
+    inventory_item_10: u16,
+    inventory_item_11: u16,
+    inventory_item_12: u16,
+    inventory_item_13: u16,
+    inventory_item_14: u16,
+    inventory_item_15: u16,
+    inventory_item_16: u16,
+    magic_weapon: u16,
+    weapon_slot_selected: u16,
+    weapon_ability_selected: u16,
 }
 
 impl Model for ItemSlots {
     fn new(buffer: &[u8]) -> Self {
-        copy_buff_to_struct::<Self>(buffer, 0)
+        let mut reader = Cursor::new(buffer);
+        reader.read_le().unwrap()
     }
     fn create_as_rc(buffer: &[u8]) -> Rc<dyn Model> {
         Rc::new(Self::new(buffer))
@@ -104,16 +107,19 @@ impl Model for ItemSlots {
     }
 
     fn to_bytes(&self) -> Vec<u8> {
-        to_u8_slice(&self).to_vec()
+        let mut writer = Cursor::new(Vec::new());
+        self.write_le(&mut writer).unwrap();
+        writer.into_inner()
     }
 }
 
 #[cfg(test)]
 mod tests {
 
-    use crate::creature::BGEECreature;
+    use crate::creature::Creature;
 
     use super::*;
+    use pretty_assertions::assert_eq;
     use std::{
         fs::File,
         io::{BufReader, Read},
@@ -128,51 +134,48 @@ mod tests {
             .read_to_end(&mut buffer)
             .expect("Could not read to buffer");
 
-        let header = copy_buff_to_struct::<BGEECreature>(&buffer, 0);
-
-        let start = usize::try_from(header.offset_to_item_slots).unwrap_or(0);
-        let item_slots = copy_buff_to_struct::<ItemSlots>(&buffer, start);
+        let creature: Creature = Creature::new(&buffer);
         assert_eq!(
-            item_slots,
+            creature.item_slots.unwrap(),
             ItemSlots {
                 helmet: 2,
-                armor: -1,
-                shield: -1,
-                gloves: -1,
+                armor: 65535,
+                shield: 65535,
+                gloves: 65535,
                 left_ring: 1,
                 right_ring: 3,
-                amulet: -1,
-                belt: -1,
-                boots: -1,
-                weapon_1: -1,
-                weapon_2: -1,
-                weapon_3: -1,
-                weapon_4: -1,
-                quiver_1: -1,
-                quiver_2: -1,
-                quiver_3: -1,
-                quiver_4: -1,
-                cloak: -1,
-                quick_item_1: -1,
-                quick_item_2: -1,
-                quick_item_3: -1,
+                amulet: 65535,
+                belt: 65535,
+                boots: 65535,
+                weapon_1: 65535,
+                weapon_2: 65535,
+                weapon_3: 65535,
+                weapon_4: 65535,
+                quiver_1: 65535,
+                quiver_2: 65535,
+                quiver_3: 65535,
+                quiver_4: 65535,
+                cloak: 65535,
+                quick_item_1: 65535,
+                quick_item_2: 65535,
+                quick_item_3: 65535,
                 inventory_item_1: 4,
                 inventory_item_2: 5,
-                inventory_item_3: -1,
-                inventory_item_4: -1,
-                inventory_item_5: -1,
-                inventory_item_6: -1,
-                inventory_item_7: -1,
-                inventory_item_8: -1,
-                inventory_item_9: -1,
-                inventory_item_10: -1,
-                inventory_item_11: -1,
-                inventory_item_12: -1,
-                inventory_item_13: -1,
-                inventory_item_14: -1,
-                inventory_item_15: -1,
-                inventory_item_16: -1,
-                magic_weapon: -1,
+                inventory_item_3: 65535,
+                inventory_item_4: 65535,
+                inventory_item_5: 65535,
+                inventory_item_6: 65535,
+                inventory_item_7: 65535,
+                inventory_item_8: 65535,
+                inventory_item_9: 65535,
+                inventory_item_10: 65535,
+                inventory_item_11: 65535,
+                inventory_item_12: 65535,
+                inventory_item_13: 65535,
+                inventory_item_14: 65535,
+                inventory_item_15: 65535,
+                inventory_item_16: 65535,
+                magic_weapon: 65535,
                 weapon_slot_selected: 0,
                 weapon_ability_selected: 0
             }

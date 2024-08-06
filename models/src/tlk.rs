@@ -1,51 +1,28 @@
-use std::rc::Rc;
+use std::{io::SeekFrom, rc::Rc};
 
+use binrw::{io::Cursor, BinRead, BinReaderExt, BinWrite};
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    common::{
-        header::Header, signed_fixed_char_array::SignedFixedCharSlice,
-        variable_char_array::VariableCharArray,
-    },
-    model::Model,
-    resources::utils::{copy_buff_to_struct, copy_transmute_buff, to_u8_slice, vec_to_u8_slice},
-};
-
-// This is hard coded by the file format
-const START: usize = 18;
+use crate::{common::resref::Resref, model::Model};
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/tlk_v1.htm
-#[repr(C)]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct Lookup {
+    #[serde(flatten)]
     pub header: TLKHeader,
+    #[serde(flatten)]
+    #[br(count=header.count_of_entries, args{ inner: (&header,) })]
     pub entries: Vec<TLKEntry>,
-    pub strings: Vec<VariableCharArray>,
 }
 
 impl Model for Lookup {
     fn new(buffer: &[u8]) -> Self {
-        let header = copy_buff_to_struct::<TLKHeader>(buffer, 0);
-
-        let count = usize::try_from(header.count_of_entries).unwrap_or(0);
-        let entries = copy_transmute_buff::<TLKEntry>(buffer, START, count);
-
-        let start = usize::try_from(header.offset_to_strings).unwrap_or(0);
-        let strings = entries
-            .iter()
-            .map(|entry| {
-                let buff_start = start
-                    + usize::try_from(entry.offset_of_this_string_relative_to_the_strings_section)
-                        .unwrap_or(0);
-                let buff_end =
-                    buff_start + usize::try_from(entry.length_of_this_string).unwrap_or(0);
-                VariableCharArray(buffer.get(buff_start..buff_end).unwrap().into())
-            })
-            .collect();
-        Self {
-            header,
-            entries,
-            strings,
+        let mut reader = Cursor::new(buffer);
+        match reader.read_le() {
+            Ok(res) => res,
+            Err(err) => {
+                panic!("Errored with {:?}, dumping buffer: {:?}", err, buffer);
+            }
         }
     }
 
@@ -58,26 +35,31 @@ impl Model for Lookup {
     }
 
     fn to_bytes(&self) -> Vec<u8> {
-        let mut out = to_u8_slice(&self.header).to_vec();
-        out.extend(vec_to_u8_slice(&self.entries));
-        out.extend(vec_to_u8_slice(&self.strings));
-        out
+        let mut writer = Cursor::new(Vec::new());
+        self.write_le(&mut writer).unwrap();
+        writer.into_inner()
     }
 }
 
 //https://gibberlings3.github.io/iesdp/file_formats/ie_formats/tlk_v1.htm#tlkv1_Header
-#[repr(C, packed)]
-#[derive(Debug, Copy, Clone, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, PartialEq, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct TLKHeader {
-    pub header: Header<4, 4>,
-    pub language_id: i16,
+    #[br(count = 4)]
+    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
+    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    pub signature: String,
+    #[br(count = 4)]
+    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
+    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    pub version: String,
+    pub language_id: u16,
     pub count_of_entries: u32,
     pub offset_to_strings: u32,
 }
 
 //https://gibberlings3.github.io/iesdp/file_formats/ie_formats/tlk_v1.htm#tlkv1_Entry
-#[repr(C, packed)]
-#[derive(Debug, Copy, Clone, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, PartialEq, BinRead, BinWrite, Serialize, Deserialize)]
+#[br(import(header: &TLKHeader))]
 pub struct TLKEntry {
     /*
         00 - No message data
@@ -86,14 +68,19 @@ pub struct TLKEntry {
         03 - Standard message. Ambient message. Used for sound without text (BG1) or message displayed over characters head (BG2) , Message with tags (for instance <CHARNAME>) for all games except BG2
         04 - Token exists (for instance <CHARNAME>), BG2 and EEs only
     */
-    pub bit_field: i16,
-    pub resource_name_of_associated_sound: SignedFixedCharSlice<8>,
+    pub bit_field: u16,
+    pub resource_name_of_associated_sound: Resref,
     //  Unused, at minimum in BG1
     pub volume_variance: u32,
     // Unused, at minimum in BG1
     pub pitch_variance: u32,
-    pub offset_of_this_string_relative_to_the_strings_section: u32,
+    // Offset of this string relative to the strings section
+    pub offset_to_this_string: u32,
     pub length_of_this_string: u32,
+    #[br(count=length_of_this_string, seek_before=SeekFrom::Start(offset_to_this_string as u64 + header.offset_to_strings as u64), restore_position)]
+    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
+    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    pub tlk_string: String,
 }
 
 #[cfg(test)]
@@ -117,10 +104,8 @@ mod tests {
         assert_eq!(
             lookup.header,
             TLKHeader {
-                header: Header {
-                    signature: "TLK ".into(),
-                    version: "V1  ".into(),
-                },
+                signature: "TLK ".to_string(),
+                version: "V1  ".to_string(),
                 language_id: 0,
                 count_of_entries: 34000,
                 offset_to_strings: 884018,
@@ -131,14 +116,27 @@ mod tests {
             entry,
             &TLKEntry {
                 bit_field: 1,
-                resource_name_of_associated_sound: "".into(),
+                resource_name_of_associated_sound: Resref("\0\0\0\0\0\0\0\0".to_string()),
                 volume_variance: 0,
                 pitch_variance: 0,
-                offset_of_this_string_relative_to_the_strings_section: 49264,
-                length_of_this_string: 213
+                offset_to_this_string: 49264,
+                length_of_this_string: 213,
+                tlk_string: " 'Twas some three hundred years hence, but folk still cringe at the mention of the destruction at Ulcaster School. I've not met a soul who claims to know why it occurred, and none that were there are alive to say.".to_string()
             }
         );
-        let content = lookup.strings.get(400).expect("Failed to find entry");
-        assert_eq!(content.to_string()," 'Twas some three hundred years hence, but folk still cringe at the mention of the destruction at Ulcaster School. I've not met a soul who claims to know why it occurred, and none that were there are alive to say.")
+
+        let entry = lookup.entries.last().expect("Failed to find entry");
+        assert_eq!(
+            entry,
+            &TLKEntry {
+                bit_field: 1,
+                resource_name_of_associated_sound: Resref("\0\0\0\0\0\0\0\0".to_string()),
+                volume_variance: 0,
+                pitch_variance: 0,
+                offset_to_this_string: 3855179,
+                length_of_this_string: 11,
+                tlk_string: "placeholder".to_string()
+            }
+        );
     }
 }

@@ -37,9 +37,7 @@ impl<const N: usize> Display for FixedCharSlice<{ N }> {
         write!(
             f,
             "{}",
-            std::str::from_utf8(&{ self.0 })
-                .unwrap_or_default()
-                .replace('\0', "")
+            std::str::from_utf8(&{ self.0 }).unwrap_or_default()
         )
     }
 }

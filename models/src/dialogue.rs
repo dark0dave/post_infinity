@@ -1,59 +1,42 @@
 use std::rc::Rc;
 
+use binrw::{
+    io::{Cursor, SeekFrom},
+    BinRead, BinReaderExt, BinWrite,
+};
 use serde::{Deserialize, Serialize};
 
-use crate::common::fixed_char_array::FixedCharSlice;
-use crate::common::header::Header;
+use crate::common::resref::Resref;
+use crate::common::strref::Strref;
 use crate::model::Model;
-use crate::resources::utils::{
-    copy_buff_to_struct, copy_transmute_buff, to_u8_slice, vec_to_u8_slice,
-};
 use crate::tlk::Lookup;
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/dlg_v1.htm
-#[repr(C)]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct Dialogue {
+    #[serde(flatten)]
     pub header: DialogueHeader,
+    #[serde(flatten)]
+    #[br(count=header.count_of_state_tables, seek_before=SeekFrom::Start(header.offset_to_state_table as u64))]
     pub state_tables: Vec<StateTable>,
+    #[serde(flatten)]
+    #[br(count=header.count_of_transitions, seek_before=SeekFrom::Start(header.offset_to_transition_table as u64))]
     pub transitions: Vec<Transition>,
+    #[serde(flatten)]
+    #[br(count=header.count_of_state_triggers, seek_before=SeekFrom::Start(header.offset_to_state_trigger_table as u64))]
     pub state_triggers: Vec<StateTrigger>,
+    #[serde(flatten)]
+    #[br(count=header.count_of_transition_triggers, seek_before=SeekFrom::Start(header.offset_to_transition_trigger_table as u64))]
     pub transition_triggers: Vec<TransitionTrigger>,
+    #[serde(flatten)]
+    #[br(count=header.count_of_action_tables, seek_before=SeekFrom::Start(header.offset_to_action_table as u64))]
     pub action_tables: Vec<ActionTable>,
 }
 
 impl Model for Dialogue {
     fn new(buffer: &[u8]) -> Self {
-        let header = copy_buff_to_struct::<DialogueHeader>(buffer, 0);
-
-        let start = usize::try_from(header.offset_to_state_table).unwrap_or(0);
-        let count = usize::try_from(header.count_of_state_tables).unwrap_or(0);
-        let state_tables = copy_transmute_buff::<StateTable>(buffer, start, count);
-
-        let start = usize::try_from(header.offset_to_transition_table).unwrap_or(0);
-        let count = usize::try_from(header.count_of_transitions).unwrap_or(0);
-        let transitions = copy_transmute_buff::<Transition>(buffer, start, count);
-
-        let start = usize::try_from(header.offset_to_state_trigger_table).unwrap_or(0);
-        let count = usize::try_from(header.count_of_state_triggers).unwrap_or(0);
-        let state_triggers = copy_transmute_buff::<StateTrigger>(buffer, start, count);
-
-        let start = usize::try_from(header.offset_to_transition_trigger_table).unwrap_or(0);
-        let count = usize::try_from(header.count_of_transition_triggers).unwrap_or(0);
-        let transition_triggers = copy_transmute_buff::<TransitionTrigger>(buffer, start, count);
-
-        let start = usize::try_from(header.offset_to_action_table).unwrap_or(0);
-        let count = usize::try_from(header.count_of_action_tables).unwrap_or(0);
-        let action_tables = copy_transmute_buff::<ActionTable>(buffer, start, count);
-
-        Self {
-            header,
-            state_tables,
-            transitions,
-            state_triggers,
-            transition_triggers,
-            action_tables,
-        }
+        let mut reader = Cursor::new(buffer);
+        reader.read_le().unwrap()
     }
 
     fn create_as_rc(buffer: &[u8]) -> Rc<dyn Model> {
@@ -65,76 +48,75 @@ impl Model for Dialogue {
     }
 
     fn to_bytes(&self) -> Vec<u8> {
-        let mut out = to_u8_slice(&self.header).to_vec();
-        out.extend(vec_to_u8_slice(&self.state_tables));
-        out.extend(vec_to_u8_slice(&self.transitions));
-        out.extend(vec_to_u8_slice(&self.state_triggers));
-        out.extend(vec_to_u8_slice(&self.transition_triggers));
-        out.extend(vec_to_u8_slice(&self.action_tables));
-        out
+        let mut writer = Cursor::new(Vec::new());
+        self.write_le(&mut writer).unwrap();
+        writer.into_inner()
     }
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/dlg_v1.htm#formDLGV1_Header
-#[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
+#[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct DialogueHeader {
-    pub header: Header<4, 4>,
-    pub count_of_state_tables: i32,
-    pub offset_to_state_table: i32,
-    pub count_of_transitions: i32,
-    pub offset_to_transition_table: i32,
-    pub offset_to_state_trigger_table: i32,
-    pub count_of_state_triggers: i32,
-    pub offset_to_transition_trigger_table: i32,
-    pub count_of_transition_triggers: i32,
-    pub offset_to_action_table: i32,
-    pub count_of_action_tables: i32,
-    pub flags: FixedCharSlice<4>,
+    #[br(count = 4)]
+    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
+    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    pub signature: String,
+    #[br(count = 4)]
+    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
+    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    pub version: String,
+    pub count_of_state_tables: u32,
+    pub offset_to_state_table: u32,
+    pub count_of_transitions: u32,
+    pub offset_to_transition_table: u32,
+    pub offset_to_state_trigger_table: u32,
+    pub count_of_state_triggers: u32,
+    pub offset_to_transition_trigger_table: u32,
+    pub count_of_transition_triggers: u32,
+    pub offset_to_action_table: u32,
+    pub count_of_action_tables: u32,
+    #[br(count = 4)]
+    pub flags: Vec<u8>,
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/dlg_v1.htm#formDLGV1_State
-#[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
+#[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct StateTable {
-    pub actor_response_text: FixedCharSlice<4>,
+    pub actor_response_text: Strref,
     pub index_of_the_first_transition: u32,
     pub count_of_transitions: u32,
     pub index_of_state_trigger: u32,
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/dlg_v1.htm#formDLGV1_Transition
-#[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
+#[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct Transition {
-    pub flags: FixedCharSlice<4>,
-    pub player_character_text: FixedCharSlice<4>,
-    pub journal_text: FixedCharSlice<4>,
+    #[br(count = 4)]
+    pub flags: Vec<u8>,
+    pub player_character_text: Strref,
+    pub journal_text: Strref,
     pub index_of_transitions_trigger: u32,
     pub index_of_transitions_action_table: u32,
-    pub resource_name: FixedCharSlice<8>,
+    pub resource_name: Resref,
     pub index_of_the_next_state: u32,
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/dlg_v1.htm#formDLGV1_StateTrigger
-#[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
+#[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct StateTrigger {
     pub offset_to_start_of_file: u32,
     pub length_in_bytes: u32,
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/dlg_v1.htm#formDLGV1_TransTrigger
-#[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
+#[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct TransitionTrigger {
     pub offset_to_start_of_file: u32,
     pub length_in_bytes: u32,
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/dlg_v1.htm#formDLGV1_Action
-#[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
+#[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct ActionTable {
     pub offset_to_start_of_file: u32,
     pub length_in_bytes: u32,

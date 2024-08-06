@@ -1,142 +1,129 @@
 use std::rc::Rc;
 
+use binrw::{io::Cursor, BinRead, BinReaderExt, BinWrite};
 use serde::{Deserialize, Serialize};
 
-use crate::resources::utils::{
-    copy_buff_to_struct, copy_transmute_buff, to_u8_slice, vec_to_u8_slice,
-};
+use crate::common::resref::Resref;
+use crate::common::strref::Strref;
+use crate::model::Model;
 use crate::tlk::Lookup;
-use crate::{
-    common::{fixed_char_array::FixedCharSlice, header::Header},
-    model::Model,
-};
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/sto_v1.htm
-#[repr(C)]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct Store {
+    #[serde(flatten)]
     pub header: StoreHeader,
+    #[serde(flatten)]
+    #[br(count=header.count_of_items_for_sale_section)]
     pub items_for_sale: Vec<ItemsForSale>,
+    #[serde(flatten)]
+    #[br(count=header.count_of_drinks_section)]
     pub drinks_for_sale: Vec<DrinksForSale>,
+    #[serde(flatten)]
+    #[br(count=header.count_of_cures_section)]
     pub cures_for_sale: Vec<CuresForSale>,
-    pub items_purchased_here: Vec<ItemsPurchasedHere>,
+    #[serde(flatten)]
+    #[br(count=header.count_of_items_in_items_purchased_section)]
+    pub items_purchased_here: Vec<u32>,
 }
 
 impl Model for Store {
     fn new(buffer: &[u8]) -> Self {
-        let header = copy_buff_to_struct::<StoreHeader>(buffer, 0);
-
-        let start = usize::try_from(header.offset_to_items_for_sale_section).unwrap_or(0);
-        let count = usize::try_from(header.count_of_items_for_sale_section).unwrap_or(0);
-        let items_for_sale = copy_transmute_buff::<ItemsForSale>(buffer, start, count);
-
-        let start = usize::try_from(header.offset_to_drinks_section).unwrap_or(0);
-        let count = usize::try_from(header.count_of_drinks_section).unwrap_or(0);
-        let drinks_for_sale = copy_transmute_buff::<DrinksForSale>(buffer, start, count);
-
-        let start = usize::try_from(header.offset_to_cures_section).unwrap_or(0);
-        let count = usize::try_from(header.count_of_cures_section).unwrap_or(0);
-        let cures_for_sale = copy_transmute_buff::<CuresForSale>(buffer, start, count);
-
-        let start = usize::try_from(header.offset_to_items_purchased_section).unwrap_or(0);
-        let count = usize::try_from(header.count_of_items_in_items_purchased_section).unwrap_or(0);
-        let items_purchased_here = copy_transmute_buff::<ItemsPurchasedHere>(buffer, start, count);
-        Self {
-            header,
-            items_for_sale,
-            drinks_for_sale,
-            cures_for_sale,
-            items_purchased_here,
+        let mut reader = Cursor::new(buffer);
+        match reader.read_le() {
+            Ok(res) => res,
+            Err(err) => {
+                panic!("Errored with {:?}, dumping buffer: {:?}", err, buffer);
+            }
         }
     }
+
     fn create_as_rc(buffer: &[u8]) -> Rc<dyn Model> {
         Rc::new(Self::new(buffer))
     }
 
     fn name(&self, _lookup: &Lookup) -> String {
-        self.header.name.to_string()
+        todo!()
     }
 
     fn to_bytes(&self) -> Vec<u8> {
-        let mut out = to_u8_slice(&self.header).to_vec();
-        out.extend(vec_to_u8_slice(&self.items_for_sale));
-        out.extend(vec_to_u8_slice(&self.drinks_for_sale));
-        out.extend(vec_to_u8_slice(&self.cures_for_sale));
-        out.extend(vec_to_u8_slice(&self.items_purchased_here));
-        out
+        let mut writer = Cursor::new(Vec::new());
+        self.write_le(&mut writer).unwrap();
+        writer.into_inner()
     }
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/sto_v1.htm#storv1_0_Header
-#[repr(C, packed)]
-#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
+#[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct StoreHeader {
-    pub header: Header<4, 4>,
+    #[br(count = 4)]
+    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
+    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    pub signature: String,
+    #[br(count = 4)]
+    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
+    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    pub version: String,
     //  (0=Store, 1=Tavern, 2=Inn, 3=Temple, 5=Container)
-    pub store_type: i32,
-    pub name: FixedCharSlice<4>,
-    pub flags: i32,
-    pub sell_price_markup: i32,
-    pub buy_price_markup: i32,
-    pub depreciation_rate: i32,
-    pub chance_of_steal_failure: i16,
-    pub capacity: i16,
+    pub store_type: u32,
+    pub name: Strref,
+    pub flags: u32,
+    pub sell_price_markup: u32,
+    pub buy_price_markup: u32,
+    pub depreciation_rate: u32,
+    pub chance_of_steal_failure: u16,
+    pub capacity: u16,
     #[serde(skip)]
-    _unknown1: [i8; 8],
-    pub offset_to_items_purchased_section: i32,
-    pub count_of_items_in_items_purchased_section: i32,
-    pub offset_to_items_for_sale_section: i32,
-    pub count_of_items_for_sale_section: i32,
-    pub lore: i32,
-    pub id_price: i32,
-    pub rumours_tavern: [i8; 8],
-    pub offset_to_drinks_section: i32,
-    pub count_of_drinks_section: i32,
-    pub rumours_temple: [i8; 8],
-    pub room_flags: i32,
-    pub price_of_a_peasant_room: i32,
-    pub price_of_a_merchant_room: i32,
-    pub price_of_a_noble_room: i32,
-    pub price_of_a_royal_room: i32,
-    pub offset_to_cures_section: i32,
-    pub count_of_cures_section: i32,
+    #[br(count = 8)]
+    _unknown1: Vec<u8>,
+    pub offset_to_items_purchased_section: u32,
+    pub count_of_items_in_items_purchased_section: u32,
+    pub offset_to_items_for_sale_section: u32,
+    pub count_of_items_for_sale_section: u32,
+    pub lore: u32,
+    pub id_price: u32,
+    pub rumours_tavern: Resref,
+    pub offset_to_drinks_section: u32,
+    pub count_of_drinks_section: u32,
+    pub rumours_temple: Resref,
+    pub room_flags: u32,
+    pub price_of_a_peasant_room: u32,
+    pub price_of_a_merchant_room: u32,
+    pub price_of_a_noble_room: u32,
+    pub price_of_a_royal_room: u32,
+    pub offset_to_cures_section: u32,
+    pub count_of_cures_section: u32,
     #[serde(skip)]
-    _unknown2: [i8; 32],
+    #[br(count = 36)]
+    _unknown2: Vec<u8>,
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/sto_v1.htm#storv1_0_Sale
-#[repr(C, packed)]
-#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
+#[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct ItemsForSale {
-    pub filename_of_item: [i8; 8],
-    pub item_expiration_time: i16,
-    pub quantity_charges_1: i16,
-    pub quantity_charges_2: i16,
-    pub quantity_charges_3: i16,
-    pub flags: i32,
-    pub amount_of_this_item_in_stock: i32,
+    pub filename_of_item: Resref,
+    pub item_expiration_time: u16,
+    pub quantity_charges_1: u16,
+    pub quantity_charges_2: u16,
+    pub quantity_charges_3: u16,
+    pub flags: u32,
+    pub amount_of_this_item_in_stock: u32,
     //  (0=limited stock, 1=infinite stock)
-    pub infinite_supply_flag: i32,
+    pub infinite_supply_flag: u32,
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/sto_v1.htm#storv1_0_Drink
-#[repr(C, packed)]
-#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
+#[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct DrinksForSale {
-    pub rumour_resource: [i8; 8],
-    pub drink_name: FixedCharSlice<4>,
-    pub drink_price: i32,
-    pub alcoholic_strength: i32,
+    pub rumour_resource: Resref,
+    pub drink_name: Strref,
+    pub drink_price: u32,
+    pub alcoholic_strength: u32,
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/sto_v1.htm#storv1_0_Cure
-#[repr(C, packed)]
-#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
+#[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct CuresForSale {
-    pub filename_of_spell: [i8; 8],
-    pub spell_price: i32,
+    pub filename_of_spell: Resref,
+    pub spell_price: u32,
 }
-
-#[repr(C, packed)]
-#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
-pub struct ItemsPurchasedHere(i32);

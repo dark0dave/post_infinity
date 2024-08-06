@@ -1,11 +1,10 @@
 use flate2::bufread::ZlibDecoder;
 use serde::{Deserialize, Serialize};
-use std::{io::Read, rc::Rc};
+use std::io::Read;
 
 use crate::{
     common::{header::Header, variable_char_array::VariableCharArray},
     from_buffer,
-    model::Model,
     resources::{types::extension_to_resource_type, utils::copy_buff_to_struct},
 };
 
@@ -14,15 +13,14 @@ use crate::{
 pub struct Save {
     pub header: Header<4, 4>,
     pub files: Vec<File>,
-    #[serde(skip)]
-    pub uncompressed_files: Vec<Rc<dyn Model>>,
+    //#[serde(skip)]
+    //pub uncompressed_files: Vec<Rc<dyn Model>>,
 }
 
 impl Save {
     pub fn new(buffer: &[u8]) -> Self {
         let header = copy_buff_to_struct::<Header<4, 4>>(buffer, 0);
         let mut files = vec![];
-        let uncompressed_files = vec![];
         let mut counter = 8;
         while counter <= (buffer.len() - 1) {
             let file = File::new(buffer.get(counter..).unwrap_or_default());
@@ -33,11 +31,7 @@ impl Save {
 
             files.push(file);
         }
-        Save {
-            header,
-            files,
-            uncompressed_files,
-        }
+        Save { header, files }
     }
     pub fn decompress(&mut self) {
         let mut uncompressed_files = Vec::with_capacity(self.files.len());
@@ -50,7 +44,6 @@ impl Save {
                 uncompressed_files.push(model);
             }
         }
-        self.uncompressed_files = uncompressed_files;
     }
 }
 
@@ -73,7 +66,7 @@ impl File {
                 .try_into()
                 .unwrap_or_default(),
         );
-        let end: usize = usize::try_from(length_of_filename).unwrap_or(0);
+        let end = length_of_filename as usize;
         let filename = VariableCharArray(buffer.get(4..(end + 4)).unwrap_or_default().into());
         let uncompressed_data_length = u32::from_ne_bytes(
             buffer
@@ -123,7 +116,7 @@ mod tests {
         io::{BufReader, Read},
     };
 
-    use pretty_assertions::{assert_eq, assert_ne};
+    use pretty_assertions::assert_eq;
 
     #[test]
     fn uncompress_files() {
@@ -135,7 +128,6 @@ mod tests {
             .expect("Could not read to buffer");
         let mut save = Save::new(&buffer);
         save.decompress();
-        assert_ne!(save.uncompressed_files.len(), 0);
     }
 
     #[test]
@@ -436,7 +428,7 @@ mod tests {
                 file.compressed_data.len(),
                 file.compressed_data_length as usize
             );
-            assert_eq!(file.filename.to_string(), file_names[i]);
+            assert_eq!(file.filename.to_string().replace("\0", ""), file_names[i]);
         }
     }
 }

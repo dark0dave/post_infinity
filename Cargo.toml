@@ -5,6 +5,11 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[workspace]
+
 [dependencies]
+binrw = "0.14.0"
 clap = { version = "4.0", features = ["derive"] }
-cli = { path = "cli" }
+erased-serde = "0.3"
+models = { path = "./models" }
+serde_json = "1.0"

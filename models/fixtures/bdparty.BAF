@@ -1,0 +1,659 @@
+IF
+	!InParty(Myself)
+	Global("bd_joined","locals",1)
+	AreaCheck("bd4700")  // Avernus Roof
+	GlobalLT("bd_plot","global",570)
+THEN
+	RESPONSE #100
+		StartDialogueNoSet(Player1)
+END
+
+IF
+	!InParty(Myself)
+	Global("bd_no_boot_dialog","myarea",0)
+	Global("bd_joined","locals",1)
+	OR(12)
+		Name("neera",Myself)  // Neera
+		Name("dorn",Myself)  // Dorn
+		Name("rasaad",Myself)  // Rasaad
+		Name("baeloth",Myself)  // Baeloth
+		Name("edwin",Myself)  // Edwin
+		Name("viconia",Myself)  // Viconia
+		Name("safana",Myself)  // Safana
+		Name("jaheira",Myself)  // Jaheira
+		Name("khalid",Myself)  // Khalid
+		Name("dynaheir",Myself)  // Dynaheir
+		Name("minsc",Myself)  // Minsc
+		HappinessGT(Myself,-299)
+THEN
+	RESPONSE #100
+		SetGlobal("bd_joined","locals",2)
+		Dialogue(Player1)
+END
+
+IF
+	!InParty(Myself)
+	Global("bd_no_boot_dialog","myarea",0)
+	Global("bd_joined","locals",1)
+	OR(4)
+		Name("corwin",Myself)  // Corwin
+		Name("glint",Myself)  // Glint
+		Name("voghiln",Myself)  // Voghiln
+		Name("mkhiin",Myself)  // M'Khiin
+	HappinessLT(Myself,-290)
+THEN
+	RESPONSE #100
+		VerbalConstant(Myself,UNHAPPY_BREAKING_POINT)
+		SetGlobal("bd_joined","locals",0)
+		SetGlobal("bd_npc_camp","locals",1)
+END
+
+IF
+	!InParty(Myself)
+	Global("bd_no_boot_dialog","myarea",0)
+	Global("bd_joined","locals",1)
+THEN
+	RESPONSE #100
+		VerbalConstant(Myself,UNHAPPY_BREAKING_POINT)
+		Wait(5)
+		EscapeArea()
+END
+
+IF
+	Global("bd_npc_camp","locals",1)
+	Name("baeloth",Myself)  // Baeloth
+	Switch("bd_npc_camp_chapter","global")
+	OR(2)
+		!Range("ff_camp",999)
+		!TriggerOverride("ff_camp",IsOverMe("baeloth"))  // Baeloth
+THEN
+	RESPONSE #2
+		EscapeAreaMove("bd1000",135,3575,NE)  // Coast Way Crossing
+	RESPONSE #3
+		EscapeAreaMove("bd7100",775,3530,NW)  // Troll Forest
+	RESPONSE #4
+		EscapeAreaMove("bd3000",1110,1795,S)  // Allied Siege Camp
+END
+
+IF
+	GlobalLT("bd_npc_camp","locals",2)
+	Global("bd_joined","locals",0)
+	Name("baeloth",Myself)  // Baeloth
+	TriggerOverride("ff_camp",IsOverMe("baeloth"))  // Baeloth
+	Switch("bd_npc_camp_chapter","global")
+THEN
+	RESPONSE #2
+		SetGlobal("bd_npc_camp","locals",2)
+		SaveLocation("LOCALS","bd_default_loc",[135.3575])
+	RESPONSE #3
+		SetGlobal("bd_npc_camp","locals",2)
+		SaveLocation("LOCALS","bd_default_loc",[775.3530])
+	RESPONSE #4
+		SetGlobal("bd_npc_camp","locals",2)
+		SaveLocation("LOCALS","bd_default_loc",[1110.1795])
+		ChangeAIScript("bdasc3",CLASS)
+END
+
+IF
+	Global("bd_npc_camp","locals",1)
+	Name("corwin",Myself)  // Corwin
+	Switch("bd_npc_camp_chapter","global")
+	OR(2)
+		!Range("ff_camp",999)
+		!TriggerOverride("ff_camp",IsOverMe("corwin"))  // Corwin
+THEN
+	RESPONSE #2
+		EscapeAreaMove("bd1000",560,3515,SW)  // Coast Way Crossing
+	RESPONSE #3
+		EscapeAreaMove("bd7100",475,3270,SE)  // Troll Forest
+	RESPONSE #4
+		EscapeAreaMove("bd3000",1355,215,SE)  // Allied Siege Camp
+END
+
+IF
+	GlobalLT("bd_npc_camp","locals",2)
+	Global("bd_joined","locals",0)
+	Name("corwin",Myself)  // Corwin
+	TriggerOverride("ff_camp",IsOverMe("corwin"))  // Corwin
+	Switch("bd_npc_camp_chapter","global")
+THEN
+	RESPONSE #2
+		SetGlobal("bd_npc_camp","locals",2)
+		SaveLocation("LOCALS","bd_default_loc",[560.3515])
+	RESPONSE #3
+		SetGlobal("bd_npc_camp","locals",2)
+		SaveLocation("LOCALS","bd_default_loc",[475.3270])
+	RESPONSE #4
+		SetGlobal("bd_npc_camp","locals",2)
+		SaveLocation("LOCALS","bd_default_loc",[1355.215])
+		ChangeAIScript("bdasc3",CLASS)
+END
+
+IF
+	Global("bd_npc_camp","locals",1)
+	Name("dorn",Myself)  // Dorn
+	Switch("bd_npc_camp_chapter","global")
+	OR(2)
+		!Range("ff_camp",999)
+		!TriggerOverride("ff_camp",IsOverMe("dorn"))  // Dorn
+THEN
+	RESPONSE #3
+		EscapeAreaMove("bd7100",600,3615,N)  // Troll Forest
+	RESPONSE #4
+		EscapeAreaMove("bd3000",1130,1635,SE)  // Allied Siege Camp
+END
+
+IF
+	GlobalLT("bd_npc_camp","locals",2)
+	Global("bd_joined","locals",0)
+	Name("dorn",Myself)  // Dorn
+	TriggerOverride("ff_camp",IsOverMe("dorn"))  // Dorn
+	Switch("bd_npc_camp_chapter","global")
+THEN
+	RESPONSE #3
+		SetGlobal("bd_npc_camp","locals",2)
+		SaveLocation("LOCALS","bd_default_loc",[600.3615])
+	RESPONSE #4
+		SetGlobal("bd_npc_camp","locals",2)
+		SaveLocation("LOCALS","bd_default_loc",[1130.1635])
+		ChangeAIScript("bdasc3",CLASS)
+END
+
+IF
+	Global("bd_npc_camp","locals",1)
+	Name("dynaheir",Myself)  // Dynaheir
+	Switch("bd_npc_camp_chapter","global")
+	OR(2)
+		!Range("ff_camp",999)
+		!TriggerOverride("ff_camp",IsOverMe("dynaheir"))  // Dynaheir
+THEN
+	RESPONSE #2
+		EscapeAreaMove("bd1000",735,3755,NW)  // Coast Way Crossing
+	RESPONSE #3
+		EscapeAreaMove("bd7100",215,3820,NE)  // Troll Forest
+	RESPONSE #4
+		EscapeAreaMove("bd3000",1385,1685,W)  // Allied Siege Camp
+END
+
+IF
+	GlobalLT("bd_npc_camp","locals",2)
+	Global("bd_joined","locals",0)
+	Name("dynaheir",Myself)  // Dynaheir
+	TriggerOverride("ff_camp",IsOverMe("dynaheir"))  // Dynaheir
+	Switch("bd_npc_camp_chapter","global")
+THEN
+	RESPONSE #2
+		SetGlobal("bd_npc_camp","locals",2)
+		SaveLocation("LOCALS","bd_default_loc",[735.3755])
+	RESPONSE #3
+		SetGlobal("bd_npc_camp","locals",2)
+		SaveLocation("LOCALS","bd_default_loc",[215.3820])
+	RESPONSE #4
+		SetGlobal("bd_npc_camp","locals",2)
+		SaveLocation("LOCALS","bd_default_loc",[1385.1685])
+		ChangeAIScript("bdasc3",CLASS)
+END
+
+IF
+	Global("bd_npc_camp","locals",1)
+	Name("edwin",Myself)  // Edwin
+	Switch("bd_npc_camp_chapter","global")
+	OR(2)
+		!Range("ff_camp",999)
+		!TriggerOverride("ff_camp",IsOverMe("edwin"))  // Edwin
+THEN
+	RESPONSE #2
+		EscapeAreaMove("bd1000",230,3460,S)  // Coast Way Crossing
+	RESPONSE #3
+		EscapeAreaMove("bd7100",375,3535,E)  // Troll Forest
+	RESPONSE #4
+		EscapeAreaMove("bd3000",1812,1711,S)  // Allied Siege Camp
+END
+
+IF
+	GlobalLT("bd_npc_camp","locals",2)
+	Global("bd_joined","locals",0)
+	Name("edwin",Myself)  // Edwin
+	TriggerOverride("ff_camp",IsOverMe("edwin"))  // Edwin
+	Switch("bd_npc_camp_chapter","global")
+THEN
+	RESPONSE #2
+		SetGlobal("bd_npc_camp","locals",2)
+		SaveLocation("LOCALS","bd_default_loc",[230.3460])
+	RESPONSE #3
+		SetGlobal("bd_npc_camp","locals",2)
+		SaveLocation("LOCALS","bd_default_loc",[375.3535])
+	RESPONSE #4
+		SetGlobal("bd_npc_camp","locals",2)
+		SaveLocation("LOCALS","bd_default_loc",[1812.1711])
+		ChangeAIScript("bdasc3",CLASS)
+END
+
+IF
+	Global("bd_npc_camp","locals",1)
+	Name("glint",Myself)  // Glint
+	Switch("bd_npc_camp_chapter","global")
+	OR(2)
+		!Range("ff_camp",999)
+		!TriggerOverride("ff_camp",IsOverMe("glint"))  // Glint
+THEN
+	RESPONSE #2
+		EscapeAreaMove("bd1000",410,3530,NE)  // Coast Way Crossing
+	RESPONSE #3
+		EscapeAreaMove("bd7100",435,3370,NE)  // Troll Forest
+	RESPONSE #4
+		EscapeAreaMove("bd3000",1055,1511,SE)  // Allied Siege Camp
+END
+
+IF
+	GlobalLT("bd_npc_camp","locals",2)
+	Global("bd_joined","locals",0)
+	Name("glint",Myself)  // Glint
+	TriggerOverride("ff_camp",IsOverMe("glint"))  // Glint
+	Switch("bd_npc_camp_chapter","global")
+THEN
+	RESPONSE #2
+		SetGlobal("bd_npc_camp","locals",2)
+		SaveLocation("LOCALS","bd_default_loc",[410.3530])
+	RESPONSE #3
+		SetGlobal("bd_npc_camp","locals",2)
+		SaveLocation("LOCALS","bd_default_loc",[435.3370])
+	RESPONSE #4
+		SetGlobal("bd_npc_camp","locals",2)
+		SaveLocation("LOCALS","bd_default_loc",[1055.1511])
+		ChangeAIScript("bdasc3",CLASS)
+END
+
+IF
+	Global("bd_npc_camp","locals",1)
+	Name("jaheira",Myself)  // Jaheira
+	Switch("bd_npc_camp_chapter","global")
+	OR(2)
+		!Range("ff_camp",999)
+		!TriggerOverride("ff_camp",IsOverMe("jaheira"))  // Jaheira
+THEN
+	RESPONSE #3
+		EscapeAreaMove("bd7100",185,3645,S)  // Troll Forest
+	RESPONSE #4
+		EscapeAreaMove("bd3000",1445,1805,SE)  // Allied Siege Camp
+END
+
+IF
+	GlobalLT("bd_npc_camp","locals",2)
+	Global("bd_joined","locals",0)
+	Name("jaheira",Myself)  // Jaheira
+	TriggerOverride("ff_camp",IsOverMe("jaheira"))  // Jaheira
+	Switch("bd_npc_camp_chapter","global")
+THEN
+	RESPONSE #3
+		SetGlobal("bd_npc_camp","locals",2)
+		SaveLocation("LOCALS","bd_default_loc",[185.3645])
+	RESPONSE #4
+		SetGlobal("bd_npc_camp","locals",2)
+		SaveLocation("LOCALS","bd_default_loc",[1445.1805])
+		ChangeAIScript("bdasc3",CLASS)
+END
+
+IF
+	Global("bd_npc_camp","locals",1)
+	Name("khalid",Myself)  // Khalid
+	Switch("bd_npc_camp_chapter","global")
+	OR(2)
+		!Range("ff_camp",999)
+		!TriggerOverride("ff_camp",IsOverMe("khalid"))  // Khalid
+THEN
+	RESPONSE #3
+		EscapeAreaMove("bd7100",225,3670,SW)  // Troll Forest
+	RESPONSE #4
+		EscapeAreaMove("bd3000",1495,1780,S)  // Allied Siege Camp
+END
+
+IF
+	GlobalLT("bd_npc_camp","locals",2)
+	Global("bd_joined","locals",0)
+	Name("khalid",Myself)  // Khalid
+	TriggerOverride("ff_camp",IsOverMe("khalid"))  // Khalid
+	Switch("bd_npc_camp_chapter","global")
+THEN
+	RESPONSE #3
+		SetGlobal("bd_npc_camp","locals",2)
+		SaveLocation("LOCALS","bd_default_loc",[225.3670])
+	RESPONSE #4
+		SetGlobal("bd_npc_camp","locals",2)
+		SaveLocation("LOCALS","bd_default_loc",[1495.1780])
+		ChangeAIScript("bdasc3",CLASS)
+END
+
+IF
+	Global("bd_npc_camp","locals",1)
+	Name("minsc",Myself)  // Minsc
+	Switch("bd_npc_camp_chapter","global")
+	OR(2)
+		!Range("ff_camp",999)
+		!TriggerOverride("ff_camp",IsOverMe("minsc"))  // Minsc
+THEN
+	RESPONSE #2
+		EscapeAreaMove("bd1000",700,3785,N)  // Coast Way Crossing
+	RESPONSE #3
+		EscapeAreaMove("bd7100",200,3770,E)  // Troll Forest
+	RESPONSE #4
+		EscapeAreaMove("bd3000",1365,1735,NW)  // Allied Siege Camp
+END
+
+IF
+	GlobalLT("bd_npc_camp","locals",2)
+	Global("bd_joined","locals",0)
+	Name("minsc",Myself)  // Minsc
+	TriggerOverride("ff_camp",IsOverMe("minsc"))  // Minsc
+	Switch("bd_npc_camp_chapter","global")
+THEN
+	RESPONSE #2
+		SetGlobal("bd_npc_camp","locals",2)
+		SaveLocation("LOCALS","bd_default_loc",[700.3785])
+	RESPONSE #3
+		SetGlobal("bd_npc_camp","locals",2)
+		SaveLocation("LOCALS","bd_default_loc",[200.3770])
+	RESPONSE #4
+		SetGlobal("bd_npc_camp","locals",2)
+		SaveLocation("LOCALS","bd_default_loc",[1365.1735])
+		ChangeAIScript("bdasc3",CLASS)
+END
+
+IF
+	Global("bd_npc_camp","locals",1)
+	Name("mkhiin",Myself)  // M'Khiin
+	Switch("bd_npc_camp_chapter","global")
+	OR(2)
+		!Range("ff_camp",999)
+		!TriggerOverride("ff_camp",IsOverMe("mkhiin"))  // M'Khiin
+THEN
+	RESPONSE #2
+		EscapeAreaMove("bd1000",495,3205,SE)  // Coast Way Crossing
+	RESPONSE #3
+		EscapeAreaMove("bd7100",85,3590,SE)  // Troll Forest
+	RESPONSE #4
+		EscapeAreaMove("bd3000",2145,1345,SW)  // Allied Siege Camp
+END
+
+IF
+	GlobalLT("bd_npc_camp","locals",2)
+	Global("bd_joined","locals",0)
+	Name("mkhiin",Myself)  // M'Khiin
+	TriggerOverride("ff_camp",IsOverMe("mkhiin"))  // M'Khiin
+	Switch("bd_npc_camp_chapter","global")
+THEN
+	RESPONSE #2
+		SetGlobal("bd_npc_camp","locals",2)
+		SaveLocation("LOCALS","bd_default_loc",[495.3205])
+	RESPONSE #3
+		SetGlobal("bd_npc_camp","locals",2)
+		SaveLocation("LOCALS","bd_default_loc",[85.3590])
+	RESPONSE #4
+		SetGlobal("bd_npc_camp","locals",2)
+		SaveLocation("LOCALS","bd_default_loc",[2145.1345])
+		ChangeAIScript("bdasc3",CLASS)
+END
+
+IF
+	Global("bd_npc_camp","locals",1)
+	Name("neera",Myself)  // Neera
+	Switch("bd_npc_camp_chapter","global")
+	OR(2)
+		!Range("ff_camp",999)
+		!TriggerOverride("ff_camp",IsOverMe("neera"))  // Neera
+THEN
+	RESPONSE #3
+		EscapeAreaMove("bd7100",350,3735,SW)  // Troll Forest
+	RESPONSE #4
+		EscapeAreaMove("bd3000",1605,1720,NE)  // Allied Siege Camp
+END
+
+IF
+	GlobalLT("bd_npc_camp","locals",2)
+	Global("bd_joined","locals",0)
+	Name("neera",Myself)  // Neera
+	TriggerOverride("ff_camp",IsOverMe("neera"))  // Neera
+	Switch("bd_npc_camp_chapter","global")
+THEN
+	RESPONSE #3
+		SetGlobal("bd_npc_camp","locals",2)
+		SaveLocation("LOCALS","bd_default_loc",[350.3735])
+	RESPONSE #4
+		SetGlobal("bd_npc_camp","locals",2)
+		SaveLocation("LOCALS","bd_default_loc",[1605.1720])
+		ChangeAIScript("bdasc3",CLASS)
+END
+
+IF
+	Global("bd_npc_camp","locals",1)
+	Name("rasaad",Myself)  // Rasaad
+	Switch("bd_npc_camp_chapter","global")
+	OR(2)
+		!Range("ff_camp",999)
+		!TriggerOverride("ff_camp",IsOverMe("rasaad"))  // Rasaad
+THEN
+	RESPONSE #2
+		EscapeAreaMove("bd1000",595,3780,NE)  // Coast Way Crossing
+	RESPONSE #3
+		EscapeAreaMove("bd7100",295,3725,S)  // Troll Forest
+	RESPONSE #4
+		EscapeAreaMove("bd3000",1545,1805,SW)  // Allied Siege Camp
+END
+
+IF
+	GlobalLT("bd_npc_camp","locals",2)
+	Global("bd_joined","locals",0)
+	Name("rasaad",Myself)  // Rasaad
+	TriggerOverride("ff_camp",IsOverMe("rasaad"))  // Rasaad
+	Switch("bd_npc_camp_chapter","global")
+THEN
+	RESPONSE #2
+		SetGlobal("bd_npc_camp","locals",2)
+		SaveLocation("LOCALS","bd_default_loc",[595.3780])
+	RESPONSE #3
+		SetGlobal("bd_npc_camp","locals",2)
+		SaveLocation("LOCALS","bd_default_loc",[295.3725])
+	RESPONSE #4
+		SetGlobal("bd_npc_camp","locals",2)
+		SaveLocation("LOCALS","bd_default_loc",[1545.1805])
+		ChangeAIScript("bdasc3",CLASS)
+END
+
+IF
+	Global("bd_npc_camp","locals",1)
+	Name("safana",Myself)  // Safana
+	Switch("bd_npc_camp_chapter","global")
+	OR(2)
+		!Range("ff_camp",999)
+		!TriggerOverride("ff_camp",IsOverMe("safana"))  // Safana
+THEN
+	RESPONSE #2
+		EscapeAreaMove("bd1000",280,3480,SW)  // Coast Way Crossing
+	RESPONSE #3
+		EscapeAreaMove("bd7100",405,3495,SE)  // Troll Forest
+	RESPONSE #4
+		EscapeAreaMove("bd3000",1509,1490,SE)  // Allied Siege Camp
+END
+
+IF
+	GlobalLT("bd_npc_camp","locals",2)
+	Global("bd_joined","locals",0)
+	Name("safana",Myself)  // Safana
+	TriggerOverride("ff_camp",IsOverMe("safana"))  // Safana
+	Switch("bd_npc_camp_chapter","global")
+THEN
+	RESPONSE #2
+		SetGlobal("bd_npc_camp","locals",2)
+		SaveLocation("LOCALS","bd_default_loc",[280.3480])
+	RESPONSE #3
+		SetGlobal("bd_npc_camp","locals",2)
+		SaveLocation("LOCALS","bd_default_loc",[405.3495])
+	RESPONSE #4
+		SetGlobal("bd_npc_camp","locals",2)
+		SaveLocation("LOCALS","bd_default_loc",[1509.1490])
+		ChangeAIScript("bdasc3",CLASS)
+END
+
+IF
+	Global("bd_npc_camp","locals",1)
+	Name("viconia",Myself)  // Viconia
+	Switch("bd_npc_camp_chapter","global")
+	OR(2)
+		!Range("ff_camp",999)
+		!TriggerOverride("ff_camp",IsOverMe("viconia"))  // Viconia
+THEN
+	RESPONSE #2
+		EscapeAreaMove("bd1000",165,3470,SE)  // Coast Way Crossing
+	RESPONSE #3
+		EscapeAreaMove("bd7100",310,3365,SE)  // Troll Forest
+	RESPONSE #4
+		EscapeAreaMove("bd3000",1799,1804,SE)  // Allied Siege Camp
+END
+
+IF
+	GlobalLT("bd_npc_camp","locals",2)
+	Global("bd_joined","locals",0)
+	Name("viconia",Myself)  // Viconia
+	TriggerOverride("ff_camp",IsOverMe("viconia"))  // Viconia
+	Switch("bd_npc_camp_chapter","global")
+THEN
+	RESPONSE #2
+		SetGlobal("bd_npc_camp","locals",2)
+		SaveLocation("LOCALS","bd_default_loc",[165.3470])
+	RESPONSE #3
+		SetGlobal("bd_npc_camp","locals",2)
+		SaveLocation("LOCALS","bd_default_loc",[310.3365])
+	RESPONSE #4
+		SetGlobal("bd_npc_camp","locals",2)
+		SaveLocation("LOCALS","bd_default_loc",[1799.1804])
+		ChangeAIScript("bdasc3",CLASS)
+END
+
+IF
+	Global("bd_npc_camp","locals",1)
+	Name("voghiln",Myself)  // Voghiln
+	Switch("bd_npc_camp_chapter","global")
+	OR(2)
+		!Range("ff_camp",999)
+		!TriggerOverride("ff_camp",IsOverMe("voghiln"))  // Voghiln
+THEN
+	RESPONSE #3
+		EscapeAreaMove("bd7100",455,3490,S)  // Troll Forest
+	RESPONSE #4
+		EscapeAreaMove("bd3000",1573,1478,SW)  // Allied Siege Camp
+END
+
+IF
+	GlobalLT("bd_npc_camp","locals",2)
+	Global("bd_joined","locals",0)
+	Name("voghiln",Myself)  // Voghiln
+	TriggerOverride("ff_camp",IsOverMe("voghiln"))  // Voghiln
+	Switch("bd_npc_camp_chapter","global")
+THEN
+	RESPONSE #3
+		SetGlobal("bd_npc_camp","locals",2)
+		SaveLocation("LOCALS","bd_default_loc",[455.3490])
+	RESPONSE #4
+		SetGlobal("bd_npc_camp","locals",2)
+		SaveLocation("LOCALS","bd_default_loc",[1573.1478])
+		ChangeAIScript("bdasc3",CLASS)
+END
+
+IF
+	GlobalLT("bd_npc_camp","locals",2)
+	Global("bd_joined","locals",0)
+THEN
+	RESPONSE #100
+		SetGlobal("bd_npc_camp","locals",2)
+		SaveObjectLocation("LOCALS","bd_default_loc",Myself)
+END
+
+IF
+	Global("bd_npc_camp","locals",2)
+	OR(2)
+		Class(Myself,CLERIC_MAGE)
+		Class(Myself,FIGHTER_MAGE_CLERIC)
+THEN
+	RESPONSE #100
+		SetGlobal("bd_npc_camp","locals",3)
+		SetGlobal("bd_no_combat","locals",0)
+		ChangeAIScript("bdclma01",GENERAL)
+END
+
+IF
+	Global("bd_npc_camp","locals",2)
+	OR(2)
+		Class(Myself,MAGE_ALL)
+		Class(Myself,BARD_ALL)
+THEN
+	RESPONSE #100
+		SetGlobal("bd_npc_camp","locals",3)
+		SetGlobal("bd_no_combat","locals",0)
+		ChangeAIScript("bdmage01",GENERAL)
+END
+
+IF
+	Global("bd_npc_camp","locals",2)
+	Class(Myself,CLERIC_ALL)
+THEN
+	RESPONSE #100
+		SetGlobal("bd_npc_camp","locals",3)
+		SetGlobal("bd_no_combat","locals",0)
+		ChangeAIScript("bdcler01",GENERAL)
+END
+
+IF
+	Global("bd_npc_camp","locals",2)
+	Class(Myself,DRUID_ALL)
+THEN
+	RESPONSE #100
+		SetGlobal("bd_npc_camp","locals",3)
+		SetGlobal("bd_no_combat","locals",0)
+		ChangeAIScript("bddrui01",GENERAL)
+END
+
+IF
+	Global("bd_npc_camp","locals",2)
+	Class(Myself,THIEF_ALL)
+THEN
+	RESPONSE #100
+		SetGlobal("bd_npc_camp","locals",3)
+		SetGlobal("bd_no_combat","locals",0)
+		ChangeAIScript("bdthie01",GENERAL)
+END
+
+IF
+	Global("bd_npc_camp","locals",2)
+	Class(Myself,MONK)
+THEN
+	RESPONSE #100
+		SetGlobal("bd_npc_camp","locals",3)
+		SetGlobal("bd_no_combat","locals",0)
+		ChangeAIScript("bdmonk01",GENERAL)
+END
+
+IF
+	Global("bd_npc_camp","locals",2)
+THEN
+	RESPONSE #100
+		SetGlobal("bd_npc_camp","locals",3)
+		SetGlobal("bd_no_combat","locals",0)
+		ChangeAIScript("bdfigh01",GENERAL)
+END
+
+IF
+	Global("bd_npc_camp","locals",3)
+THEN
+	RESPONSE #100
+		SetGlobal("bd_joined","locals",0)
+		SetGlobal("bd_retreat","locals",1)
+		SetGlobal("bd_no_aggro","locals",1)
+		SetGlobal("bd_no_assist","locals",1)
+		SetGlobal("bd_no_search","locals",1)
+		SetGlobal("bd_no_combat","locals",1)
+		ChangeEnemyAlly(Myself,NEUTRAL)
+		ChangeSpecifics(Myself,ALLIES)
+		ChangeAIScript("bdshout",RACE)
+		ChangeAIScript("",DEFAULT)
+END
+

@@ -68,7 +68,7 @@ post_infinity models/fixtures/gate1.spl
   "extended_headers": [
     {
       "spell_form": 1,
-      "freindly": 0,
+      "friendly": 0,
       "location": 2,
       "memorised_icon": "SPWI905B",
       "target_type": 4,
@@ -95,4 +95,12 @@ post_infinity models/fixtures/gate1.spl
 
 ```
 cargo build --release
+```
+
+## Performance
+
+It takes about 0.5->1.0s to read all the supported files in an unmodded bg1ee game, into memory, without parsing them.
+
+```sh
+time cargo run -- <path to bgee dir>/chitin.key  0.63s user 1.01s system 105% cpu 1.555 total
 ```

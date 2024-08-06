@@ -10,13 +10,7 @@ pub struct VariableCharArray(pub Rc<[u8]>);
 
 impl Display for VariableCharArray {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "{}",
-            std::str::from_utf8(&self.0)
-                .unwrap_or_default()
-                .replace('\0', "")
-        )
+        write!(f, "{}", std::str::from_utf8(&self.0).unwrap_or_default())
     }
 }
 
@@ -75,16 +69,8 @@ impl<'de> Deserialize<'de> for VariableCharArray {
 
 #[cfg(test)]
 mod tests {
-
-    use std::io::{BufReader, Read, Seek, SeekFrom, Write};
-
     use super::*;
-    #[test]
-    fn strips_nulls_and_returns() {
-        let input = "BALDUR\0";
-        let expected = "BALDUR";
-        assert_eq!(VariableCharArray::from(input).to_string(), expected)
-    }
+    use std::io::{BufReader, Read, Seek, SeekFrom, Write};
 
     #[test]
     fn deserialize_serialize_deserialize() {

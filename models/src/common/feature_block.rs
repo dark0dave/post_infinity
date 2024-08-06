@@ -1,9 +1,9 @@
+use binrw::{BinRead, BinWrite};
 use serde::{Deserialize, Serialize};
 
-use super::fixed_char_array::FixedCharSlice;
+use super::resref::Resref;
 
-#[repr(C, packed)]
-#[derive(Debug, Copy, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, PartialEq, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct FeatureBlock {
     pub opcode_number: u16,
     pub target_type: u8,
@@ -15,10 +15,11 @@ pub struct FeatureBlock {
     pub duration: u32,
     pub probability_1: u8,
     pub probability_2: u8,
-    pub resource: FixedCharSlice<8>,
+    pub resource: Resref,
     pub dice_thrown_max_level: u32,
     pub dice_sides_min_level: u32,
-    pub saving_throw_type: FixedCharSlice<4>,
+    #[br(count = 4)]
+    pub saving_throw_type: Vec<u8>,
     pub saving_throw_bonus: u32,
     pub stacking_id: u32,
 }

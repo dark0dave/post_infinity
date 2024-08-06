@@ -1,94 +1,71 @@
 use std::rc::Rc;
 
+use binrw::{io::Cursor, BinRead, BinReaderExt, BinWrite};
 use serde::{Deserialize, Serialize};
 
 use crate::common::feature_block::FeatureBlock;
-use crate::common::fixed_char_array::FixedCharSlice;
-use crate::common::fixed_char_nd_array::FixedCharNDArray;
-use crate::common::header::Header;
+use crate::common::resref::Resref;
 use crate::model::Model;
-use crate::resources::utils::{
-    copy_buff_to_struct, copy_transmute_buff, to_u8_slice, vec_to_u8_slice,
-};
 use crate::tlk::Lookup;
 
 //https://gibberlings3.github.io/iesdp/file_formats/ie_formats/itm_v1.htm
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct Item {
+    #[serde(flatten)]
     pub header: ItemHeader,
+    #[serde(flatten)]
+    #[br(count=header.count_of_extended_headers)]
     pub extended_headers: Vec<ItemExtendedHeader>,
+    #[serde(flatten)]
+    #[br(count=header.count_of_feature_blocks)]
     pub equipping_feature_blocks: Vec<ItemFeatureBlock>,
 }
-
 impl Model for Item {
     fn new(buffer: &[u8]) -> Self {
-        let header = copy_buff_to_struct::<ItemHeader>(buffer, 0);
-
-        let start = usize::try_from(header.offset_to_extended_headers).unwrap_or(0);
-        let count = usize::try_from(header.count_of_extended_headers).unwrap_or(0);
-        let extended_headers = copy_transmute_buff::<ItemExtendedHeader>(buffer, start, count);
-
-        let start = usize::try_from(header.offset_to_feature_blocks).unwrap_or(0);
-        let count = (buffer.len() - start) / std::mem::size_of::<ItemFeatureBlock>();
-        let equipping_feature_blocks =
-            copy_transmute_buff::<ItemFeatureBlock>(buffer, start, count);
-
-        Self {
-            header,
-            extended_headers,
-            equipping_feature_blocks,
+        let mut reader = Cursor::new(buffer);
+        match reader.read_le() {
+            Ok(res) => res,
+            Err(err) => {
+                panic!("Errored with {:?}, dumping buffer: {:?}", err, buffer);
+            }
         }
     }
+
     fn create_as_rc(buffer: &[u8]) -> Rc<dyn Model> {
         Rc::new(Self::new(buffer))
     }
 
-    fn name(&self, lookup: &Lookup) -> String {
-        let name = if self.header.identified_item_name > -1
-            && self.header.identified_item_name < lookup.entries.len() as i32
-        {
-            lookup
-                .strings
-                .get(self.header.identified_item_name as usize)
-                .unwrap()
-                .to_string()
-        } else if self.header.unidentified_item_name > -1
-            && self.header.unidentified_item_name < lookup.entries.len() as i32
-        {
-            lookup
-                .strings
-                .get(self.header.unidentified_item_name as usize)
-                .unwrap()
-                .to_string()
-        } else {
-            format!("{}", { self.header.identified_item_name })
-        }
-        .to_ascii_lowercase()
-        .replace(' ', "_");
-        format!("{}.itm", name)
+    fn name(&self, _lookup: &Lookup) -> String {
+        todo!()
     }
 
     fn to_bytes(&self) -> Vec<u8> {
-        let mut out = to_u8_slice(&self.header).to_vec();
-        out.extend(vec_to_u8_slice(&self.extended_headers));
-        out.extend(vec_to_u8_slice(&self.equipping_feature_blocks));
-        out
+        let mut writer = Cursor::new(Vec::new());
+        self.write_le(&mut writer).unwrap();
+        writer.into_inner()
     }
 }
 
 //https://gibberlings3.github.io/iesdp/file_formats/ie_formats/itm_v1.htm#itmv1_Header
-#[repr(C, packed)]
-#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
+#[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct ItemHeader {
-    header: Header<4, 4>,
-    unidentified_item_name: i32,
-    identified_item_name: i32,
-    replacement_item: FixedCharSlice<8>,
+    #[br(count = 4)]
+    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
+    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    signature: String,
+    #[br(count = 4)]
+    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
+    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    version: String,
+    unidentified_item_name: u32,
+    identified_item_name: u32,
+    replacement_item: Resref,
     // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/itm_v1.htm#Header_Flags
     type_flags: u32,
     category: u16,
     usability: u32,
-    item_animation: FixedCharSlice<2>,
+    #[br(count = 2)]
+    item_animation: Vec<u8>,
     min_level: u16,
     min_strength: u16,
     min_strength_bonus: u8,
@@ -104,30 +81,29 @@ pub struct ItemHeader {
     min_charisma: u16,
     base_value: u32,
     max_stackable: u16,
-    item_icon: FixedCharSlice<8>,
+    item_icon: Resref,
     lore: u16,
-    ground_icon: FixedCharSlice<8>,
+    ground_icon: Resref,
     base_weight: u32,
-    item_description_generic: i32,
-    item_description_identified: i32,
-    description_icon: FixedCharSlice<8>,
+    item_description_generic: u32,
+    item_description_identified: u32,
+    description_icon: Resref,
     enchantment: u32,
-    offset_to_extended_headers: i32,
-    count_of_extended_headers: i16,
-    offset_to_feature_blocks: i32,
-    index_to_equipping_feature_blocks: i16,
-    count_of_feature_blocks: i16,
+    offset_to_extended_headers: u32,
+    count_of_extended_headers: u16,
+    offset_to_feature_blocks: u32,
+    index_to_equipping_feature_blocks: u16,
+    count_of_feature_blocks: u16,
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/itm_v1.htm#itmv1_Extended_Header
-#[repr(C, packed)]
-#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
+#[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct ItemExtendedHeader {
     attack_type: u8, // Note zero is very bad here
     id_required: u8,
     location: u8,
     alternative_dice_sides: u8,
-    use_icon: FixedCharSlice<8>,
+    use_icon: Resref,
     target_type: u8,
     target_count: u8,
     range: u16,
@@ -146,9 +122,10 @@ pub struct ItemExtendedHeader {
     feature_blocks_index: u16,
     max_charges: u16,
     charge_depletion_behaviour: u16,
-    flags: FixedCharSlice<4>,
-    projectile_animation: FixedCharSlice<2>,
-    melee_animation: FixedCharNDArray<2, 3>,
+    flags: u32,
+    projectile_animation: u16,
+    #[br(count = 6)]
+    melee_animation: Vec<u8>,
     is_arrow: u16,
     is_bolt: u16,
     is_bullet: u16,
@@ -159,19 +136,13 @@ type ItemFeatureBlock = FeatureBlock;
 
 #[cfg(test)]
 mod tests {
+
     use super::*;
+    use pretty_assertions::assert_eq;
     use std::{
         fs::File,
         io::{BufReader, Read},
-        mem::size_of,
     };
-
-    #[test]
-    fn ensure_size() {
-        assert_eq!(size_of::<ItemHeader>(), 114);
-        assert_eq!(size_of::<ItemExtendedHeader>(), 56);
-        assert_eq!(size_of::<ItemFeatureBlock>(), 48);
-    }
 
     #[test]
     fn valid_item_file_parsed() {
@@ -182,8 +153,8 @@ mod tests {
             .read_to_end(&mut buffer)
             .expect("Could not read to buffer");
         let item = Item::new(&buffer);
-        assert_eq!({ item.header.identified_item_name }, -1);
-        assert_eq!({ item.header.max_stackable }, 1);
+        assert_eq!(item.header.identified_item_name, 4294967295);
+        assert_eq!(item.header.max_stackable, 1);
     }
 
     #[test]

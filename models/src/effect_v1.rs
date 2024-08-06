@@ -1,15 +1,14 @@
 use std::rc::Rc;
 
+use binrw::{io::Cursor, BinRead, BinReaderExt, BinWrite};
 use serde::{Deserialize, Serialize};
 
-use crate::common::fixed_char_array::FixedCharSlice;
+use crate::common::resref::Resref;
 use crate::model::Model;
-use crate::resources::utils::{copy_buff_to_struct, to_u8_slice};
 use crate::tlk::Lookup;
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/eff_v1.htm#effv1_Header
-#[repr(C)]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct EffectV1 {
     pub effect_type: u16,
     pub target_type: u8,
@@ -21,18 +20,19 @@ pub struct EffectV1 {
     pub duration: u32,
     pub probability_1: u8,
     pub probability_2: u8,
-    pub resref_key: FixedCharSlice<8>,
+    pub resref_key: Resref,
     pub dice_thrown_maximum_level: u32,
-    pub dice_sides_minimmum_level: u32,
+    pub dice_sides_minimum_level: u32,
     pub saving_throw_type: u32,
     pub saving_throw_bonus: u32,
-    #[serde(skip_serializing)]
+    #[serde(skip)]
     _unknown: u32,
 }
 
 impl Model for EffectV1 {
     fn new(buffer: &[u8]) -> Self {
-        copy_buff_to_struct::<EffectV1>(buffer, 0)
+        let mut reader = Cursor::new(buffer);
+        reader.read_le().unwrap()
     }
 
     fn create_as_rc(buffer: &[u8]) -> Rc<dyn Model> {
@@ -44,6 +44,8 @@ impl Model for EffectV1 {
     }
 
     fn to_bytes(&self) -> Vec<u8> {
-        to_u8_slice(&self).to_vec()
+        let mut writer = Cursor::new(Vec::new());
+        self.write_le(&mut writer).unwrap();
+        writer.into_inner()
     }
 }

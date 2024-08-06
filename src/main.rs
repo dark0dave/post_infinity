@@ -1,5 +1,9 @@
 use clap::Parser;
-use cli::args::Args;
+
+use args::Args;
+
+pub mod args;
+pub mod cli;
 
 fn main() {
     let args: Args = Args::parse();

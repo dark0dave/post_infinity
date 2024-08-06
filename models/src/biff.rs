@@ -1,8 +1,8 @@
 use core::mem::size_of;
 use std::{collections::HashMap, fmt::Debug, rc::Rc};
 
+use crate::common::fixed_char_array::FixedCharSlice;
 use crate::common::header::Header;
-use crate::common::signed_fixed_char_array::SignedFixedCharSlice;
 use crate::resources::utils::{copy_buff_to_struct, copy_transmute_buff};
 use crate::{from_buffer, model::Model, resources::types::ResourceType};
 
@@ -20,14 +20,14 @@ impl Biff {
     pub fn new(buffer: &[u8]) -> Self {
         let header = copy_buff_to_struct::<BiffHeader>(buffer, 0);
 
-        let start = usize::try_from(header.offset_to_file_entries).unwrap_or(0);
-        let count = usize::try_from(header.count_of_fileset_entries).unwrap_or(0);
+        let start = header.offset_to_file_entries as usize;
+        let count = header.count_of_fileset_entries as usize;
         let file_set = copy_transmute_buff::<FilesetEntryHeader>(buffer, start, count);
 
         let mut fileset_entries: HashMap<ResourceType, Vec<FilesetEntry>> = HashMap::new();
         for header in file_set {
-            let start = usize::try_from(header.offset).unwrap_or(0);
-            let end = start + usize::try_from(header.size).unwrap_or(0);
+            let start = header.offset as usize;
+            let end = start + header.size as usize;
             let buffer = buffer.get(start..end).unwrap();
             if let Some(data) = from_buffer(buffer, header.resource_type) {
                 fileset_entries
@@ -45,13 +45,11 @@ impl Biff {
     }
 
     pub fn populate_tiles(&mut self, buffer: &[u8]) {
-        let start_of_file_entries =
-            usize::try_from(self.header.offset_to_file_entries).unwrap_or(0);
-        let count_of_file_entries =
-            usize::try_from(self.header.count_of_fileset_entries).unwrap_or(0);
+        let start_of_file_entries = self.header.offset_to_file_entries as usize;
+        let count_of_file_entries = self.header.count_of_fileset_entries as usize;
 
         let start = start_of_file_entries + count_of_file_entries * size_of::<FilesetEntryHeader>();
-        let count = usize::try_from(self.header.count_of_tileset_entries).unwrap_or(0);
+        let count = self.header.count_of_tileset_entries as usize;
         self.tileset_entries = copy_transmute_buff::<TilesetEntry>(buffer, start, count);
     }
 }
@@ -70,7 +68,7 @@ pub struct BiffHeader {
 #[repr(C, packed)]
 #[derive(Debug, Copy, Clone)]
 pub struct FilesetEntryHeader {
-    pub resource_locator: SignedFixedCharSlice<4>,
+    pub resource_locator: FixedCharSlice<4>,
     pub offset: u32,
     pub size: u32,
     pub resource_type: ResourceType,

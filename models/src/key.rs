@@ -1,4 +1,4 @@
-use std::{fmt::Debug, usize};
+use std::fmt::Debug;
 
 use crate::common::header::Header;
 use crate::common::{fixed_char_array::FixedCharSlice, variable_char_array::VariableCharArray};
@@ -19,8 +19,8 @@ impl Key {
     pub fn new(buffer: &[u8]) -> Self {
         let header = copy_buff_to_struct::<KeyHeader>(buffer, 0);
 
-        let start = usize::try_from(header.offset_to_bif_entries).unwrap_or(0);
-        let count = usize::try_from(header.count_of_bif_entries).unwrap_or(0);
+        let start = header.offset_to_bif_entries as usize;
+        let count = header.count_of_bif_entries as usize;
         let bifs = copy_transmute_buff::<BiffIndexHeader>(buffer, start, count);
 
         let bif_entries: Vec<BiffIndex> = bifs
@@ -28,8 +28,8 @@ impl Key {
             .flat_map(|header| BiffIndex::try_from(header, buffer))
             .collect();
 
-        let start = usize::try_from(header.offset_to_resource_entries).unwrap_or(0);
-        let count = usize::try_from(header.count_of_resource_entries).unwrap_or(0);
+        let start = header.offset_to_resource_entries as usize;
+        let count = header.count_of_resource_entries as usize;
         let raw_resource_entries = copy_transmute_buff::<RawResourceIndex>(buffer, start, count);
         let resource_entries = raw_resource_entries
             .iter()
@@ -49,20 +49,20 @@ impl Key {
 #[derive(Debug, Copy, Clone)]
 pub struct KeyHeader {
     header: Header<4, 4>,
-    count_of_bif_entries: i32,
-    count_of_resource_entries: i32,
-    offset_to_bif_entries: i32,
-    offset_to_resource_entries: i32,
+    count_of_bif_entries: u32,
+    count_of_resource_entries: u32,
+    offset_to_bif_entries: u32,
+    offset_to_resource_entries: u32,
 }
 
 //https://gibberlings3.github.io/iesdp/file_formats/ie_formats/key_v1.htm#keyv1_BifIndices
 #[repr(C, packed)]
 #[derive(Debug, Copy, Clone)]
 pub struct BiffIndexHeader {
-    file_length: i32,
-    offset_to_file_name: i32,
-    file_name_length: i16,
-    file_location: i16,
+    file_length: u32,
+    offset_to_file_name: u32,
+    file_name_length: u16,
+    file_location: u16,
 }
 
 #[derive(Debug)]
@@ -73,8 +73,8 @@ pub struct BiffIndex {
 
 impl BiffIndex {
     fn try_from(header: &BiffIndexHeader, buffer: &[u8]) -> Option<Self> {
-        let start = usize::try_from(header.offset_to_file_name).unwrap_or(0);
-        let end = start + usize::try_from(header.file_name_length).unwrap_or(0);
+        let start = header.offset_to_file_name as usize;
+        let end = start + header.file_name_length as usize;
         buffer.get(start..end).map(|buff| BiffIndex {
             header: *header,
             name: VariableCharArray(buff.into()),

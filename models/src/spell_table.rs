@@ -1,30 +1,31 @@
 use serde::{Deserialize, Serialize};
 
-use crate::common::fixed_char_array::FixedCharSlice;
+use crate::common::resref::Resref;
+use binrw::{BinRead, BinWrite};
 
-#[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
+// https://gibberlings3.github.io/iesdp/file_formats/ie_formats/cre_v1.htm#CREV1_0_KnownSpell
+#[derive(Debug, PartialEq, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct KnownSpells {
-    pub spell_name: FixedCharSlice<8>,
+    pub spell_name: Resref,
     pub spell_level: u16,
     pub spell_type: u16,
 }
 
-#[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
+// https://gibberlings3.github.io/iesdp/file_formats/ie_formats/cre_v1.htm#CREV1_0_MemSpellInfo
+#[derive(Debug, PartialEq, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct SpellMemorizationInfo {
     pub spell_level: u16,
     pub number_of_spells_memorizable: u16,
     pub number_of_spells_memorizable_after_effects: u16,
     pub spell_type: u16,
-    pub index_to_spell_table: i32,
-    pub count_of_memorizable_spell_tables: i32,
+    pub index_to_spell_table: u32,
+    pub count_of_memorizable_spell_tables: u32,
 }
 
-#[repr(C, packed)]
-#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize)]
+// https://gibberlings3.github.io/iesdp/file_formats/ie_formats/cre_v1.htm#CREV1_0_MemSpell
+#[derive(Debug, PartialEq, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct SpellMemorizationTable {
-    pub spell_name: FixedCharSlice<8>,
+    pub spell_name: Resref,
     pub memorised: u32,
 }
 
@@ -65,139 +66,139 @@ mod tests {
             creature.memorized_spells,
             vec![
                 SpellMemorizationTable {
-                    spell_name: "SPPR103".into(),
+                    spell_name: Resref("SPPR103\0".to_string()),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: "SPPR103".into(),
+                    spell_name: Resref("SPPR103\0".to_string()),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: "SPPR109".into(),
+                    spell_name: Resref("SPPR109\0".to_string()),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: "SPPR101".into(),
+                    spell_name: Resref("SPPR101\0".to_string()),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: "SPPR203".into(),
+                    spell_name: Resref("SPPR203\0".to_string()),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: "SPPR208".into(),
+                    spell_name: Resref("SPPR208\0".to_string()),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: "SPPR211".into(),
+                    spell_name: Resref("SPPR211\0".to_string()),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: "SPPR212".into(),
+                    spell_name: Resref("SPPR212\0".to_string()),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: "SPPR312".into(),
+                    spell_name: Resref("SPPR312\0".to_string()),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: "SPPR313".into(),
+                    spell_name: Resref("SPPR313\0".to_string()),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: "SPPR315".into(),
+                    spell_name: Resref("SPPR315\0".to_string()),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: "SPPR401".into(),
+                    spell_name: Resref("SPPR401\0".to_string()),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: "SPPR413".into(),
+                    spell_name: Resref("SPPR413\0".to_string()),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: "SPPR411".into(),
+                    spell_name: Resref("SPPR411\0".to_string()),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: "SPPR502".into(),
+                    spell_name: Resref("SPPR502\0".to_string()),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: "SPPR503".into(),
+                    spell_name: Resref("SPPR503\0".to_string()),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: "SPWI113".into(),
+                    spell_name: Resref("SPWI113\0".to_string()),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: "SPWI112".into(),
+                    spell_name: Resref("SPWI112\0".to_string()),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: "SPWI110".into(),
+                    spell_name: Resref("SPWI110\0".to_string()),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: "SPWI105".into(),
+                    spell_name: Resref("SPWI105\0".to_string()),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: "SPWI213".into(),
+                    spell_name: Resref("SPWI213\0".to_string()),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: "SPWI220".into(),
+                    spell_name: Resref("SPWI220\0".to_string()),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: "SPWI211".into(),
+                    spell_name: Resref("SPWI211\0".to_string()),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: "SPWI203".into(),
+                    spell_name: Resref("SPWI203\0".to_string()),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: "SPWI312".into(),
+                    spell_name: Resref("SPWI312\0".to_string()),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: "SPWI311".into(),
+                    spell_name: Resref("SPWI311\0".to_string()),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: "SPWI318".into(),
+                    spell_name: Resref("SPWI318\0".to_string()),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: "SPWI308".into(),
+                    spell_name: Resref("SPWI308\0".to_string()),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: "SPWI408".into(),
+                    spell_name: Resref("SPWI408\0".to_string()),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: "SPWI405".into(),
+                    spell_name: Resref("SPWI405\0".to_string()),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: "SPWI406".into(),
+                    spell_name: Resref("SPWI406\0".to_string()),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: "SPWI510".into(),
+                    spell_name: Resref("SPWI510\0".to_string()),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: "SPWI505".into(),
+                    spell_name: Resref("SPWI505\0".to_string()),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: "SPWI522".into(),
+                    spell_name: Resref("SPWI522\0".to_string()),
                     memorised: 1,
                 },
             ]
