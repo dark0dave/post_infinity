@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 use binrw::{io::Cursor, BinRead, BinReaderExt, BinWrite};
 use serde::{Deserialize, Serialize};
 
@@ -7,7 +5,7 @@ use crate::{model::Model, tlk::Lookup};
 
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct Biography(
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     #[br(parse_with = binrw::helpers::until_eof, map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
     pub String,
 );
@@ -16,10 +14,6 @@ impl Model for Biography {
     fn new(buffer: &[u8]) -> Self {
         let mut reader = Cursor::new(buffer);
         reader.read_le().unwrap()
-    }
-
-    fn create_as_rc(buffer: &[u8]) -> Rc<dyn Model> {
-        Rc::new(Self::new(buffer))
     }
 
     fn name(&self, _lookup: &Lookup) -> String {

@@ -1,94 +1,155 @@
-use core::mem::size_of;
-use std::{collections::HashMap, fmt::Debug, rc::Rc};
+use core::str;
+use std::io::{Read, Seek};
+use std::{fmt::Debug, rc::Rc};
 
-use crate::common::fixed_char_array::FixedCharSlice;
-use crate::common::header::Header;
-use crate::resources::utils::{copy_buff_to_struct, copy_transmute_buff};
-use crate::{from_buffer, model::Model, resources::types::ResourceType};
+use binrw::{io::Cursor, io::SeekFrom, BinRead, BinReaderExt, BinResult, BinWrite};
+use serde::{Deserialize, Serialize};
+
+use crate::common::strref::Strref;
+use crate::{common::types::ResourceType, from_buffer, model::Model};
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/bif_v1.htm
-#[repr(C)]
-#[derive(Debug)]
+#[derive(Debug, BinRead, BinWrite, Serialize)]
 pub struct Biff {
+    #[serde(flatten)]
     pub header: BiffHeader,
-    pub fileset_entries: HashMap<ResourceType, Vec<FilesetEntry>>,
+    #[br(seek_before=SeekFrom::Start(header.offset_to_file_entries as u64), count=header.count_of_fileset_entries)]
+    pub fileset_entries: Vec<FilesetEntry>,
+    #[br(count=header.count_of_tileset_entries)]
     pub tileset_entries: Vec<TilesetEntry>,
+    #[serde(skip)]
+    #[br(seek_before=SeekFrom::Start(0), parse_with = |reader, _endian, _args: Vec<u8>| parse_contained_files(reader, &fileset_entries, &tileset_entries))]
+    #[bw(map = |x| x.iter().flat_map(|x| x.to_bytes()).collect::<Vec<u8>>())]
+    pub contained_files: Vec<Rc<dyn Model>>,
+}
+
+fn parse_contained_files<R: Read + Seek>(
+    reader: &mut R,
+    fileset_entries: &Vec<FilesetEntry>,
+    tileset_entries: &Vec<TilesetEntry>,
+) -> BinResult<Vec<Rc<dyn Model>>> {
+    let mut buffer = vec![];
+    reader.read_to_end(&mut buffer).unwrap();
+
+    let mut out: Vec<Rc<dyn Model>> = Vec::with_capacity(fileset_entries.len());
+    for fileset_entry in fileset_entries {
+        let start: usize = fileset_entry.offset as usize;
+        let end: usize = start + fileset_entry.size as usize;
+        let buff = buffer.get(start..end).unwrap_or_default();
+        if let Some(data) = from_buffer(buff, fileset_entry.resource_type) {
+            out.push(data);
+        }
+    }
+    for tileset_entry in tileset_entries {
+        let start: usize = tileset_entry.offset as usize;
+        let end: usize = start + (tileset_entry.tile_count * tileset_entry.tile_size) as usize;
+        let buff = buffer.get(start..end).unwrap_or_default();
+        if let Some(data) = from_buffer(buff, tileset_entry.resource_type) {
+            out.push(data);
+        }
+    }
+    Ok(out)
 }
 
 impl Biff {
-    // TODO: Pass option to process only resources needed, make this part of init and make new from Resource
     pub fn new(buffer: &[u8]) -> Self {
-        let header = copy_buff_to_struct::<BiffHeader>(buffer, 0);
-
-        let start = header.offset_to_file_entries as usize;
-        let count = header.count_of_fileset_entries as usize;
-        let file_set = copy_transmute_buff::<FilesetEntryHeader>(buffer, start, count);
-
-        let mut fileset_entries: HashMap<ResourceType, Vec<FilesetEntry>> = HashMap::new();
-        for header in file_set {
-            let start = header.offset as usize;
-            let end = start + header.size as usize;
-            let buffer = buffer.get(start..end).unwrap();
-            if let Some(data) = from_buffer(buffer, header.resource_type) {
-                fileset_entries
-                    .entry(header.resource_type)
-                    .or_default()
-                    .push(FilesetEntry { header, data });
+        let mut reader = Cursor::new(buffer);
+        match reader.read_le() {
+            Ok(res) => res,
+            Err(err) => {
+                panic!("Errored with {:?}, dumping buffer: {:?}", err, buffer);
             }
         }
-
-        Biff {
-            header,
-            fileset_entries,
-            tileset_entries: vec![],
-        }
-    }
-
-    pub fn populate_tiles(&mut self, buffer: &[u8]) {
-        let start_of_file_entries = self.header.offset_to_file_entries as usize;
-        let count_of_file_entries = self.header.count_of_fileset_entries as usize;
-
-        let start = start_of_file_entries + count_of_file_entries * size_of::<FilesetEntryHeader>();
-        let count = self.header.count_of_tileset_entries as usize;
-        self.tileset_entries = copy_transmute_buff::<TilesetEntry>(buffer, start, count);
     }
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/bif_v1.htm#bif_v1_Header
-#[repr(C, packed)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, PartialEq, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct BiffHeader {
-    pub header: Header<4, 4>,
+    #[br(count = 4)]
+    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
+    #[bw(map = |x| x.as_bytes())]
+    pub signature: String,
+    #[br(count = 4)]
+    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
+    #[bw(map = |x| x.as_bytes())]
+    pub version: String,
     pub count_of_fileset_entries: u32,
     pub count_of_tileset_entries: u32,
     pub offset_to_file_entries: u32,
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/bif_v1.htm#bif_v1_FileEntry
-#[repr(C, packed)]
-#[derive(Debug, Copy, Clone)]
-pub struct FilesetEntryHeader {
-    pub resource_locator: FixedCharSlice<4>,
+#[derive(Debug, PartialEq, BinRead, BinWrite, Serialize, Deserialize)]
+pub struct FilesetEntry {
+    pub resource_locator: Strref,
     pub offset: u32,
     pub size: u32,
     pub resource_type: ResourceType,
     pub unknown: u16,
 }
 
-#[derive(Debug)]
-pub struct FilesetEntry {
-    pub header: FilesetEntryHeader,
-    pub data: Rc<dyn Model>,
-}
-
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/bif_v1.htm#bif_v1_TilesetEntry
-#[repr(C, packed)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
+
 pub struct TilesetEntry {
     pub resource_locator: u32,
     pub offset: u32,
     pub tile_count: u32,
     pub tile_size: u32,
+    // Type of this resource (always 0x3eb - TIS)
     pub resource_type: ResourceType,
     pub unknown: u16,
+}
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+    use pretty_assertions::assert_eq;
+    use std::{
+        fs::File,
+        io::{BufReader, Read},
+    };
+
+    #[test]
+    fn valid_biff_file_parsed() {
+        let file = File::open("fixtures/Effects.bif").unwrap();
+        let mut reader = BufReader::new(file);
+        let mut buffer = Vec::new();
+        reader
+            .read_to_end(&mut buffer)
+            .expect("Could not read to buffer");
+        let biff = Biff::new(&buffer);
+        assert_eq!(
+            biff.header,
+            BiffHeader {
+                signature: "BIFF".to_string(),
+                version: "V1  ".to_string(),
+                count_of_fileset_entries: 534,
+                count_of_tileset_entries: 0,
+                offset_to_file_entries: 181288
+            }
+        );
+        assert_eq!(
+            *biff.fileset_entries.first().unwrap(),
+            FilesetEntry {
+                resource_locator: Strref(0),
+                offset: 24,
+                size: 492,
+                resource_type: ResourceType::FileTypeVvc,
+                unknown: 0
+            }
+        );
+        assert_eq!(
+            *biff.fileset_entries.last().unwrap(),
+            FilesetEntry {
+                resource_locator: Strref(533),
+                offset: 181012,
+                size: 272,
+                resource_type: ResourceType::FileTypeEff,
+                unknown: 0
+            }
+        )
+    }
 }

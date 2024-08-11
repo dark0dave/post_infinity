@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 use binrw::{io::Cursor, io::SeekFrom, BinRead, BinReaderExt, BinWrite};
 use serde::{Deserialize, Serialize};
 
@@ -12,9 +10,12 @@ use crate::tlk::Lookup;
 pub struct WorldMap {
     #[serde(flatten)]
     pub header: WorldMapHeader,
-    #[serde(flatten)]
     #[br(count=header.count_of_worldmap_entries, seek_before=SeekFrom::Start(header.offset_to_worldmap_entries as u64))]
     pub world_map_entries: Vec<WorldMapEntry>,
+    #[br(count=world_map_entries.iter().map(|x| x.count_of_area_entries).reduce(|a,b| a+b).unwrap_or_default())]
+    pub area_entries: Vec<AreaEntry>,
+    #[br(parse_with = binrw::helpers::until_eof)]
+    pub area_link_entries: Vec<AreaLink>,
 }
 
 impl Model for WorldMap {
@@ -26,10 +27,6 @@ impl Model for WorldMap {
                 panic!("Errored with {:?}, dumping buffer: {:?}", err, buffer);
             }
         }
-    }
-
-    fn create_as_rc(buffer: &[u8]) -> Rc<dyn Model> {
-        Rc::new(Self::new(buffer))
     }
 
     fn name(&self, _lookup: &Lookup) -> String {
@@ -48,11 +45,11 @@ impl Model for WorldMap {
 pub struct WorldMapHeader {
     #[br(count = 4)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub signature: String,
     #[br(count = 4)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub version: String,
     pub count_of_worldmap_entries: u32,
     pub offset_to_worldmap_entries: u32,
@@ -76,14 +73,8 @@ pub struct WorldMapEntry {
     // BGEE field only
     pub flags: u32,
     #[serde(skip)]
-    #[br(count = 128)]
+    #[br(count = 124)]
     _unused: Vec<u8>,
-    #[serde(flatten)]
-    #[br(count=count_of_area_entries, seek_before=SeekFrom::Start(offset_to_area_entries as u64))]
-    pub area_entries: Vec<AreaEntry>,
-    #[serde(flatten)]
-    #[br(count=count_of_area_link_entries, seek_before=SeekFrom::Start(offset_to_area_link_entries as u64))]
-    pub area_link_entries: Vec<AreaLink>,
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/wmap_v1.htm#wmapv1_0_Area
@@ -93,7 +84,7 @@ pub struct AreaEntry {
     pub area_name_short: Resref,
     #[br(count = 32)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub area_name_long: String,
     #[br(count = 4)]
     pub bitmask_indicating_status_of_area: Vec<u8>,
@@ -122,7 +113,7 @@ pub struct AreaLink {
     pub index_of_destination_area: u32,
     #[br(count = 32)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub entry_point: String,
     pub travel_time: u32,
     pub default_entry_location: u32,
@@ -157,21 +148,7 @@ mod tests {
             .read_to_end(&mut buffer)
             .expect("Could not read to buffer");
         let world = WorldMap::new(&buffer);
-        let mut count_of_area_entries = 0;
-        let mut count_of_area_link = 0;
-        for entry in world.world_map_entries {
-            count_of_area_entries += entry.count_of_area_entries;
-            count_of_area_link += entry.count_of_area_link_entries;
-            assert_eq!(
-                entry.count_of_area_entries as usize,
-                entry.area_entries.len()
-            );
-            assert_eq!(
-                entry.count_of_area_link_entries as usize,
-                entry.area_link_entries.len()
-            );
-        }
-        assert_eq!(count_of_area_entries, 58);
-        assert_eq!(count_of_area_link, 208)
+        assert_eq!(world.area_entries.len(), 58);
+        assert_eq!(world.area_link_entries.len(), 208)
     }
 }

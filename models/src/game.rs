@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 use binrw::{
     io::{Cursor, SeekFrom},
     BinRead, BinReaderExt, BinWrite,
@@ -15,27 +13,20 @@ use crate::tlk::Lookup;
 pub struct Game {
     #[serde(flatten)]
     pub header: BGEEGameHeader,
-    #[serde(flatten)]
     #[br(count=header.count_of_npc_structs_for_party_members, seek_before=SeekFrom::Start(header.offset_to_npc_structs_for_party_members as u64))]
     pub party_npcs: Vec<GameNPC>,
-    #[serde(flatten)]
     #[br(count=header.count_of_npc_structs_for_npcs, seek_before=SeekFrom::Start(header.offset_to_npc_structs_for_npcs as u64))]
     pub non_party_npcs: Vec<GameNPC>,
-    #[serde(flatten)]
     #[br(count=header.count_of_global_namespace_variables, seek_before=SeekFrom::Start(header.offset_to_global_namespace_variables as u64))]
     pub global_variables: Vec<GlobalVariables>,
-    #[serde(flatten)]
     #[br(count=header.count_of_journal_entries, seek_before=SeekFrom::Start(header.offset_to_journal_entries as u64))]
     pub journal_entries: Vec<JournalEntries>,
     #[br(seek_before=SeekFrom::Start(header.offset_to_familiar as u64))]
     pub familiar: Option<Familiar>,
-    #[serde(flatten)]
     #[br(count=header.count_of_stored_locations, seek_before=SeekFrom::Start(header.offset_to_stored_locations as u64))]
     pub stored_locations: Vec<Location>,
-    #[serde(flatten)]
     #[br(count=header.count_of_pocket_plane_locations, seek_before=SeekFrom::Start(header.offset_to_pocket_plane_locations as u64))]
     pub pocket_plane_locations: Vec<Location>,
-    #[serde(flatten)]
     #[br(if(familiar.is_some()), parse_with=binrw::helpers::until_eof, seek_before=SeekFrom::Start(header.offset_to_familiar_extra as u64))]
     pub familiar_extra: Vec<FamiliarExtra>,
 }
@@ -44,10 +35,6 @@ impl Model for Game {
     fn new(buffer: &[u8]) -> Self {
         let mut reader = Cursor::new(buffer);
         reader.read_le().unwrap()
-    }
-
-    fn create_as_rc(buffer: &[u8]) -> Rc<dyn Model> {
-        Rc::new(Self::new(buffer))
     }
 
     fn name(&self, _lookup: &Lookup) -> String {
@@ -66,11 +53,11 @@ impl Model for Game {
 pub struct BGEEGameHeader {
     #[br(count = 4)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub signature: String,
     #[br(count = 4)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub version: String,
     pub game_time: u32,
     pub selected_formation: u16,
@@ -126,12 +113,12 @@ pub struct BGEEGameHeader {
     pub current_world_map: Resref,
     #[br(count = 8)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub current_campaign: String,
     pub familiar_owner: u32,
     #[br(count = 20)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub random_encounter_script: String,
 }
 
@@ -145,7 +132,7 @@ pub struct GameNPC {
     pub size_of_cre_resource: u32,
     #[br(count = 8)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub character_name: String,
     pub character_orientation: u32,
     pub characters_current_area: Resref,
@@ -190,7 +177,7 @@ pub struct GameNPC {
     pub quick_item_slot_3_ability: u16,
     #[br(count = 32)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub name: String,
     pub talk_count: u32,
     #[serde(flatten)]
@@ -218,17 +205,13 @@ pub struct CharacterKillStats {
     pub chapter_kills_number: u32,
     pub game_kills_xp_gained: u32,
     pub game_kills_number: u32,
-    #[serde(flatten)]
     #[br(count = 4)]
     pub favourite_spells: Vec<Resref>,
-    #[serde(flatten)]
     #[br(count = 4)]
     pub favourite_spell_count: Vec<u16>,
-    #[serde(flatten)]
     #[br(count = 4)]
     pub favourite_weapons: Vec<Resref>,
     // time equipped in combat - 1/15 seconds
-    #[serde(flatten)]
     #[br(count = 4)]
     pub favourite_weapon_time: Vec<u16>,
 }
@@ -238,7 +221,7 @@ pub struct CharacterKillStats {
 pub struct GlobalVariables {
     #[br(count = 32)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub name: String,
     /*
       bit 0: int
@@ -255,7 +238,7 @@ pub struct GlobalVariables {
     pub double_value: u64,
     #[br(count = 32)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub script_name_value: String,
 }
 

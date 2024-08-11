@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 use binrw::{io::Cursor, BinRead, BinReaderExt, BinWrite};
 use serde::{Deserialize, Serialize};
 
@@ -33,10 +31,6 @@ impl Model for EffectV1 {
     fn new(buffer: &[u8]) -> Self {
         let mut reader = Cursor::new(buffer);
         reader.read_le().unwrap()
-    }
-
-    fn create_as_rc(buffer: &[u8]) -> Rc<dyn Model> {
-        Rc::new(Self::new(buffer))
     }
 
     fn name(&self, _lookup: &Lookup) -> String {

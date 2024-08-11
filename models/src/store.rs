@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 use binrw::{io::Cursor, BinRead, BinReaderExt, BinWrite};
 use serde::{Deserialize, Serialize};
 
@@ -13,16 +11,12 @@ use crate::tlk::Lookup;
 pub struct Store {
     #[serde(flatten)]
     pub header: StoreHeader,
-    #[serde(flatten)]
     #[br(count=header.count_of_items_for_sale_section)]
     pub items_for_sale: Vec<ItemsForSale>,
-    #[serde(flatten)]
     #[br(count=header.count_of_drinks_section)]
     pub drinks_for_sale: Vec<DrinksForSale>,
-    #[serde(flatten)]
     #[br(count=header.count_of_cures_section)]
     pub cures_for_sale: Vec<CuresForSale>,
-    #[serde(flatten)]
     #[br(count=header.count_of_items_in_items_purchased_section)]
     pub items_purchased_here: Vec<u32>,
 }
@@ -36,10 +30,6 @@ impl Model for Store {
                 panic!("Errored with {:?}, dumping buffer: {:?}", err, buffer);
             }
         }
-    }
-
-    fn create_as_rc(buffer: &[u8]) -> Rc<dyn Model> {
-        Rc::new(Self::new(buffer))
     }
 
     fn name(&self, _lookup: &Lookup) -> String {
@@ -58,11 +48,11 @@ impl Model for Store {
 pub struct StoreHeader {
     #[br(count = 4)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub signature: String,
     #[br(count = 4)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub version: String,
     //  (0=Store, 1=Tavern, 2=Inn, 3=Temple, 5=Container)
     pub store_type: u32,

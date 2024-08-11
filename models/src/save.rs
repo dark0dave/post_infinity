@@ -1,100 +1,61 @@
+use binrw::{io::Cursor, io::Read, BinRead, BinReaderExt, BinWrite};
 use flate2::bufread::ZlibDecoder;
 use serde::{Deserialize, Serialize};
-use std::io::Read;
 
-use crate::{
-    common::{header::Header, variable_char_array::VariableCharArray},
-    from_buffer,
-    resources::{types::extension_to_resource_type, utils::copy_buff_to_struct},
-};
+use crate::{model::Model, tlk::Lookup};
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/sav_v1.htm
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct Save {
-    pub header: Header<4, 4>,
+    #[br(count = 4)]
+    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
+    #[bw(map = |x| x.as_bytes())]
+    signature: String,
+    #[br(count = 4)]
+    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
+    #[bw(map = |x| x.as_bytes())]
+    version: String,
+    #[br(parse_with=binrw::helpers::until_eof)]
     pub files: Vec<File>,
-    //#[serde(skip)]
-    //pub uncompressed_files: Vec<Rc<dyn Model>>,
 }
 
-impl Save {
-    pub fn new(buffer: &[u8]) -> Self {
-        let header = copy_buff_to_struct::<Header<4, 4>>(buffer, 0);
-        let mut files = vec![];
-        let mut counter = 8;
-        while counter <= (buffer.len() - 1) {
-            let file = File::new(buffer.get(counter..).unwrap_or_default());
-            counter = counter
-                + 12
-                + file.length_of_filename as usize
-                + file.compressed_data_length as usize;
-
-            files.push(file);
-        }
-        Save { header, files }
-    }
-    pub fn decompress(&mut self) {
-        let mut uncompressed_files = Vec::with_capacity(self.files.len());
-        for file in self.files.iter() {
-            let file_name = file.filename.clone().to_string();
-            let uncompresseed_buffer = file.decompress();
-            let file_extension = file_name[file_name.len() - 3..].to_string();
-            let file_type = extension_to_resource_type(&file_extension);
-            if let Some(model) = from_buffer(&uncompresseed_buffer, file_type) {
-                uncompressed_files.push(model);
+impl Model for Save {
+    fn new(buffer: &[u8]) -> Self {
+        let mut reader = Cursor::new(buffer);
+        match reader.read_le() {
+            Ok(res) => res,
+            Err(err) => {
+                panic!("Errored with {:?}, dumping buffer: {:?}", err, buffer);
             }
         }
+    }
+
+    fn name(&self, _lookup: &Lookup) -> String {
+        todo!()
+    }
+
+    fn to_bytes(&self) -> Vec<u8> {
+        let mut writer = Cursor::new(Vec::new());
+        self.write_le(&mut writer).unwrap();
+        writer.into_inner()
     }
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/sav_v1.htm#savv1_File
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct File {
     pub length_of_filename: u32,
-    pub filename: VariableCharArray,
+    #[br(count=length_of_filename,map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
+    #[bw(map = |x| x.as_bytes())]
+    pub filename: String,
     pub uncompressed_data_length: u32,
     pub compressed_data_length: u32,
+    #[br(count=compressed_data_length)]
     pub compressed_data: Vec<u8>,
 }
 
 impl File {
-    fn new(buffer: &[u8]) -> Self {
-        let length_of_filename: u32 = u32::from_ne_bytes(
-            buffer
-                .get(0..4)
-                .unwrap_or_default()
-                .try_into()
-                .unwrap_or_default(),
-        );
-        let end = length_of_filename as usize;
-        let filename = VariableCharArray(buffer.get(4..(end + 4)).unwrap_or_default().into());
-        let uncompressed_data_length = u32::from_ne_bytes(
-            buffer
-                .get((end + 4)..(end + 8))
-                .unwrap_or_default()
-                .try_into()
-                .unwrap_or_default(),
-        );
-        let compressed_data_length = u32::from_ne_bytes(
-            buffer
-                .get((end + 8)..(end + 12))
-                .unwrap_or_default()
-                .try_into()
-                .unwrap_or_default(),
-        );
-        let compressed_data: Vec<u8> = buffer
-            .get((end + 12)..(12 + end + compressed_data_length as usize))
-            .unwrap_or_default()
-            .to_vec();
-        File {
-            length_of_filename,
-            filename,
-            uncompressed_data_length,
-            compressed_data_length,
-            compressed_data,
-        }
-    }
-    fn decompress(&self) -> Vec<u8> {
+    pub fn decompress(&self) -> Vec<u8> {
         let mut d = ZlibDecoder::new(&self.compressed_data[..]);
         let mut buff = Vec::with_capacity(self.uncompressed_data_length as usize);
         match d.read_to_end(&mut buff) {
@@ -126,8 +87,10 @@ mod tests {
         reader
             .read_to_end(&mut buffer)
             .expect("Could not read to buffer");
-        let mut save = Save::new(&buffer);
-        save.decompress();
+        let save = Save::new(&buffer);
+        for file_entry in save.files {
+            file_entry.decompress();
+        }
     }
 
     #[test]

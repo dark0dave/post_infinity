@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 use binrw::{io::Cursor, io::SeekFrom, BinRead, BinReaderExt, BinWrite};
 use serde::{Deserialize, Serialize};
 
@@ -13,49 +11,34 @@ use crate::tlk::Lookup;
 pub struct Area {
     #[serde(flatten)]
     pub header: FileHeader,
-    #[serde(flatten)]
     #[br(count=header.count_of_actors, seek_before=SeekFrom::Start(header.offset_to_actors as u64))]
     pub actors: Vec<Actor>,
-    #[serde(flatten)]
     #[br(count=header.count_of_regions, seek_before=SeekFrom::Start(header.offset_to_regions as u64))]
     pub regions: Vec<Region>,
-    #[serde(flatten)]
     #[br(count=header.count_of_spawn_points, seek_before=SeekFrom::Start(header.offset_to_spawn_points as u64))]
     pub spawn_points: Vec<SpawnPoint>,
-    #[serde(flatten)]
     #[br(count=header.count_of_entrances, seek_before=SeekFrom::Start(header.offset_to_entrances as u64))]
     pub entrances: Vec<Entrance>,
-    #[serde(flatten)]
     #[br(count=header.count_of_containers, seek_before=SeekFrom::Start(header.offset_to_containers as u64))]
     pub containers: Vec<Container>,
-    #[serde(flatten)]
     #[br(count=header.count_of_items, seek_before=SeekFrom::Start(header.offset_to_items as u64))]
     pub items: Vec<Item>,
-    #[serde(flatten)]
     #[br(count=header.count_of_vertices, seek_before=SeekFrom::Start(header.offset_to_vertices as u64))]
     pub vertices: Vec<Vertice>,
-    #[serde(flatten)]
     #[br(count=header.count_of_ambients, seek_before=SeekFrom::Start(header.offset_to_ambients as u64))]
     pub ambients: Vec<Ambient>,
-    #[serde(flatten)]
     #[br(count=header.count_of_variables, seek_before=SeekFrom::Start(header.offset_to_variables as u64))]
     pub variables: Vec<Variable>,
-    #[serde(flatten)]
     #[br(count=header.size_of_explored_bitmask, seek_before=SeekFrom::Start(header.offset_to_explored_bitmask as u64))]
     pub explored_bitmasks: Vec<ExploredBitmask>,
-    #[serde(flatten)]
     #[br(count=header.count_of_doors, seek_before=SeekFrom::Start(header.offset_to_doors as u64))]
     pub doors: Vec<Door>,
-    #[serde(flatten)]
     #[br(count=header.count_of_animations, seek_before=SeekFrom::Start(header.offset_to_animations as u64))]
     pub animations: Vec<Animation>,
-    #[serde(flatten)]
     #[br(count=header.count_of_automap_notes, seek_before=SeekFrom::Start(header.offset_to_automap_notes as u64))]
     pub automap_notes: Vec<AutomapNotesBGEE>,
-    #[serde(flatten)]
     #[br(count=header.count_of_tiled_objects,seek_before=SeekFrom::Start(header.offset_to_tiled_objects as u64))]
     pub tiled_objects: Vec<TiledObject>,
-    #[serde(flatten)]
     #[br(count=header.number_of_entries_in_the_projectile_traps, seek_before=SeekFrom::Start(header.offset_to_projectile_traps as u64))]
     pub projectile_traps: Vec<ProjectileTrap>,
     #[serde(flatten)]
@@ -77,16 +60,14 @@ impl Model for Area {
         }
     }
 
-    fn create_as_rc(buffer: &[u8]) -> Rc<dyn Model> {
-        Rc::new(Self::new(buffer))
-    }
-
     fn name(&self, _lookup: &Lookup) -> String {
         todo!()
     }
 
     fn to_bytes(&self) -> Vec<u8> {
-        vec![]
+        let mut writer = Cursor::new(Vec::new());
+        self.write_le(&mut writer).unwrap();
+        writer.into_inner()
     }
 }
 
@@ -95,11 +76,11 @@ impl Model for Area {
 pub struct FileHeader {
     #[br(count = 4)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub signature: String,
     #[br(count = 4)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub version: String,
     pub area_wed: Resref,
     pub last_saved: u32,
@@ -168,7 +149,7 @@ pub struct FileHeader {
 pub struct Actor {
     #[br(count = 32)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub name: String,
     pub current_x_coordinate: u16,
     pub current_y_coordinate: u16,
@@ -181,6 +162,7 @@ pub struct Actor {
     _unused_1: u8,
     pub actor_animation: u32,
     pub actor_orientation: u16,
+    #[serde(skip)]
     _unused: u16,
     pub actor_removal_timer: u32,
     pub movement_restriction_distance: u16,
@@ -208,7 +190,7 @@ pub struct Actor {
 pub struct Region {
     #[br(count = 32)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub name: String,
     pub region_type: u16,
     pub minimum_bounding_box_of_this_point: [u16; 4],
@@ -221,7 +203,7 @@ pub struct Region {
     // for travel regions
     #[br(count = 32)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub entrance_name_in_destination_area: String,
     pub flags: u32,
     // for info points
@@ -249,7 +231,7 @@ pub struct Region {
 pub struct SpawnPoint {
     #[br(count = 32)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub name: String,
     pub x_coordinate: u16,
     pub y_coordinate: u16,
@@ -309,7 +291,7 @@ pub struct SpawnPoint {
 pub struct Entrance {
     #[br(count = 32)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub name: String,
     pub x_coordinate: u16,
     pub y_coordinate: u16,
@@ -324,7 +306,7 @@ pub struct Entrance {
 pub struct Container {
     #[br(count = 32)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub name: String,
     pub x_coordinate: u16,
     pub y_coordinate: u16,
@@ -351,7 +333,7 @@ pub struct Container {
     pub trigger_range: u16,
     #[br(count = 32)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub owner_script_name: String,
     pub key_item: Resref,
     pub break_difficulty: u32,
@@ -381,7 +363,7 @@ pub struct Vertice(pub u16);
 pub struct Ambient {
     #[br(count = 32)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub name: String,
     pub x_coordinate: u16,
     pub y_coordinate: u16,
@@ -417,7 +399,7 @@ pub struct Ambient {
 pub struct Variable {
     #[br(count = 32)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub name: String,
     /*
       bit 0: int
@@ -434,7 +416,7 @@ pub struct Variable {
     pub double_value: i64,
     #[br(count = 32)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub script_name_value: String,
 }
 
@@ -447,12 +429,12 @@ pub struct ExploredBitmask(pub u8);
 pub struct Door {
     #[br(count = 32)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub name: String,
     // Link with WED
     #[br(count = 8)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub door_id: String,
     pub flags: u32,
     pub index_of_first_vertex_of_the_door_outline_when_open: u32,
@@ -487,7 +469,7 @@ pub struct Door {
     pub lockpick_string: Strref,
     #[br(count = 24)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub travel_trigger_name: String,
     pub dialog_speaker_name: Strref,
     pub dialog_resref: Resref,
@@ -501,7 +483,7 @@ pub struct Door {
 pub struct Animation {
     #[br(count = 32)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub name: String,
     pub x_coordinate: u16,
     pub y_coordinate: u16,
@@ -546,7 +528,7 @@ pub struct AutomapNotesBGEE {
 pub struct TiledObject {
     #[br(count = 32)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub name: String,
     pub tile_id: Resref,
     pub flags: u32,
@@ -605,11 +587,11 @@ pub struct SongEntry {
 pub struct RestInterruption {
     #[br(count = 32)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub name: String,
     #[br(count = 40)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub interruption_explanation_text: String,
     #[br(count = 10)]
     pub resref_of_creature_to_spawn: Vec<Resref>,

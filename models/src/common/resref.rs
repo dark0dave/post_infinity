@@ -5,6 +5,6 @@ use serde::{Deserialize, Serialize};
 pub struct Resref(
     #[br(count = 8)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub String,
 );

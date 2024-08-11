@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 use binrw::{io::Cursor, BinRead, BinReaderExt, BinWrite};
 use serde::{Deserialize, Serialize};
 
@@ -12,11 +10,11 @@ use crate::tlk::Lookup;
 pub struct EffectV2 {
     #[br(count = 4)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub signature: String,
     #[br(count = 4)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub version: String,
     #[serde(flatten)]
     pub body: EffectV2Body,
@@ -40,10 +38,6 @@ impl Model for EffectV2 {
         }
     }
 
-    fn create_as_rc(buffer: &[u8]) -> Rc<dyn Model> {
-        Rc::new(Self::new(buffer))
-    }
-
     fn name(&self, _lookup: &Lookup) -> String {
         todo!()
     }
@@ -60,11 +54,11 @@ impl Model for EffectV2 {
 pub struct EffectV2Body {
     #[br(count = 4)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub signature: String,
     #[br(count = 4)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub version: String,
     #[serde(flatten)]
     pub body: EffectV2BodyWithOutHeader,
@@ -113,7 +107,7 @@ pub struct EffectV2BodyWithOutHeader {
     pub parent_resource_slot: u32,
     #[br(count = 32)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub variable_name: String,
     pub caster_level: u32,
     pub first_apply: u32,

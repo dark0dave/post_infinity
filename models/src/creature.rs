@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 use binrw::{
     io::{Cursor, SeekFrom},
     BinRead, BinReaderExt, BinWrite,
@@ -21,22 +19,16 @@ use crate::{
 pub struct Creature {
     #[serde(flatten)]
     pub header: BGEECreatureHeader,
-    #[serde(flatten)]
     #[br(count=header.count_of_known_spells, seek_before=SeekFrom::Start(header.offset_to_known_spells as u64))]
     pub known_spells: Vec<KnownSpells>,
-    #[serde(flatten)]
     #[br(count=header.count_of_memorized_spell_table, seek_before=SeekFrom::Start(header.offset_to_memorized_spell_table as u64))]
     pub memorized_spells: Vec<SpellMemorizationTable>,
-    #[serde(flatten)]
     #[br(count=header.count_of_spell_memorization_info, seek_before=SeekFrom::Start(header.offset_to_spell_memorization_info as u64))]
     pub memorized_spell_info: Vec<SpellMemorizationInfo>,
-    #[serde(flatten)]
     #[br(count=header.count_of_effects, seek_before=SeekFrom::Start(header.offset_to_effects as u64))]
     pub effects: Vec<EffectV1>,
-    #[serde(flatten)]
     #[br(count=header.count_of_items, seek_before=SeekFrom::Start(header.offset_to_items as u64))]
     pub item_table: Vec<ItemReferenceTable>,
-    #[serde(flatten)]
     #[br(seek_before=SeekFrom::Start(header.offset_to_item_slots as u64))]
     pub item_slots: Option<ItemSlots>,
 }
@@ -50,10 +42,6 @@ impl Model for Creature {
                 panic!("Errored with {:?}, dumping buffer: {:?}", err, buffer);
             }
         }
-    }
-
-    fn create_as_rc(buffer: &[u8]) -> Rc<dyn Model> {
-        Rc::new(Self::new(buffer))
     }
 
     fn name(&self, _lookup: &Lookup) -> String {
@@ -72,11 +60,11 @@ impl Model for Creature {
 pub struct BGEECreatureHeader {
     #[br(count = 4)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub signature: String,
     #[br(count = 4)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub version: String,
     pub long_creature_name: u32,
     pub short_creature_name: u32,
@@ -146,7 +134,7 @@ pub struct BGEECreatureHeader {
     pub proficiency_missiles: u8,
     #[br(count = 7)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub unused_proficiencies: String,
     pub nightmare_mode: u8,
     pub translucency: u8,
@@ -158,7 +146,7 @@ pub struct BGEECreatureHeader {
     // The following entry applies to BG1, BG2 and BGEE
     #[br(count = 32)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub tracking: String,
     // Strrefs pertaining to the character.
     // Most are connected with the sound-set (see SOUNDOFF.IDS (BG1) and SNDSLOT.IDS for (BG2)).
@@ -184,23 +172,23 @@ pub struct BGEECreatureHeader {
     pub kit: u32,
     #[br(count = 8)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub override_script: String,
     #[br(count = 8)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub class_script: String,
     #[br(count = 8)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub race_script: String,
     #[br(count = 8)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub general_script: String,
     #[br(count = 8)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub default_script: String,
     pub enemy_ally: u8,
     pub general: u8,
@@ -211,7 +199,7 @@ pub struct BGEECreatureHeader {
     // object.ids references
     #[br(count = 5)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub object_references: String,
     pub alignment: u8,
     pub global_actor_enumeration: u16,
@@ -219,7 +207,7 @@ pub struct BGEECreatureHeader {
     // death variable: sprite_is_dead on death
     #[br(count = 32)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub death_variable: String,
     pub offset_to_known_spells: u32,
     pub count_of_known_spells: u32,
@@ -234,7 +222,7 @@ pub struct BGEECreatureHeader {
     pub count_of_effects: u32,
     #[br(count = 8)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub dialog_ref: String,
 }
 

@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 use binrw::{io::Cursor, BinRead, BinReaderExt, BinWrite};
 use serde::{Deserialize, Serialize};
 
@@ -7,6 +5,7 @@ use crate::common::resref::Resref;
 use crate::tlk::Lookup;
 use crate::{creature::Creature, model::Model};
 
+// https://gibberlings3.github.io/iesdp/file_formats/ie_formats/chr_v2.htm
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct ExpandedCharacter {
     pub character: BGCharacter,
@@ -17,10 +16,6 @@ impl Model for ExpandedCharacter {
     fn new(buffer: &[u8]) -> Self {
         let mut reader = Cursor::new(buffer);
         reader.read_le().unwrap()
-    }
-
-    fn create_as_rc(buffer: &[u8]) -> Rc<dyn Model> {
-        Rc::new(Self::new(buffer))
     }
 
     fn name(&self, _lookup: &Lookup) -> String {
@@ -38,15 +33,15 @@ impl Model for ExpandedCharacter {
 pub struct BGCharacter {
     #[br(count = 4)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub signature: String,
     #[br(count = 4)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub version: String,
     #[br(count = 32)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub name: String,
     pub offset_to_cre_structure: u32,
     pub length_of_the_cre_structure: u32,

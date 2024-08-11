@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 use binrw::{io::Cursor, BinRead, BinReaderExt, BinWrite};
 use serde::{Deserialize, Serialize};
 
@@ -8,15 +6,13 @@ use crate::common::resref::Resref;
 use crate::model::Model;
 use crate::tlk::Lookup;
 
-//https://gibberlings3.github.io/iesdp/file_formats/ie_formats/itm_v1.htm
+// https://gibberlings3.github.io/iesdp/file_formats/ie_formats/itm_v1.htm
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct Item {
     #[serde(flatten)]
     pub header: ItemHeader,
-    #[serde(flatten)]
     #[br(count=header.count_of_extended_headers)]
     pub extended_headers: Vec<ItemExtendedHeader>,
-    #[serde(flatten)]
     #[br(count=header.count_of_feature_blocks)]
     pub equipping_feature_blocks: Vec<ItemFeatureBlock>,
 }
@@ -31,10 +27,6 @@ impl Model for Item {
         }
     }
 
-    fn create_as_rc(buffer: &[u8]) -> Rc<dyn Model> {
-        Rc::new(Self::new(buffer))
-    }
-
     fn name(&self, _lookup: &Lookup) -> String {
         todo!()
     }
@@ -46,16 +38,16 @@ impl Model for Item {
     }
 }
 
-//https://gibberlings3.github.io/iesdp/file_formats/ie_formats/itm_v1.htm#itmv1_Header
+// https://gibberlings3.github.io/iesdp/file_formats/ie_formats/itm_v1.htm#itmv1_Header
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct ItemHeader {
     #[br(count = 4)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     signature: String,
     #[br(count = 4)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     version: String,
     unidentified_item_name: u32,
     identified_item_name: u32,

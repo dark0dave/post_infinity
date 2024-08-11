@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 use binrw::{io::Cursor, BinRead, BinReaderExt, BinWrite};
 use serde::{Deserialize, Serialize};
 
@@ -15,10 +13,8 @@ use crate::tlk::Lookup;
 pub struct Spell {
     #[serde(flatten)]
     pub header: SpellHeader,
-    #[serde(flatten)]
     #[br(count=header.count_of_extended_headers)]
     pub extended_headers: Vec<SpellExtendedHeader>,
-    #[serde(flatten)]
     #[br(parse_with=binrw::helpers::until_eof)]
     pub equipping_feature_blocks: Vec<SpellFeatureBlock>,
 }
@@ -32,10 +28,6 @@ impl Model for Spell {
                 panic!("Errored with {:?}, dumping buffer: {:?}", err, buffer);
             }
         }
-    }
-
-    fn create_as_rc(buffer: &[u8]) -> Rc<dyn Model> {
-        Rc::new(Self::new(buffer))
     }
 
     fn name(&self, _lookup: &Lookup) -> String {
@@ -54,11 +46,11 @@ impl Model for Spell {
 pub struct SpellHeader {
     #[br(count = 4)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     signature: String,
     #[br(count = 4)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     version: String,
     unidentified_spell_name: u32,
     identified_spell_name: u32,

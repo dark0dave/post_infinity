@@ -1,7 +1,8 @@
 use std::rc::Rc;
 
+use common::types::ResourceType;
 use model::Model;
-use resources::types::ResourceType;
+use tileset::Tileset;
 use tlk::Lookup;
 
 use crate::{
@@ -25,11 +26,11 @@ pub mod item;
 pub mod item_table;
 pub mod key;
 pub mod model;
-pub mod resources;
 pub mod save;
 pub mod spell;
 pub mod spell_table;
 pub mod store;
+pub mod tileset;
 pub mod tlk;
 pub mod twoda;
 pub mod world_map;
@@ -51,32 +52,32 @@ pub fn from_buffer(buffer: &[u8], resource_type: ResourceType) -> Option<Rc<dyn 
         ResourceType::FileTypeWed => None,
         // I am skipping GUI defs
         ResourceType::FileTypeChu => None,
-        ResourceType::FileTypeTi => todo!(),
+        ResourceType::FileTypeTi => Some(Rc::new(Tileset::new(buffer))),
         // I am skipping compress graphic files
         ResourceType::FileTypeMos => None,
-        ResourceType::FileTypeItm => Some(Item::create_as_rc(buffer)),
-        ResourceType::FileTypeSpl => Some(Spell::create_as_rc(buffer)),
+        ResourceType::FileTypeItm => Some(Rc::new(Item::new(buffer))),
+        ResourceType::FileTypeSpl => Some(Rc::new(Spell::new(buffer))),
         // I am ignoring scripting files
         ResourceType::FileTypeBcs => None,
-        ResourceType::FileTypeIds => Some(Ids::create_as_rc(buffer)),
-        ResourceType::FileTypeCre => Some(Creature::create_as_rc(buffer)),
-        ResourceType::FileTypeAre => Some(Area::create_as_rc(buffer)),
-        ResourceType::FileTypeDlg => Some(Dialogue::create_as_rc(buffer)),
-        ResourceType::FileType2da => Some(TwoDA::create_as_rc(buffer)),
+        ResourceType::FileTypeIds => Some(Rc::new(Ids::new(buffer))),
+        ResourceType::FileTypeCre => Some(Rc::new(Creature::new(buffer))),
+        ResourceType::FileTypeAre => Some(Rc::new(Area::new(buffer))),
+        ResourceType::FileTypeDlg => Some(Rc::new(Dialogue::new(buffer))),
+        ResourceType::FileType2da => Some(Rc::new(TwoDA::new(buffer))),
         // Game is a slow resource
-        ResourceType::FileTypeGam => Some(Game::create_as_rc(buffer)),
-        ResourceType::FileTypeSto => Some(Store::create_as_rc(buffer)),
-        ResourceType::FileTypeWmap => Some(WorldMap::create_as_rc(buffer)),
-        ResourceType::FileTypeEff => Some(EffectV2::create_as_rc(buffer)),
+        ResourceType::FileTypeGam => Some(Rc::new(Game::new(buffer))),
+        ResourceType::FileTypeSto => Some(Rc::new(Store::new(buffer))),
+        ResourceType::FileTypeWmap => Some(Rc::new(WorldMap::new(buffer))),
+        ResourceType::FileTypeEff => Some(Rc::new(EffectV2::new(buffer))),
         ResourceType::FileTypeBs => todo!(),
-        ResourceType::FileTypeChr => Some(ExpandedCharacter::create_as_rc(buffer)),
+        ResourceType::FileTypeChr => Some(Rc::new(ExpandedCharacter::new(buffer))),
         // I am skipping spell casting graphics
         ResourceType::FileTypeVvc => None,
         // Skip visual effects
         ResourceType::FileTypeVef => None,
         // I am skipping projectiles
         ResourceType::FileTypePro => None,
-        ResourceType::FileTypeBio => Some(Biography::create_as_rc(buffer)),
+        ResourceType::FileTypeBio => Some(Rc::new(Biography::new(buffer))),
         ResourceType::FileTypeWbm => None,
         ResourceType::FileTypeFnt => None,
         ResourceType::FileTypeGui => None,
@@ -84,7 +85,7 @@ pub fn from_buffer(buffer: &[u8], resource_type: ResourceType) -> Option<Rc<dyn 
         // Skipping graphic data
         ResourceType::FileTypePvrz => None,
         ResourceType::FileTypeGlsl => None,
-        ResourceType::FileTypeTlk => Some(Lookup::create_as_rc(buffer)),
+        ResourceType::FileTypeTlk => Some(Rc::new(Lookup::new(buffer))),
         ResourceType::FileTypeMenu => None,
         ResourceType::FileTypeTtf => None,
         ResourceType::FileTypePng => todo!(),

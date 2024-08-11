@@ -8,13 +8,8 @@ use std::{
 
 use binrw::io::BufReader;
 use models::{
-    biff::Biff,
-    from_buffer, from_json,
-    key::Key,
-    model::Model,
-    resources::types::{extension_to_resource_type, ResourceType},
-    save::Save,
-    tlk::Lookup,
+    biff::Biff, common::types::ResourceType, from_buffer, from_json, key::Key, model::Model,
+    save::Save, tlk::Lookup,
 };
 
 use erased_serde::Serializer;
@@ -32,16 +27,13 @@ fn write_file(path: &Path, extension: &str, buffer: &[u8]) {
 
 fn json_back_to_ie_type(path: &Path) {
     let extension = path
-        .file_name()
+        .extension()
         .unwrap_or_default()
-        .to_str()
-        .unwrap_or_default()
-        .split('.')
-        .nth(1)
-        .unwrap_or_default()
-        .to_ascii_lowercase();
+        .to_ascii_lowercase()
+        .into_string()
+        .unwrap_or_default();
 
-    let resource_type = extension_to_resource_type(&extension);
+    let resource_type = ResourceType::from(extension.as_str());
     let file_contents = read_file(path);
     let out = from_json(&file_contents, resource_type);
     write_file(path, &extension, &out);
@@ -79,10 +71,10 @@ fn parse_key_file(path: &Path, buffer: &[u8]) -> Vec<Biff> {
     let key: Key = Key::new(buffer);
     let parent = path.parent().unwrap();
 
-    key.bif_entries
+    key.bif_file_names
         .iter()
-        .map(|bif_ref| {
-            let buffer = read_file(&parent.join(bif_ref.name.to_string()).with_extension("bif"));
+        .map(|file_name| {
+            let buffer = read_file(&parent.join(file_name.replace('\0', "")));
             Biff::new(&buffer)
         })
         .collect()
@@ -93,10 +85,11 @@ fn get_model_from_file(path: &Path, json: bool) -> Vec<Biff> {
     let extention = path
         .extension()
         .unwrap_or_default()
-        .to_str()
-        .unwrap_or_default()
-        .to_ascii_lowercase();
-    let resource_type = extension_to_resource_type(&extention);
+        .to_ascii_lowercase()
+        .into_string()
+        .unwrap_or_default();
+
+    let resource_type = ResourceType::from(extention.as_str());
 
     // Non resource types
     if resource_type == ResourceType::NotFound {
@@ -104,9 +97,9 @@ fn get_model_from_file(path: &Path, json: bool) -> Vec<Biff> {
             "key" => parse_key_file(path, &buffer),
             "biff" => vec![Biff::new(&read_file(path))],
             "sav" => {
-                let mut save = Save::new(&buffer);
-                save.decompress();
-                println!("{:#?}", save);
+                for file in Save::new(&buffer).files {
+                    println!("{:#?}", file.decompress());
+                }
                 exit(0)
             }
             "json" => {

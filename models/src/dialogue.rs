@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 use binrw::{
     io::{Cursor, SeekFrom},
     BinRead, BinReaderExt, BinWrite,
@@ -16,19 +14,14 @@ use crate::tlk::Lookup;
 pub struct Dialogue {
     #[serde(flatten)]
     pub header: DialogueHeader,
-    #[serde(flatten)]
     #[br(count=header.count_of_state_tables, seek_before=SeekFrom::Start(header.offset_to_state_table as u64))]
     pub state_tables: Vec<StateTable>,
-    #[serde(flatten)]
     #[br(count=header.count_of_transitions, seek_before=SeekFrom::Start(header.offset_to_transition_table as u64))]
     pub transitions: Vec<Transition>,
-    #[serde(flatten)]
     #[br(count=header.count_of_state_triggers, seek_before=SeekFrom::Start(header.offset_to_state_trigger_table as u64))]
     pub state_triggers: Vec<StateTrigger>,
-    #[serde(flatten)]
     #[br(count=header.count_of_transition_triggers, seek_before=SeekFrom::Start(header.offset_to_transition_trigger_table as u64))]
     pub transition_triggers: Vec<TransitionTrigger>,
-    #[serde(flatten)]
     #[br(count=header.count_of_action_tables, seek_before=SeekFrom::Start(header.offset_to_action_table as u64))]
     pub action_tables: Vec<ActionTable>,
 }
@@ -37,10 +30,6 @@ impl Model for Dialogue {
     fn new(buffer: &[u8]) -> Self {
         let mut reader = Cursor::new(buffer);
         reader.read_le().unwrap()
-    }
-
-    fn create_as_rc(buffer: &[u8]) -> Rc<dyn Model> {
-        Rc::new(Self::new(buffer))
     }
 
     fn name(&self, _lookup: &Lookup) -> String {
@@ -59,11 +48,11 @@ impl Model for Dialogue {
 pub struct DialogueHeader {
     #[br(count = 4)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub signature: String,
     #[br(count = 4)]
     #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.parse::<u8>().unwrap())]
+    #[bw(map = |x| x.as_bytes())]
     pub version: String,
     pub count_of_state_tables: u32,
     pub offset_to_state_table: u32,
