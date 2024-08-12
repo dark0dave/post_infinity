@@ -1,18 +1,15 @@
 # git-cliff ~ default configuration file
 # https://git-cliff.org/docs/configuration
-#
-# Lines starting with "#" are comments.
-# Configuration options are organized into tables and keys.
-# See documentation for more information on available options.
-
+[remote.github]
+owner = "dark0dave"
+repo = "post_infinity"
 [changelog]
 # changelog header
 header = ""
 # template for the changelog body
 # https://tera.netlify.app/docs
 body = """
-
-### Changelog
+### Changelog \
 {% for group, commits in commits | group_by(attribute="group") %}
     \n#### {{ group | striptags | trim | upper_first }}:
     {% for commit in commits
@@ -21,7 +18,16 @@ body = """
             {{ commit.message }} ([{{ commit.id | truncate(length=7, end="") }}](https://github.com/dark0dave/post_infinity/commit/{{ commit.id }}) by [{{ commit.author.name }}](https://github.com/{{ commit.author.name }}))
     {%- endfor -%}
 {% endfor %}
-
+{% if version %}
+    {% if previous.version %}\
+Full Changelog: [{{ previous.version }}...{{ version }}]({{ self::remote_url() }}/compare/{{ previous.version }}...{{ version }})\
+    {% endif %}\
+{% else -%}\
+  {% raw %}\n{% endraw %}\
+{% endif %}\
+{%- macro remote_url() -%}
+  https://github.com/{{ remote.github.owner }}/{{ remote.github.repo }}
+{%- endmacro -%}
 """
 # remove the leading and trailing whitespace from the template
 trim = true
