@@ -98,7 +98,7 @@ fn get_model_from_file(path: &Path, json: bool) -> Vec<Biff> {
             "biff" => vec![Biff::new(&read_file(path))],
             "sav" => {
                 for file in Save::new(&buffer).files {
-                    println!("{:#?}", file.decompress());
+                    println!("{:#?}", file.uncompressed_data);
                 }
                 exit(0)
             }

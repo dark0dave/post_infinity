@@ -1,8 +1,12 @@
+use std::rc::Rc;
+
+use std::path::Path;
+
 use binrw::{io::Cursor, io::Read, BinRead, BinReaderExt, BinWrite};
 use flate2::bufread::ZlibDecoder;
 use serde::{Deserialize, Serialize};
 
-use crate::{model::Model, tlk::Lookup};
+use crate::{common::types::ResourceType, from_buffer, model::Model, tlk::Lookup};
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/sav_v1.htm
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
@@ -50,26 +54,40 @@ pub struct File {
     pub filename: String,
     pub uncompressed_data_length: u32,
     pub compressed_data_length: u32,
-    #[br(count=compressed_data_length)]
+    #[br(count=compressed_data_length, restore_position)]
     pub compressed_data: Vec<u8>,
+    #[br(count=compressed_data_length, map = |s: Vec<u8>| parse_compressed_data(&s, &filename))]
+    #[bw(ignore)]
+    #[serde(skip)]
+    pub uncompressed_data: Option<Rc<dyn Model>>,
 }
 
-impl File {
-    pub fn decompress(&self) -> Vec<u8> {
-        let mut d = ZlibDecoder::new(&self.compressed_data[..]);
-        let mut buff = Vec::with_capacity(self.uncompressed_data_length as usize);
-        match d.read_to_end(&mut buff) {
-            Ok(_) => buff,
-            Err(err) => {
-                println!("{}", err);
-                vec![]
-            }
+fn parse_compressed_data(buff: &[u8], file_name: &str) -> Option<Rc<dyn Model>> {
+    let mut d = ZlibDecoder::new(buff);
+    let mut buffer = vec![];
+    match d.read_to_end(&mut buffer) {
+        Ok(_) => {
+            let extension = Path::new(file_name)
+                .extension()
+                .unwrap_or_default()
+                .to_ascii_lowercase()
+                .into_string()
+                .unwrap_or_default()
+                .replace('\0', "");
+            let resource_type = ResourceType::from(extension.as_str());
+            from_buffer(&buffer, resource_type)
+        }
+        Err(err) => {
+            println!("{}", err);
+            None
         }
     }
 }
 
 #[cfg(test)]
 mod tests {
+
+    use crate::area::Area;
 
     use super::*;
     use std::{
@@ -88,9 +106,12 @@ mod tests {
             .read_to_end(&mut buffer)
             .expect("Could not read to buffer");
         let save = Save::new(&buffer);
-        for file_entry in save.files {
-            file_entry.decompress();
-        }
+        let model = save.files[0].uncompressed_data.clone().unwrap();
+        let ptr = Rc::into_raw(model) as *const Area;
+        let area: Area = unsafe { ptr.read() };
+        assert_eq!(area.header.last_saved, 47888);
+        assert_eq!(area.actors.len(), 5);
+        assert_eq!(area.ambients.len(), 2);
     }
 
     #[test]

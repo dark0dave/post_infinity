@@ -6,6 +6,7 @@ use binrw::{io::Cursor, io::SeekFrom, BinRead, BinReaderExt, BinResult, BinWrite
 use serde::{Deserialize, Serialize};
 
 use crate::common::strref::Strref;
+use crate::tileset::Tileset;
 use crate::{common::types::ResourceType, from_buffer, model::Model};
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/bif_v1.htm
@@ -44,9 +45,9 @@ fn parse_contained_files<R: Read + Seek>(
         let start: usize = tileset_entry.offset as usize;
         let end: usize = start + (tileset_entry.tile_count * tileset_entry.tile_size) as usize;
         let buff = buffer.get(start..end).unwrap_or_default();
-        if let Some(data) = from_buffer(buff, tileset_entry.resource_type) {
-            out.push(data);
-        }
+        out.push(Rc::new(Tileset {
+            data: buff.to_vec(),
+        }));
     }
     Ok(out)
 }
