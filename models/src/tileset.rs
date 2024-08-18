@@ -2,7 +2,6 @@ use binrw::{binread, io::Cursor, BinReaderExt, BinWrite};
 use serde::{Deserialize, Serialize};
 
 use crate::model::Model;
-use crate::tlk::Lookup;
 
 #[binread]
 #[derive(Debug, PartialEq, BinWrite, Serialize, Deserialize)]
@@ -25,10 +24,6 @@ impl Model for Tileset {
                 panic!("Errored with {:?}, dumping buffer: {:?}", err, buffer);
             }
         }
-    }
-
-    fn name(&self, _lookup: &Lookup) -> String {
-        todo!()
     }
 
     fn to_bytes(&self) -> Vec<u8> {

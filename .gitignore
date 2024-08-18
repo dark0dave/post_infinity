@@ -3,3 +3,6 @@ target/
 *.swp
 *json
 CHANGELOG.md
+perf*
+flamegraph*
+

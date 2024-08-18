@@ -1,7 +1,7 @@
 use binrw::{io::Cursor, BinRead, BinReaderExt, BinWrite};
 use serde::{Deserialize, Serialize};
 
-use crate::{model::Model, tlk::Lookup};
+use crate::model::Model;
 
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct Biography(
@@ -16,10 +16,6 @@ impl Model for Biography {
         reader.read_le().unwrap()
     }
 
-    fn name(&self, _lookup: &Lookup) -> String {
-        todo!()
-    }
-
     fn to_bytes(&self) -> Vec<u8> {
         self.0.as_bytes().to_vec()
     }
@@ -29,10 +25,8 @@ impl Model for Biography {
 mod tests {
 
     use super::*;
-    use std::{
-        fs::File,
-        io::{BufReader, Read},
-    };
+    use binrw::io::{BufReader, Read};
+    use std::fs::File;
 
     #[test]
     fn read_biography() {

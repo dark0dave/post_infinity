@@ -4,7 +4,6 @@ use serde::{Deserialize, Serialize};
 use crate::common::resref::Resref;
 use crate::common::strref::Strref;
 use crate::model::Model;
-use crate::tlk::Lookup;
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/sto_v1.htm
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
@@ -30,10 +29,6 @@ impl Model for Store {
                 panic!("Errored with {:?}, dumping buffer: {:?}", err, buffer);
             }
         }
-    }
-
-    fn name(&self, _lookup: &Lookup) -> String {
-        todo!()
     }
 
     fn to_bytes(&self) -> Vec<u8> {

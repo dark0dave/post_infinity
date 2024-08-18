@@ -3,9 +3,9 @@ use flate2::bufread::ZlibDecoder;
 use serde::{Deserialize, Serialize};
 
 use crate::model::Model;
-use crate::tlk::Lookup;
 
-// // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/bam_v1.htm
+// This is slow
+// https://gibberlings3.github.io/iesdp/file_formats/ie_formats/bam_v1.htm
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/bam_v2.htm
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/bamcv1.htm
 #[derive(Debug, PartialEq, BinRead, BinWrite, Serialize, Deserialize)]
@@ -86,10 +86,6 @@ impl Model for Bam {
     fn new(buffer: &[u8]) -> Self {
         let mut reader = Cursor::new(buffer);
         reader.read_le().unwrap()
-    }
-
-    fn name(&self, _lookup: &Lookup) -> String {
-        todo!()
     }
 
     fn to_bytes(&self) -> Vec<u8> {

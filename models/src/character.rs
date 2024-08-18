@@ -2,13 +2,15 @@ use binrw::{io::Cursor, BinRead, BinReaderExt, BinWrite};
 use serde::{Deserialize, Serialize};
 
 use crate::common::resref::Resref;
-use crate::tlk::Lookup;
+
 use crate::{creature::Creature, model::Model};
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/chr_v2.htm
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct ExpandedCharacter {
+    #[serde(flatten)]
     pub character: BGCharacter,
+    #[serde(flatten)]
     pub creature: Creature,
 }
 
@@ -16,10 +18,6 @@ impl Model for ExpandedCharacter {
     fn new(buffer: &[u8]) -> Self {
         let mut reader = Cursor::new(buffer);
         reader.read_le().unwrap()
-    }
-
-    fn name(&self, _lookup: &Lookup) -> String {
-        todo!()
     }
 
     fn to_bytes(&self) -> Vec<u8> {

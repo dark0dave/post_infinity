@@ -147,8 +147,17 @@ cargo build --release
 
 ## Performance
 
-It takes about 0.5->1.0s to read all the supported files in an unmodded bg1ee game, into memory, without parsing them.
+It takes about 0.07 ish to read all the supported files in an unmodded bg1ee game, into memory, without parsing them.
 
 ```sh
-time cargo run -- <path to bgee dir>/chitin.key  0.63s user 1.01s system 105% cpu 1.555 total
+time cargo run -- <path to bgee dir>/chitin.key
+0.07s user 0.58s system 99% cpu 0.655 total
 ```
+
+you can analyze performance:
+
+```sh
+cargo isntall flamegraph
+flamegraph -- target/release/post_infinity <path to chitin file>
+```
+

@@ -1,7 +1,12 @@
-use binrw::{io::Cursor, BinRead, BinReaderExt, BinWrite};
+use std::fs::File;
+
+use binrw::{
+    io::{BufReader, Read, Seek},
+    BinRead, BinReaderExt, BinResult, BinWrite,
+};
 use serde::{Deserialize, Serialize};
 
-use crate::{common::resref::Resref, model::Model};
+use crate::common::resref::Resref;
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/tlk_v1.htm
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
@@ -10,41 +15,32 @@ pub struct Lookup {
     pub header: TLKHeader,
     #[br(count=header.count_of_entries)]
     pub entries: Vec<TLKEntry>,
-    #[br(parse_with=binrw::helpers::until_eof, map = |s: Vec<u8>| read_tlk_strings(s, &entries))]
+    #[br(parse_with = |reader, _, _:()| read_to_end(reader, &entries))]
     #[bw(map = |x : &Vec<String>| x.iter().flat_map(|x: &String| x.as_bytes().to_vec()).collect::<Vec<u8>>())]
     pub tlk_strings: Vec<String>,
 }
 
-fn read_tlk_strings(s: Vec<u8>, entries: &Vec<TLKEntry>) -> Vec<String> {
-    let mut out = Vec::with_capacity(entries.len());
-    let mut start: usize = 0;
+fn read_to_end<R: Read + Seek>(reader: &mut R, entries: &Vec<TLKEntry>) -> BinResult<Vec<String>> {
+    let mut out = vec![];
     for entry in entries {
-        let end: usize = start + entry.length_of_this_string as usize;
-        out.push(String::from_utf8_lossy(s.get(start..end).unwrap_or_default()).to_string());
-        start = end;
+        let mut buf = String::new();
+        reader
+            .take(entry.length_of_this_string as u64)
+            .read_to_string(&mut buf)
+            .unwrap_or_default();
+        out.push(buf);
     }
-    out
+    Ok(out)
 }
 
-impl Model for Lookup {
-    fn new(buffer: &[u8]) -> Self {
-        let mut reader = Cursor::new(buffer);
+impl Lookup {
+    pub fn new(reader: &mut BufReader<File>) -> Self {
         match reader.read_le() {
             Ok(res) => res,
             Err(err) => {
-                panic!("Errored with {:?}, dumping buffer: {:?}", err, buffer);
+                panic!("Errored with {:?}", err);
             }
         }
-    }
-
-    fn name(&self, _lookup: &Lookup) -> String {
-        todo!()
-    }
-
-    fn to_bytes(&self) -> Vec<u8> {
-        let mut writer = Cursor::new(Vec::new());
-        self.write_le(&mut writer).unwrap();
-        writer.into_inner()
     }
 }
 
@@ -89,20 +85,13 @@ pub struct TLKEntry {
 mod tests {
 
     use super::*;
-    use std::{
-        fs::File,
-        io::{BufReader, Read},
-    };
+    use pretty_assertions::assert_eq;
 
     #[test]
     fn valid_lookup_parsed() {
         let file = File::open("fixtures/dialog.tlk").expect("Fixture missing");
-        let mut buffer = Vec::new();
-        BufReader::new(file)
-            .read_to_end(&mut buffer)
-            .expect("Could not read to buffer");
-
-        let lookup = Lookup::new(&buffer);
+        let mut reader = BufReader::new(file);
+        let lookup = Lookup::new(&mut reader);
         assert_eq!(
             lookup.header,
             TLKHeader {
@@ -118,7 +107,7 @@ mod tests {
             entry,
             &TLKEntry {
                 bit_field: 1,
-                resource_name_of_associated_sound: Resref("\0\0\0\0\0\0\0\0".to_string()),
+                resource_name_of_associated_sound: Resref("\0\0\0\0\0\0\0\0".into()),
                 volume_variance: 0,
                 pitch_variance: 0,
                 offset_to_this_string: 49264,
@@ -132,7 +121,7 @@ mod tests {
             entry,
             &TLKEntry {
                 bit_field: 1,
-                resource_name_of_associated_sound: Resref("\0\0\0\0\0\0\0\0".to_string()),
+                resource_name_of_associated_sound: Resref("\0\0\0\0\0\0\0\0".into()),
                 volume_variance: 0,
                 pitch_variance: 0,
                 offset_to_this_string: 3855179,

@@ -4,7 +4,6 @@ use serde::{Deserialize, Serialize};
 use crate::common::resref::Resref;
 use crate::common::strref::Strref;
 use crate::model::Model;
-use crate::tlk::Lookup;
 
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct WorldMap {
@@ -27,10 +26,6 @@ impl Model for WorldMap {
                 panic!("Errored with {:?}, dumping buffer: {:?}", err, buffer);
             }
         }
-    }
-
-    fn name(&self, _lookup: &Lookup) -> String {
-        todo!()
     }
 
     fn to_bytes(&self) -> Vec<u8> {
@@ -134,10 +129,8 @@ mod tests {
 
     use pretty_assertions::assert_eq;
 
-    use std::{
-        fs::File,
-        io::{BufReader, Read},
-    };
+    use binrw::io::{BufReader, Read};
+    use std::fs::File;
 
     #[test]
     fn world_test() {

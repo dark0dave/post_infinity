@@ -4,7 +4,6 @@ use serde::{Deserialize, Serialize};
 use crate::common::feature_block::FeatureBlock;
 use crate::common::resref::Resref;
 use crate::model::Model;
-use crate::tlk::Lookup;
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/itm_v1.htm
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
@@ -25,10 +24,6 @@ impl Model for Item {
                 panic!("Errored with {:?}, dumping buffer: {:?}", err, buffer);
             }
         }
-    }
-
-    fn name(&self, _lookup: &Lookup) -> String {
-        todo!()
     }
 
     fn to_bytes(&self) -> Vec<u8> {
@@ -130,11 +125,9 @@ type ItemFeatureBlock = FeatureBlock;
 mod tests {
 
     use super::*;
+    use binrw::io::{BufReader, Read};
     use pretty_assertions::assert_eq;
-    use std::{
-        fs::File,
-        io::{BufReader, Read},
-    };
+    use std::fs::File;
 
     #[test]
     fn valid_item_file_parsed() {

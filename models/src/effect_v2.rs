@@ -3,7 +3,6 @@ use serde::{Deserialize, Serialize};
 
 use crate::common::resref::Resref;
 use crate::model::Model;
-use crate::tlk::Lookup;
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/eff_v2.htm
 #[derive(Debug, PartialEq, BinRead, BinWrite, Serialize, Deserialize)]
@@ -36,10 +35,6 @@ impl Model for EffectV2 {
                 panic!("Errored with {:?}, dumping buffer: {:?}", err, buffer);
             }
         }
-    }
-
-    fn name(&self, _lookup: &Lookup) -> String {
-        todo!()
     }
 
     fn to_bytes(&self) -> Vec<u8> {
@@ -122,11 +117,9 @@ pub struct EffectV2BodyWithOutHeader {
 mod tests {
 
     use super::*;
+    use binrw::io::{BufReader, Read};
     use pretty_assertions::assert_eq;
-    use std::{
-        fs::File,
-        io::{BufReader, Read},
-    };
+    use std::fs::File;
 
     #[test]
     fn valid_simple_creature_file_header_parsed() {
@@ -157,7 +150,7 @@ mod tests {
                         duration: 120,
                         probability_1: 100,
                         probability_2: 0,
-                        resource_1: Resref("\0\0\0\0\0\0\0\0".to_string()),
+                        resource_1: Resref("\0\0\0\0\0\0\0\0".into()),
                         dice_thrown: 0,
                         dice_sides: 0,
                         saving_throw_type: 0,
@@ -172,14 +165,14 @@ mod tests {
                         parameter_4: 0,
                         parameter_5: 0,
                         time_applied_ticks: 0,
-                        resource_2: Resref("\0\0\0\0\0\0\0\0".to_string()),
-                        resource_3: Resref("\0\0\0\0\0\0\0\0".to_string()),
+                        resource_2: Resref("\0\0\0\0\0\0\0\0".into()),
+                        resource_3: Resref("\0\0\0\0\0\0\0\0".into()),
                         caster_x_coordinate: 4294967295,
                         caster_y_coordinate: 4294967295,
                         target_x_coordinate: 4294967295,
                         target_y_coordinate: 4294967295,
                         parent_resource_type: 0,
-                        parent_resource: Resref("\0\0\0\0\0\0\0\0".to_string()),
+                        parent_resource: Resref("\0\0\0\0\0\0\0\0".into()),
                         parent_resource_flags: vec![0; 4],
                         projectile: 0,
                         parent_resource_slot: 4294967295,

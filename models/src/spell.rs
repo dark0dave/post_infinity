@@ -6,8 +6,6 @@ use crate::common::resref::Resref;
 use crate::common::strref::Strref;
 use crate::model::Model;
 
-use crate::tlk::Lookup;
-
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/spl_v1.htm
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct Spell {
@@ -28,10 +26,6 @@ impl Model for Spell {
                 panic!("Errored with {:?}, dumping buffer: {:?}", err, buffer);
             }
         }
-    }
-
-    fn name(&self, _lookup: &Lookup) -> String {
-        todo!()
     }
 
     fn to_bytes(&self) -> Vec<u8> {
@@ -124,11 +118,9 @@ mod tests {
     use crate::common::resref::Resref;
 
     use super::*;
+    use binrw::io::{BufReader, Read};
     use pretty_assertions::assert_eq;
-    use std::{
-        fs::File,
-        io::{BufReader, Read},
-    };
+    use std::fs::File;
 
     #[test]
     fn valid_creature_file_item_table_parsed() {
@@ -147,7 +139,7 @@ mod tests {
                 version: "V1  ".to_string(),
                 unidentified_spell_name: 14260,
                 identified_spell_name: 9999999,
-                completion_sound: Resref("CAS_M03\0".to_string()),
+                completion_sound: Resref("CAS_M03\0".into()),
                 flags: 0,
                 spell_type: 1,
                 exclusion_flags: 0,
@@ -168,13 +160,13 @@ mod tests {
                 min_charisma: 0,
                 spell_level: 9,
                 max_stackable: 1,
-                spell_book_icon: Resref("SPWI905C".to_string()),
+                spell_book_icon: Resref("SPWI905C".into()),
                 lore: 0,
-                ground_icon: Resref("\0\0rb\0\0Un".to_string()),
+                ground_icon: Resref("\0\0rb\0\0Un".into()),
                 base_weight: 0,
                 spell_description_generic: Strref(4294967295),
                 spell_description_identified: Strref(9999999),
-                description_icon: Resref("".to_string()),
+                description_icon: Resref(vec![0, 0, 0, 104, 134, 64, 0, 5,]),
                 enchantment: 0,
                 offset_to_extended_headers: 114,
                 count_of_extended_headers: 1,
@@ -196,7 +188,7 @@ mod tests {
                 duration: 100000,
                 probability_1: 39,
                 probability_2: 0,
-                resource: Resref("balorsu\0".to_string()),
+                resource: Resref("balorsu\0".into()),
                 dice_thrown_max_level: 0,
                 dice_sides_min_level: 0,
                 saving_throw_type: vec![0, 0, 0, 0],

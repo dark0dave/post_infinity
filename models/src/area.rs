@@ -4,7 +4,6 @@ use serde::{Deserialize, Serialize};
 use crate::common::resref::Resref;
 use crate::common::strref::Strref;
 use crate::model::Model;
-use crate::tlk::Lookup;
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/are_v1.htm
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
@@ -58,10 +57,6 @@ impl Model for Area {
                 panic!("Errored with {:?}, dumping buffer: {:?}", err, buffer);
             }
         }
-    }
-
-    fn name(&self, _lookup: &Lookup) -> String {
-        todo!()
     }
 
     fn to_bytes(&self) -> Vec<u8> {
@@ -614,10 +609,8 @@ pub struct RestInterruption {
 mod tests {
 
     use super::*;
-    use std::{
-        fs::File,
-        io::{BufReader, Read},
-    };
+    use binrw::io::{BufReader, Read};
+    use std::fs::File;
 
     #[test]
     fn test_ambients() {
@@ -631,7 +624,10 @@ mod tests {
             area.ambients[0].name,
             "Main Ambient\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
         );
-        assert_eq!(area.ambients[0].resref_of_sound_1.0, "AM0011\0\0");
+        assert_eq!(
+            area.ambients[0].resref_of_sound_1,
+            Resref("AM0011\0\0".into())
+        );
         assert_eq!(
             area.ambients[1].name,
             "SS-wispers\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
@@ -677,14 +673,14 @@ mod tests {
                 movement_restriction_distance_move_to_object: 0,
                 actor_appearence_schedule: 4294967295,
                 num_times_talked_to: 0,
-                dialog: Resref("\0\0\0\0\0\0\0\0".to_string()),
-                script_override: Resref("\0\0\0\0\0\0\0\0".to_string()),
-                script_general: Resref("\0\0\0\0\0\0\0\0".to_string()),
-                script_class: Resref("\0\0\0\0\0\0\0\0".to_string()),
-                script_race: Resref("\0\0\0\0\0\0\0\0".to_string()),
-                script_default: Resref("\0\0\0\0\0\0\0\0".to_string()),
-                script_specific: Resref("\0\0\0\0\0\0\0\0".to_string()),
-                cre_file: Resref("PRIHEL\0\0".to_string()),
+                dialog: Resref("\0\0\0\0\0\0\0\0".into()),
+                script_override: Resref("\0\0\0\0\0\0\0\0".into()),
+                script_general: Resref("\0\0\0\0\0\0\0\0".into()),
+                script_class: Resref("\0\0\0\0\0\0\0\0".into()),
+                script_race: Resref("\0\0\0\0\0\0\0\0".into()),
+                script_default: Resref("\0\0\0\0\0\0\0\0".into()),
+                script_specific: Resref("\0\0\0\0\0\0\0\0".into()),
+                cre_file: Resref("PRIHEL\0\0".into()),
                 offset_to_cre_structure: 0,
                 size_of_stored_cre_structure: 0,
                 _unused_2: vec![

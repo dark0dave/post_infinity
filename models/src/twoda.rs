@@ -2,7 +2,6 @@ use binrw::{io::Cursor, BinRead, BinReaderExt, BinWrite};
 use serde::{Deserialize, Serialize};
 
 use crate::model::Model;
-use crate::tlk::Lookup;
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/2da.htm
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
@@ -16,10 +15,6 @@ impl Model for TwoDA {
     fn new(buffer: &[u8]) -> Self {
         let mut reader = Cursor::new(buffer);
         reader.read_le().unwrap()
-    }
-
-    fn name(&self, _lookup: &Lookup) -> String {
-        todo!()
     }
 
     fn to_bytes(&self) -> Vec<u8> {

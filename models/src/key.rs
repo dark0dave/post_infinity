@@ -1,6 +1,6 @@
-use std::fmt::Debug;
+use std::{fmt::Debug, fs::File};
 
-use binrw::{io::Cursor, BinRead, BinReaderExt, BinWrite};
+use binrw::{io::BufReader, BinRead, BinReaderExt, BinWrite};
 use serde::{Deserialize, Serialize};
 
 use crate::common::resref::Resref;
@@ -31,12 +31,11 @@ fn read_key_strings(s: &[u8], entries: &Vec<BiffEntry>) -> Vec<String> {
 }
 
 impl Key {
-    pub fn new(buffer: &[u8]) -> Self {
-        let mut reader = Cursor::new(buffer);
+    pub fn new(reader: &mut BufReader<File>) -> Self {
         match reader.read_le() {
             Ok(res) => res,
             Err(err) => {
-                panic!("Errored with {:?}, dumping buffer: {:?}", err, buffer);
+                panic!("Errored with {:?}", err);
             }
         }
     }
@@ -81,20 +80,12 @@ mod tests {
 
     use super::*;
     use pretty_assertions::assert_eq;
-    use std::{
-        fs::File,
-        io::{BufReader, Read},
-    };
 
     #[test]
     fn valid_key_file_parsed() {
         let file = File::open("fixtures/chitin.key").unwrap();
         let mut reader = BufReader::new(file);
-        let mut buffer = Vec::new();
-        reader
-            .read_to_end(&mut buffer)
-            .expect("Could not read to buffer");
-        let key = Key::new(&buffer);
+        let key = Key::new(&mut reader);
         assert_eq!(
             key.bif_entries.len(),
             key.header.count_of_bif_entries as usize
