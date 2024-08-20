@@ -6,34 +6,36 @@ use binrw::{
 };
 use serde::{Deserialize, Serialize};
 
-use crate::common::resref::Resref;
+use crate::common::{char_array::CharArray, resref::Resref};
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/tlk_v1.htm
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
-pub struct Lookup {
+pub struct TLK {
     #[serde(flatten)]
     pub header: TLKHeader,
     #[br(count=header.count_of_entries)]
     pub entries: Vec<TLKEntry>,
     #[br(parse_with = |reader, _, _:()| read_to_end(reader, &entries))]
-    #[bw(map = |x : &Vec<String>| x.iter().flat_map(|x: &String| x.as_bytes().to_vec()).collect::<Vec<u8>>())]
-    pub tlk_strings: Vec<String>,
+    #[bw(map = |x : &Vec<CharArray>| x.iter().flat_map(|x: &CharArray| x.0.clone()).collect::<Vec<u8>>())]
+    pub tlk_strings: Vec<CharArray>,
 }
 
-fn read_to_end<R: Read + Seek>(reader: &mut R, entries: &Vec<TLKEntry>) -> BinResult<Vec<String>> {
+fn read_to_end<R: Read + Seek>(
+    reader: &mut R,
+    entries: &Vec<TLKEntry>,
+) -> BinResult<Vec<CharArray>> {
     let mut out = vec![];
+    let mut buf = vec![];
+    reader.read_to_end(&mut buf)?;
     for entry in entries {
-        let mut buf = String::new();
-        reader
-            .take(entry.length_of_this_string as u64)
-            .read_to_string(&mut buf)
-            .unwrap_or_default();
-        out.push(buf);
+        let start = entry.offset_to_this_string as usize;
+        let end = start + entry.length_of_this_string as usize;
+        out.push(CharArray(buf.get(start..end).unwrap_or_default().to_vec()));
     }
     Ok(out)
 }
 
-impl Lookup {
+impl TLK {
     pub fn new(reader: &mut BufReader<File>) -> Self {
         match reader.read_le() {
             Ok(res) => res,
@@ -48,13 +50,9 @@ impl Lookup {
 #[derive(Debug, PartialEq, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct TLKHeader {
     #[br(count = 4)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub signature: String,
+    pub signature: CharArray,
     #[br(count = 4)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub version: String,
+    pub version: CharArray,
     pub language_id: u16,
     pub count_of_entries: u32,
     pub offset_to_strings: u32,
@@ -91,18 +89,18 @@ mod tests {
     fn valid_lookup_parsed() {
         let file = File::open("fixtures/dialog.tlk").expect("Fixture missing");
         let mut reader = BufReader::new(file);
-        let lookup = Lookup::new(&mut reader);
+        let tlk = TLK::new(&mut reader);
         assert_eq!(
-            lookup.header,
+            tlk.header,
             TLKHeader {
-                signature: "TLK ".to_string(),
-                version: "V1  ".to_string(),
+                signature: "TLK ".into(),
+                version: "V1  ".into(),
                 language_id: 0,
                 count_of_entries: 34000,
                 offset_to_strings: 884018,
             }
         );
-        let entry = lookup.entries.get(400).expect("Failed to find entry");
+        let entry = tlk.entries.get(400).expect("Failed to find entry");
         assert_eq!(
             entry,
             &TLKEntry {
@@ -114,9 +112,9 @@ mod tests {
                 length_of_this_string: 213,
             }
         );
-        assert_eq!(lookup.tlk_strings.get(400), Some(&" 'Twas some three hundred years hence, but folk still cringe at the mention of the destruction at Ulcaster School. I've not met a soul who claims to know why it occurred, and none that were there are alive to say.".to_string()));
+        assert_eq!(tlk.tlk_strings.get(400), Some(&" 'Twas some three hundred years hence, but folk still cringe at the mention of the destruction at Ulcaster School. I've not met a soul who claims to know why it occurred, and none that were there are alive to say.".into()));
 
-        let entry = lookup.entries.last().expect("Failed to find entry");
+        let entry = tlk.entries.last().expect("Failed to find entry");
         assert_eq!(
             entry,
             &TLKEntry {
@@ -128,6 +126,6 @@ mod tests {
                 length_of_this_string: 11,
             }
         );
-        assert_eq!(lookup.tlk_strings.last(), Some(&"placeholder".to_string()))
+        assert_eq!(tlk.tlk_strings.last(), Some(&"placeholder".into()))
     }
 }

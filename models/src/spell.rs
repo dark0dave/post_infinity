@@ -1,6 +1,7 @@
 use binrw::{io::Cursor, BinRead, BinReaderExt, BinWrite};
 use serde::{Deserialize, Serialize};
 
+use crate::common::char_array::CharArray;
 use crate::common::feature_block::FeatureBlock;
 use crate::common::resref::Resref;
 use crate::common::strref::Strref;
@@ -39,13 +40,9 @@ impl Model for Spell {
 #[derive(Debug, PartialEq, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct SpellHeader {
     #[br(count = 4)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    signature: String,
+    signature: CharArray,
     #[br(count = 4)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    version: String,
+    version: CharArray,
     unidentified_spell_name: u32,
     identified_spell_name: u32,
     completion_sound: Resref,
@@ -135,8 +132,8 @@ mod tests {
         assert_eq!(
             spell.header,
             SpellHeader {
-                signature: "SPL ".to_string(),
-                version: "V1  ".to_string(),
+                signature: "SPL ".into(),
+                version: "V1  ".into(),
                 unidentified_spell_name: 14260,
                 identified_spell_name: 9999999,
                 completion_sound: Resref("CAS_M03\0".into()),

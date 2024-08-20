@@ -157,7 +157,7 @@ time cargo run -- <path to bgee dir>/chitin.key
 you can analyze performance:
 
 ```sh
-cargo isntall flamegraph
+cargo install flamegraph
 flamegraph -- target/release/post_infinity <path to chitin file>
 ```
 

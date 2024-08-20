@@ -5,4 +5,4 @@ target/
 CHANGELOG.md
 perf*
 flamegraph*
-
+Cargo.toml.test

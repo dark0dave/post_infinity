@@ -1,6 +1,7 @@
 use binrw::{io::Cursor, io::SeekFrom, BinRead, BinReaderExt, BinWrite};
 use serde::{Deserialize, Serialize};
 
+use crate::common::char_array::CharArray;
 use crate::common::resref::Resref;
 use crate::common::strref::Strref;
 use crate::model::Model;
@@ -70,13 +71,9 @@ impl Model for Area {
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct FileHeader {
     #[br(count = 4)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub signature: String,
+    pub signature: CharArray,
     #[br(count = 4)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub version: String,
+    pub version: CharArray,
     pub area_wed: Resref,
     pub last_saved: u32,
     pub area_flags: u32,
@@ -143,9 +140,7 @@ pub struct FileHeader {
 #[derive(Debug, PartialEq, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct Actor {
     #[br(count = 32)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub name: String,
+    pub name: CharArray,
     pub current_x_coordinate: u16,
     pub current_y_coordinate: u16,
     pub destination_x_coordinate: u16,
@@ -184,9 +179,7 @@ pub struct Actor {
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct Region {
     #[br(count = 32)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub name: String,
+    pub name: CharArray,
     pub region_type: u16,
     pub minimum_bounding_box_of_this_point: [u16; 4],
     pub count_of_vertices_composing_the_perimeter: u16,
@@ -197,9 +190,7 @@ pub struct Region {
     pub destination_area: Resref,
     // for travel regions
     #[br(count = 32)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub entrance_name_in_destination_area: String,
+    pub entrance_name_in_destination_area: CharArray,
     pub flags: u32,
     // for info points
     pub information_text: Strref,
@@ -225,9 +216,7 @@ pub struct Region {
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct SpawnPoint {
     #[br(count = 32)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub name: String,
+    pub name: CharArray,
     pub x_coordinate: u16,
     pub y_coordinate: u16,
     pub resref_of_creature_to_spawn_1st: Resref,
@@ -285,9 +274,7 @@ pub struct SpawnPoint {
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct Entrance {
     #[br(count = 32)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub name: String,
+    pub name: CharArray,
     pub x_coordinate: u16,
     pub y_coordinate: u16,
     pub orientation: u16,
@@ -300,9 +287,7 @@ pub struct Entrance {
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct Container {
     #[br(count = 32)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub name: String,
+    pub name: CharArray,
     pub x_coordinate: u16,
     pub y_coordinate: u16,
     pub container_type: u16,
@@ -327,9 +312,7 @@ pub struct Container {
     pub count_of_vertices_making_up_the_outline: u16,
     pub trigger_range: u16,
     #[br(count = 32)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub owner_script_name: String,
+    pub owner_script_name: CharArray,
     pub key_item: Resref,
     pub break_difficulty: u32,
     pub lockpick_string: Strref,
@@ -357,9 +340,7 @@ pub struct Vertice(pub u16);
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct Ambient {
     #[br(count = 32)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub name: String,
+    pub name: CharArray,
     pub x_coordinate: u16,
     pub y_coordinate: u16,
     pub radius: u16,
@@ -393,9 +374,7 @@ pub struct Ambient {
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct Variable {
     #[br(count = 32)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub name: String,
+    pub name: CharArray,
     /*
       bit 0: int
       bit 1: float
@@ -410,9 +389,7 @@ pub struct Variable {
     pub int_value: u32,
     pub double_value: i64,
     #[br(count = 32)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub script_name_value: String,
+    pub script_name_value: CharArray,
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/are_v1.htm#formAREAV1_0_Explored
@@ -423,14 +400,10 @@ pub struct ExploredBitmask(pub u8);
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct Door {
     #[br(count = 32)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub name: String,
+    pub name: CharArray,
     // Link with WED
     #[br(count = 8)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub door_id: String,
+    pub door_id: CharArray,
     pub flags: u32,
     pub index_of_first_vertex_of_the_door_outline_when_open: u32,
     pub count_of_vertices_of_the_door_outline_when_open: u16,
@@ -463,9 +436,7 @@ pub struct Door {
     pub two_points: [u16; 4],
     pub lockpick_string: Strref,
     #[br(count = 24)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub travel_trigger_name: String,
+    pub travel_trigger_name: CharArray,
     pub dialog_speaker_name: Strref,
     pub dialog_resref: Resref,
     #[serde(skip)]
@@ -477,9 +448,7 @@ pub struct Door {
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct Animation {
     #[br(count = 32)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub name: String,
+    pub name: CharArray,
     pub x_coordinate: u16,
     pub y_coordinate: u16,
     pub animation_appearence_schedule: u32,
@@ -522,9 +491,7 @@ pub struct AutomapNotesBGEE {
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct TiledObject {
     #[br(count = 32)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub name: String,
+    pub name: CharArray,
     pub tile_id: Resref,
     pub flags: u32,
     pub offset_to_open_search_squares: u32,
@@ -581,13 +548,9 @@ pub struct SongEntry {
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct RestInterruption {
     #[br(count = 32)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub name: String,
+    pub name: CharArray,
     #[br(count = 40)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub interruption_explanation_text: String,
+    pub interruption_explanation_text: CharArray,
     #[br(count = 10)]
     pub resref_of_creature_to_spawn: Vec<Resref>,
     pub count_of_creatures_in_spawn_table: u16,
@@ -622,7 +585,7 @@ mod tests {
         let area: Area = Area::new(&buffer);
         assert_eq!(
             area.ambients[0].name,
-            "Main Ambient\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
+            "Main Ambient\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0".into()
         );
         assert_eq!(
             area.ambients[0].resref_of_sound_1,
@@ -630,7 +593,7 @@ mod tests {
         );
         assert_eq!(
             area.ambients[1].name,
-            "SS-wispers\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
+            "SS-wispers\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0".into()
         );
     }
 
@@ -656,7 +619,7 @@ mod tests {
         assert_eq!(
             area.actors[0],
             Actor {
-                name: "Priest of Helm\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0".to_string(),
+                name: "Priest of Helm\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0".into(),
                 current_x_coordinate: 446,
                 current_y_coordinate: 333,
                 destination_x_coordinate: 446,

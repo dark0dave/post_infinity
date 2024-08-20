@@ -1,6 +1,7 @@
 use binrw::{io::Cursor, BinRead, BinReaderExt, BinWrite};
 use serde::{Deserialize, Serialize};
 
+use crate::common::char_array::CharArray;
 use crate::common::resref::Resref;
 use crate::common::strref::Strref;
 use crate::model::Model;
@@ -42,13 +43,9 @@ impl Model for Store {
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct StoreHeader {
     #[br(count = 4)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub signature: String,
+    pub signature: CharArray,
     #[br(count = 4)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub version: String,
+    pub version: CharArray,
     //  (0=Store, 1=Tavern, 2=Inn, 3=Temple, 5=Container)
     pub store_type: u32,
     pub name: Strref,
