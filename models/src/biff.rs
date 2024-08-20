@@ -8,7 +8,7 @@ use binrw::{
 };
 use serde::{Deserialize, Serialize};
 
-use crate::common::strref::Strref;
+use crate::common::{char_array::CharArray, strref::Strref};
 use crate::tileset::Tileset;
 use crate::{common::types::ResourceType, from_buffer, model::Model};
 
@@ -70,13 +70,9 @@ impl Biff {
 #[derive(Debug, PartialEq, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct BiffHeader {
     #[br(count = 4)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub signature: String,
+    pub signature: CharArray,
     #[br(count = 4)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub version: String,
+    pub version: CharArray,
     pub count_of_fileset_entries: u32,
     pub count_of_tileset_entries: u32,
     pub offset_to_file_entries: u32,
@@ -119,8 +115,8 @@ mod tests {
         assert_eq!(
             biff.header,
             BiffHeader {
-                signature: "BIFF".to_string(),
-                version: "V1  ".to_string(),
+                signature: "BIFF".into(),
+                version: "V1  ".into(),
                 count_of_fileset_entries: 534,
                 count_of_tileset_entries: 0,
                 offset_to_file_entries: 181288

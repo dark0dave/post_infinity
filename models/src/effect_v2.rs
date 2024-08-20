@@ -1,6 +1,7 @@
 use binrw::{io::Cursor, BinRead, BinReaderExt, BinWrite};
 use serde::{Deserialize, Serialize};
 
+use crate::common::char_array::CharArray;
 use crate::common::resref::Resref;
 use crate::model::Model;
 
@@ -8,13 +9,9 @@ use crate::model::Model;
 #[derive(Debug, PartialEq, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct EffectV2 {
     #[br(count = 4)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub signature: String,
+    pub signature: CharArray,
     #[br(count = 4)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub version: String,
+    pub version: CharArray,
     #[serde(flatten)]
     pub body: EffectV2Body,
 }
@@ -48,13 +45,9 @@ impl Model for EffectV2 {
 #[derive(Debug, PartialEq, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct EffectV2Body {
     #[br(count = 4)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub signature: String,
+    pub signature: CharArray,
     #[br(count = 4)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub version: String,
+    pub version: CharArray,
     #[serde(flatten)]
     pub body: EffectV2BodyWithOutHeader,
 }
@@ -101,9 +94,7 @@ pub struct EffectV2BodyWithOutHeader {
     pub projectile: u32,
     pub parent_resource_slot: u32,
     #[br(count = 32)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub variable_name: String,
+    pub variable_name: CharArray,
     pub caster_level: u32,
     pub first_apply: u32,
     // https://gibberlings3.github.io/iesdp/files/2da/2da_bgee/msectype.htm
@@ -134,11 +125,11 @@ mod tests {
         assert_eq!(
             EffectV2::new(&buffer),
             EffectV2 {
-                signature: "EFF ".to_string(),
-                version: "V2.0".to_string(),
+                signature: "EFF ".into(),
+                version: "V2.0".into(),
                 body: EffectV2Body {
-                    signature: "EFF ".to_string(),
-                    version: "V2.0".to_string(),
+                    signature: "EFF ".into(),
+                    version: "V2.0".into(),
                     body: EffectV2BodyWithOutHeader {
                         opcode_number: 98,
                         target_type: 2,

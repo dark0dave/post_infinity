@@ -4,20 +4,19 @@ use binrw::{
 };
 use serde::{Deserialize, Serialize};
 
-use crate::model::Model;
+use crate::{common::char_array::CharArray, model::Model};
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/ids.htm
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct Ids {
     #[br(parse_with = |reader, _, _:()| read_to_end(reader))]
-    #[bw(map = |x| x.as_bytes())]
-    pub data: String,
+    pub data: CharArray,
 }
 
-fn read_to_end<R: Read + Seek>(reader: &mut R) -> BinResult<String> {
-    let mut buff = String::new();
-    reader.read_to_string(&mut buff).unwrap_or_default();
-    Ok(buff)
+fn read_to_end<R: Read + Seek>(reader: &mut R) -> BinResult<CharArray> {
+    let mut buff = vec![];
+    reader.read_to_end(&mut buff).unwrap_or_default();
+    Ok(CharArray(buff))
 }
 
 impl Model for Ids {

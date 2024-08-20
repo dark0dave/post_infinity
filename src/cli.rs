@@ -3,7 +3,7 @@ use std::{fs::File, path::Path, process::exit, str};
 use binrw::io::{BufReader, Read, Write};
 use models::{
     biff::Biff, common::types::ResourceType, from_buffer, from_json, key::Key, model::Model,
-    save::Save, tlk::Lookup,
+    save::Save, tlk::TLK,
 };
 
 use erased_serde::Serializer;
@@ -52,11 +52,6 @@ fn read_file(path: &Path) -> BufReader<File> {
     let file = File::open(path).unwrap_or_else(|_| panic!("Could not open file: {:#?}", path));
 
     BufReader::new(file)
-}
-
-fn parse_tlk_file(path: &Path) -> Lookup {
-    let mut reader = read_file(path);
-    Lookup::new(&mut reader)
 }
 
 fn parse_key_file(path: &Path, reader: &mut BufReader<File>) -> Vec<Biff> {
@@ -115,7 +110,7 @@ fn get_model_from_file(path: &Path, json: bool) -> Vec<Biff> {
     exit(0)
 }
 
-pub fn read_files(args: &Args) -> (Vec<Biff>, Option<Lookup>) {
+pub fn read_files(args: &Args) -> (Vec<Biff>, Option<TLK>) {
     let dir_or_file = &args.resource_file_or_dir;
 
     let biffs = if dir_or_file.is_dir() {
@@ -134,11 +129,12 @@ pub fn read_files(args: &Args) -> (Vec<Biff>, Option<Lookup>) {
     let lookup = match args.process_tlk {
         true if dir_or_file.parent().is_some() => {
             let game_directory = dir_or_file.parent().unwrap();
-            let tlk_path = game_directory
+            let path = game_directory
                 .join("lang")
                 .join(args.game_lang.clone())
                 .join("dialog.tlk");
-            Some(parse_tlk_file(&tlk_path))
+            let mut reader = read_file(&path);
+            Some(TLK::new(&mut reader))
         }
         _ => None,
     };

@@ -1,6 +1,7 @@
 use binrw::{io::Cursor, BinRead, BinReaderExt, BinWrite};
 use serde::{Deserialize, Serialize};
 
+use crate::common::char_array::CharArray;
 use crate::common::feature_block::FeatureBlock;
 use crate::common::resref::Resref;
 use crate::model::Model;
@@ -37,13 +38,9 @@ impl Model for Item {
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct ItemHeader {
     #[br(count = 4)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    signature: String,
+    signature: CharArray,
     #[br(count = 4)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    version: String,
+    version: CharArray,
     unidentified_item_name: u32,
     identified_item_name: u32,
     replacement_item: Resref,

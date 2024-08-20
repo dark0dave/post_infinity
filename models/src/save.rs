@@ -6,19 +6,19 @@ use binrw::{io::BufReader, io::Read, BinRead, BinReaderExt, BinWrite};
 use flate2::bufread::ZlibDecoder;
 use serde::{Deserialize, Serialize};
 
-use crate::{common::types::ResourceType, from_buffer, model::Model};
+use crate::{
+    common::{char_array::CharArray, types::ResourceType},
+    from_buffer,
+    model::Model,
+};
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/sav_v1.htm
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct Save {
     #[br(count = 4)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    signature: String,
+    signature: CharArray,
     #[br(count = 4)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    version: String,
+    version: CharArray,
     #[br(parse_with=binrw::helpers::until_eof)]
     pub files: Vec<SavedFile>,
 }
@@ -38,9 +38,8 @@ impl Save {
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct SavedFile {
     pub length_of_filename: u32,
-    #[br(count=length_of_filename,map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub filename: String,
+    #[br(count=length_of_filename)]
+    pub filename: CharArray,
     pub uncompressed_data_length: u32,
     pub compressed_data_length: u32,
     #[br(count=compressed_data_length, restore_position)]
@@ -51,12 +50,12 @@ pub struct SavedFile {
     pub uncompressed_data: Option<Rc<dyn Model>>,
 }
 
-fn parse_compressed_data(buff: &[u8], file_name: &str) -> Option<Rc<dyn Model>> {
+fn parse_compressed_data(buff: &[u8], file_name: &CharArray) -> Option<Rc<dyn Model>> {
     let mut d = ZlibDecoder::new(buff);
     let mut buffer = vec![];
     match d.read_to_end(&mut buffer) {
         Ok(_) => {
-            let extension = Path::new(file_name)
+            let extension = Path::new(&file_name.to_string())
                 .extension()
                 .unwrap_or_default()
                 .to_ascii_lowercase()

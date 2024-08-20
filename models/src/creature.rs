@@ -4,6 +4,7 @@ use binrw::{
 };
 use serde::{Deserialize, Serialize};
 
+use crate::common::char_array::CharArray;
 use crate::common::{resref::Resref, strref::Strref};
 use crate::effect_v1::EffectV1;
 use crate::item_table::ItemReferenceTable;
@@ -55,13 +56,9 @@ impl Model for Creature {
 #[derive(Debug, PartialEq, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct BGEECreatureHeader {
     #[br(count = 4)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub signature: String,
+    pub signature: CharArray,
     #[br(count = 4)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub version: String,
+    pub version: CharArray,
     pub long_creature_name: u32,
     pub short_creature_name: u32,
     // see CRE_FLAG_* above for possible flags
@@ -139,9 +136,7 @@ pub struct BGEECreatureHeader {
     pub tracking_skill: u8,
     // The following entry applies to BG1, BG2 and BGEE
     #[br(count = 32)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub tracking: String,
+    pub tracking: CharArray,
     // Strrefs pertaining to the character.
     // Most are connected with the sound-set (see SOUNDOFF.IDS (BG1) and SNDSLOT.IDS for (BG2)).
     // This is broken, it should be 100 u32s
@@ -183,9 +178,7 @@ pub struct BGEECreatureHeader {
     pub local_actor_enumeration: u16,
     // death variable: sprite_is_dead on death
     #[br(count = 32)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub death_variable: String,
+    pub death_variable: CharArray,
     pub offset_to_known_spells: u32,
     pub count_of_known_spells: u32,
     pub offset_to_spell_memorization_info: u32,

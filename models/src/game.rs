@@ -4,6 +4,7 @@ use binrw::{
 };
 use serde::{Deserialize, Serialize};
 
+use crate::common::char_array::CharArray;
 use crate::model::Model;
 use crate::{
     common::{resref::Resref, strref::Strref},
@@ -73,13 +74,9 @@ impl Model for Game {
 #[derive(Debug, PartialEq, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct BGEEGameHeader {
     #[br(count = 4)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub signature: String,
+    pub signature: CharArray,
     #[br(count = 4)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub version: String,
+    pub version: CharArray,
     pub game_time: u32,
     pub selected_formation: u16,
     pub formation_button_1: u16,
@@ -133,14 +130,10 @@ pub struct BGEEGameHeader {
     pub random_encounter_area: Resref,
     pub current_world_map: Resref,
     #[br(count = 8)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub current_campaign: String,
+    pub current_campaign: CharArray,
     pub familiar_owner: u32,
     #[br(count = 20)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub random_encounter_script: String,
+    pub random_encounter_script: CharArray,
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/gam_v2.0.htm#GAMEV2_0_NPC
@@ -152,9 +145,7 @@ pub struct GameNPC {
     pub offset_to_cre_resource: u32,
     pub size_of_cre_resource: u32,
     #[br(count = 8)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub character_name: String,
+    pub character_name: CharArray,
     pub character_orientation: u32,
     pub characters_current_area: Resref,
     pub character_x_coordinate: u16,
@@ -197,9 +188,7 @@ pub struct GameNPC {
     // (0/1/2 or -1 disabled)
     pub quick_item_slot_3_ability: u16,
     #[br(count = 32)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub name: String,
+    pub name: CharArray,
     pub talk_count: u32,
     #[serde(flatten)]
     pub character_kill_stats: CharacterKillStats,
@@ -241,9 +230,7 @@ pub struct CharacterKillStats {
 #[derive(Debug, PartialEq, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct GlobalVariables {
     #[br(count = 32)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub name: String,
+    pub name: CharArray,
     /*
       bit 0: int
       bit 1: float
@@ -258,9 +245,7 @@ pub struct GlobalVariables {
     pub int_value: u32,
     pub double_value: u64,
     #[br(count = 32)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub script_name_value: String,
+    pub script_name_value: CharArray,
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/gam_v2.0.htm#GAMEV2_0_Journal
@@ -411,8 +396,8 @@ mod tests {
             .expect("Could not read to buffer");
 
         let header = Game::new(&buffer).header;
-        assert_eq!(header.signature, "GAME".to_string());
-        assert_eq!(header.version, "V2.0".to_string());
+        assert_eq!(header.signature, "GAME".into());
+        assert_eq!(header.version, "V2.0".into());
         assert_eq!(header.party_gold, 109741);
         assert_eq!(header.game_time, 1664811);
         assert_eq!(header.count_of_journal_entries, 188);
@@ -439,7 +424,7 @@ mod tests {
                 party_order: 0,
                 offset_to_cre_resource: 2292,
                 size_of_cre_resource: 19752,
-                character_name: "*AV_PALA".to_string(),
+                character_name: "*AV_PALA".into(),
                 character_orientation: 6,
                 characters_current_area: Resref("AR0800\0\0".into()),
                 character_x_coordinate: 968,
@@ -466,7 +451,7 @@ mod tests {
                 quick_item_slot_1_ability: 0,
                 quick_item_slot_2_ability: 0,
                 quick_item_slot_3_ability: 0,
-                name: "Nimi Iluvia\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0".to_string(),
+                name: "Nimi Iluvia\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0".into(),
                 talk_count: 0,
                 character_kill_stats: CharacterKillStats {
                     most_powerful_vanquished_name: Strref(14430),
@@ -505,7 +490,7 @@ mod tests {
                 party_order: 4,
                 offset_to_cre_resource: 71292,
                 size_of_cre_resource: 17084,
-                character_name: "*ERIE6\0\0".to_string(),
+                character_name: "*ERIE6\0\0".into(),
                 character_orientation: 6,
                 characters_current_area: Resref("AR0800\0\0".into()),
                 character_x_coordinate: 1000,
@@ -612,8 +597,7 @@ mod tests {
                 quick_item_slot_1_ability: 65535,
                 quick_item_slot_2_ability: 65535,
                 quick_item_slot_3_ability: 65535,
-                name: "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
-                    .to_string(),
+                name: "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0".into(),
                 talk_count: 1,
                 character_kill_stats: CharacterKillStats {
                     most_powerful_vanquished_name: Strref(4294967295),
