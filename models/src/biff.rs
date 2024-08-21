@@ -1,9 +1,8 @@
 use core::str;
-use std::fs::File;
 use std::rc::Rc;
 
 use binrw::{
-    io::{BufReader, Read, Seek, SeekFrom},
+    io::{Read, Seek, SeekFrom},
     BinRead, BinReaderExt, BinResult, BinWrite,
 };
 use serde::{Deserialize, Serialize};
@@ -56,7 +55,7 @@ fn parse_contained_files<R: Read + Seek>(
 }
 
 impl Biff {
-    pub fn new(reader: &mut BufReader<File>) -> Self {
+    pub fn new<R: Read + Seek>(reader: &mut R) -> Self {
         match reader.read_le() {
             Ok(res) => res,
             Err(err) => {
@@ -104,7 +103,10 @@ pub struct TilesetEntry {
 #[cfg(test)]
 mod tests {
 
+    use std::fs::File;
+
     use super::*;
+    use binrw::io::BufReader;
     use pretty_assertions::assert_eq;
 
     #[test]

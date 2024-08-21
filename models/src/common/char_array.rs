@@ -1,4 +1,4 @@
-use std::fmt::Write;
+use std::fmt::{Debug, Write};
 
 use binrw::{BinRead, BinWrite};
 use serde::{Deserialize, Serialize};
@@ -21,3 +21,32 @@ impl From<&str> for CharArray {
         Self(value.as_bytes().to_vec())
     }
 }
+
+// #[zerovec::make_varule(TestULE)]
+// #[zerovec::derive(Serialize, Deserialize)]
+// #[derive(Debug, Clone, PartialEq, Eq, Ord, PartialOrd, serde::Serialize, serde::Deserialize)]
+// pub struct Test<'data> {
+//     f: u8,
+//     #[serde(borrow)]
+//     name: &'data str,
+// }
+
+// #[zerovec::make_varule(ARRULE)]
+// #[zerovec::derive(Serialize, Deserialize)]
+// #[derive(Clone, PartialEq, Eq, Ord, PartialOrd, serde::Serialize, serde::Deserialize)]
+// pub struct Arrr<'data> {
+//     test: u8,
+//     #[serde(borrow)]
+//     goat: ZeroVec<'data, u8>,
+//     #[serde(borrow)]
+//     fish: VarZeroVec<'data, TestULE>
+// }
+
+// #[derive(Serialize, Deserialize)]
+// pub struct ParentARR<'data> {
+//     test: u8,
+//     #[serde(borrow)]
+//     goat: ZeroVec<'data, u8>,
+//     #[serde(borrow)]
+//     fish: VarZeroVec<'data, ARRULE>
+// }

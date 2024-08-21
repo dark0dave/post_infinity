@@ -1,6 +1,9 @@
-use std::{fmt::Debug, fs::File};
+use std::fmt::Debug;
 
-use binrw::{io::BufReader, BinRead, BinReaderExt, BinWrite};
+use binrw::{
+    io::{Read, Seek},
+    BinRead, BinReaderExt, BinWrite,
+};
 use serde::{Deserialize, Serialize};
 
 use crate::common::{char_array::CharArray, resref::Resref};
@@ -31,7 +34,7 @@ fn read_key_strings(s: &[u8], entries: &Vec<BiffEntry>) -> Vec<String> {
 }
 
 impl Key {
-    pub fn new(reader: &mut BufReader<File>) -> Self {
+    pub fn new<R: Read + Seek>(reader: &mut R) -> Self {
         match reader.read_le() {
             Ok(res) => res,
             Err(err) => {
@@ -74,7 +77,10 @@ pub struct ResourceEntry {
 #[cfg(test)]
 mod tests {
 
+    use std::fs::File;
+
     use super::*;
+    use binrw::io::BufReader;
     use pretty_assertions::assert_eq;
 
     #[test]

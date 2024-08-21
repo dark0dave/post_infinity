@@ -1,8 +1,7 @@
-use std::fs::File;
 use std::path::Path;
 use std::rc::Rc;
 
-use binrw::{io::BufReader, io::Read, BinRead, BinReaderExt, BinWrite};
+use binrw::{io::Read, io::Seek, BinRead, BinReaderExt, BinWrite};
 use flate2::bufread::ZlibDecoder;
 use serde::{Deserialize, Serialize};
 
@@ -24,7 +23,7 @@ pub struct Save {
 }
 
 impl Save {
-    pub fn new(reader: &mut BufReader<File>) -> Self {
+    pub fn new<R: Read + Seek>(reader: &mut R) -> Self {
         match reader.read_le() {
             Ok(res) => res,
             Err(err) => {
@@ -75,8 +74,11 @@ fn parse_compressed_data(buff: &[u8], file_name: &CharArray) -> Option<Rc<dyn Mo
 #[cfg(test)]
 mod tests {
 
+    use std::fs::File;
+
     use super::*;
     use crate::area::Area;
+    use binrw::io::BufReader;
     use pretty_assertions::assert_eq;
 
     #[test]
