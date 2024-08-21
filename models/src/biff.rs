@@ -1,11 +1,14 @@
 use core::str;
-use std::io::{Read, Seek};
-use std::{fmt::Debug, rc::Rc};
+use std::fs::File;
+use std::rc::Rc;
 
-use binrw::{io::Cursor, io::SeekFrom, BinRead, BinReaderExt, BinResult, BinWrite};
+use binrw::{
+    io::{BufReader, Read, Seek, SeekFrom},
+    BinRead, BinReaderExt, BinResult, BinWrite,
+};
 use serde::{Deserialize, Serialize};
 
-use crate::common::strref::Strref;
+use crate::common::{char_array::CharArray, strref::Strref};
 use crate::tileset::Tileset;
 use crate::{common::types::ResourceType, from_buffer, model::Model};
 
@@ -19,7 +22,7 @@ pub struct Biff {
     #[br(count=header.count_of_tileset_entries)]
     pub tileset_entries: Vec<TilesetEntry>,
     #[serde(skip)]
-    #[br(seek_before=SeekFrom::Start(0), parse_with = |reader, _endian, _args: Vec<u8>| parse_contained_files(reader, &fileset_entries, &tileset_entries))]
+    #[br(seek_before=SeekFrom::Start(0), parse_with = |reader, _, _: ()| parse_contained_files(reader, &fileset_entries, &tileset_entries))]
     #[bw(map = |x| x.iter().flat_map(|x| x.to_bytes()).collect::<Vec<u8>>())]
     pub contained_files: Vec<Rc<dyn Model>>,
 }
@@ -53,12 +56,11 @@ fn parse_contained_files<R: Read + Seek>(
 }
 
 impl Biff {
-    pub fn new(buffer: &[u8]) -> Self {
-        let mut reader = Cursor::new(buffer);
+    pub fn new(reader: &mut BufReader<File>) -> Self {
         match reader.read_le() {
             Ok(res) => res,
             Err(err) => {
-                panic!("Errored with {:?}, dumping buffer: {:?}", err, buffer);
+                panic!("Errored with {:?}", err);
             }
         }
     }
@@ -68,13 +70,9 @@ impl Biff {
 #[derive(Debug, PartialEq, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct BiffHeader {
     #[br(count = 4)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub signature: String,
+    pub signature: CharArray,
     #[br(count = 4)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub version: String,
+    pub version: CharArray,
     pub count_of_fileset_entries: u32,
     pub count_of_tileset_entries: u32,
     pub offset_to_file_entries: u32,
@@ -108,25 +106,17 @@ mod tests {
 
     use super::*;
     use pretty_assertions::assert_eq;
-    use std::{
-        fs::File,
-        io::{BufReader, Read},
-    };
 
     #[test]
     fn valid_biff_file_parsed() {
         let file = File::open("fixtures/Effects.bif").unwrap();
         let mut reader = BufReader::new(file);
-        let mut buffer = Vec::new();
-        reader
-            .read_to_end(&mut buffer)
-            .expect("Could not read to buffer");
-        let biff = Biff::new(&buffer);
+        let biff = Biff::new(&mut reader);
         assert_eq!(
             biff.header,
             BiffHeader {
-                signature: "BIFF".to_string(),
-                version: "V1  ".to_string(),
+                signature: "BIFF".into(),
+                version: "V1  ".into(),
                 count_of_fileset_entries: 534,
                 count_of_tileset_entries: 0,
                 offset_to_file_entries: 181288

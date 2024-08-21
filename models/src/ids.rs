@@ -1,24 +1,28 @@
-use binrw::{io::Cursor, BinRead, BinReaderExt, BinWrite};
+use binrw::{
+    io::{Cursor, Read, Seek},
+    BinRead, BinReaderExt, BinResult, BinWrite,
+};
 use serde::{Deserialize, Serialize};
 
-use crate::{model::Model, tlk::Lookup};
+use crate::{common::char_array::CharArray, model::Model};
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/ids.htm
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct Ids {
-    #[br(parse_with = binrw::helpers::until_eof, map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub data: String,
+    #[br(parse_with = |reader, _, _:()| read_to_end(reader))]
+    pub data: CharArray,
+}
+
+fn read_to_end<R: Read + Seek>(reader: &mut R) -> BinResult<CharArray> {
+    let mut buff = vec![];
+    reader.read_to_end(&mut buff).unwrap_or_default();
+    Ok(CharArray(buff))
 }
 
 impl Model for Ids {
     fn new(buffer: &[u8]) -> Self {
         let mut reader = Cursor::new(buffer);
         reader.read_le().unwrap()
-    }
-
-    fn name(&self, _lookup: &Lookup) -> String {
-        todo!()
     }
 
     fn to_bytes(&self) -> Vec<u8> {

@@ -4,9 +4,10 @@ use binrw::{BinRead, BinWrite};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, BinRead, BinWrite, Serialize, Deserialize)]
-pub struct Resref(#[br(count = 8)] pub Vec<u8>);
+#[br(import{count: usize})]
+pub struct CharArray(#[br(count = count)] pub Vec<u8>);
 
-impl std::fmt::Display for Resref {
+impl std::fmt::Display for CharArray {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         for element in self.0.iter() {
             f.write_char(char::from(*element))?;
@@ -15,8 +16,8 @@ impl std::fmt::Display for Resref {
     }
 }
 
-impl From<String> for Resref {
-    fn from(value: String) -> Self {
-        Self(value.into_bytes())
+impl From<&str> for CharArray {
+    fn from(value: &str) -> Self {
+        Self(value.as_bytes().to_vec())
     }
 }

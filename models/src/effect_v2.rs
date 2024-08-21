@@ -1,21 +1,17 @@
 use binrw::{io::Cursor, BinRead, BinReaderExt, BinWrite};
 use serde::{Deserialize, Serialize};
 
+use crate::common::char_array::CharArray;
 use crate::common::resref::Resref;
 use crate::model::Model;
-use crate::tlk::Lookup;
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/eff_v2.htm
 #[derive(Debug, PartialEq, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct EffectV2 {
     #[br(count = 4)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub signature: String,
+    pub signature: CharArray,
     #[br(count = 4)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub version: String,
+    pub version: CharArray,
     #[serde(flatten)]
     pub body: EffectV2Body,
 }
@@ -38,10 +34,6 @@ impl Model for EffectV2 {
         }
     }
 
-    fn name(&self, _lookup: &Lookup) -> String {
-        todo!()
-    }
-
     fn to_bytes(&self) -> Vec<u8> {
         let mut writer = Cursor::new(Vec::new());
         self.write_le(&mut writer).unwrap();
@@ -53,13 +45,9 @@ impl Model for EffectV2 {
 #[derive(Debug, PartialEq, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct EffectV2Body {
     #[br(count = 4)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub signature: String,
+    pub signature: CharArray,
     #[br(count = 4)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub version: String,
+    pub version: CharArray,
     #[serde(flatten)]
     pub body: EffectV2BodyWithOutHeader,
 }
@@ -106,9 +94,7 @@ pub struct EffectV2BodyWithOutHeader {
     pub projectile: u32,
     pub parent_resource_slot: u32,
     #[br(count = 32)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub variable_name: String,
+    pub variable_name: CharArray,
     pub caster_level: u32,
     pub first_apply: u32,
     // https://gibberlings3.github.io/iesdp/files/2da/2da_bgee/msectype.htm
@@ -122,11 +108,9 @@ pub struct EffectV2BodyWithOutHeader {
 mod tests {
 
     use super::*;
+    use binrw::io::{BufReader, Read};
     use pretty_assertions::assert_eq;
-    use std::{
-        fs::File,
-        io::{BufReader, Read},
-    };
+    use std::fs::File;
 
     #[test]
     fn valid_simple_creature_file_header_parsed() {
@@ -141,11 +125,11 @@ mod tests {
         assert_eq!(
             EffectV2::new(&buffer),
             EffectV2 {
-                signature: "EFF ".to_string(),
-                version: "V2.0".to_string(),
+                signature: "EFF ".into(),
+                version: "V2.0".into(),
                 body: EffectV2Body {
-                    signature: "EFF ".to_string(),
-                    version: "V2.0".to_string(),
+                    signature: "EFF ".into(),
+                    version: "V2.0".into(),
                     body: EffectV2BodyWithOutHeader {
                         opcode_number: 98,
                         target_type: 2,
@@ -157,7 +141,7 @@ mod tests {
                         duration: 120,
                         probability_1: 100,
                         probability_2: 0,
-                        resource_1: Resref("\0\0\0\0\0\0\0\0".to_string()),
+                        resource_1: Resref("\0\0\0\0\0\0\0\0".into()),
                         dice_thrown: 0,
                         dice_sides: 0,
                         saving_throw_type: 0,
@@ -172,14 +156,14 @@ mod tests {
                         parameter_4: 0,
                         parameter_5: 0,
                         time_applied_ticks: 0,
-                        resource_2: Resref("\0\0\0\0\0\0\0\0".to_string()),
-                        resource_3: Resref("\0\0\0\0\0\0\0\0".to_string()),
+                        resource_2: Resref("\0\0\0\0\0\0\0\0".into()),
+                        resource_3: Resref("\0\0\0\0\0\0\0\0".into()),
                         caster_x_coordinate: 4294967295,
                         caster_y_coordinate: 4294967295,
                         target_x_coordinate: 4294967295,
                         target_y_coordinate: 4294967295,
                         parent_resource_type: 0,
-                        parent_resource: Resref("\0\0\0\0\0\0\0\0".to_string()),
+                        parent_resource: Resref("\0\0\0\0\0\0\0\0".into()),
                         parent_resource_flags: vec![0; 4],
                         projectile: 0,
                         parent_resource_slot: 4294967295,

@@ -1,9 +1,9 @@
 use std::rc::Rc;
 
+use bam::Bam;
 use common::types::ResourceType;
 use model::Model;
 use tileset::Tileset;
-use tlk::Lookup;
 
 use crate::{
     area::Area, bio::Biography, character::ExpandedCharacter, creature::Creature,
@@ -12,6 +12,7 @@ use crate::{
 };
 
 pub mod area;
+pub mod bam;
 pub mod biff;
 pub mod bio;
 pub mod character;
@@ -46,7 +47,6 @@ pub fn from_buffer(buffer: &[u8], resource_type: ResourceType) -> Option<Rc<dyn 
         ResourceType::FileTypeWfx => None,
         // Skipping
         ResourceType::FileTypePlt => None,
-        // I am skipping image files
         ResourceType::FileTypeBam => None,
         // I am skipping texture files
         ResourceType::FileTypeWed => None,
@@ -85,7 +85,7 @@ pub fn from_buffer(buffer: &[u8], resource_type: ResourceType) -> Option<Rc<dyn 
         // Skipping graphic data
         ResourceType::FileTypePvrz => None,
         ResourceType::FileTypeGlsl => None,
-        ResourceType::FileTypeTlk => Some(Rc::new(Lookup::new(buffer))),
+        ResourceType::FileTypeTlk => None,
         ResourceType::FileTypeMenu => None,
         ResourceType::FileTypeTtf => None,
         ResourceType::FileTypePng => todo!(),
@@ -109,8 +109,7 @@ pub fn from_json(buffer: &[u8], resource_type: ResourceType) -> Vec<u8> {
         ResourceType::FileTypeWfx => todo!(),
         // Skipping
         ResourceType::FileTypePlt => todo!(),
-        // I am skipping image files
-        ResourceType::FileTypeBam => todo!(),
+        ResourceType::FileTypeBam => Rc::new(serde_json::from_slice::<Bam>(buffer).unwrap()),
         // I am skipping texture files
         ResourceType::FileTypeWed => todo!(),
         // I am skipping GUI defs
@@ -150,7 +149,7 @@ pub fn from_json(buffer: &[u8], resource_type: ResourceType) -> Vec<u8> {
         // Skipping graphic data
         ResourceType::FileTypePvrz => todo!(),
         ResourceType::FileTypeGlsl => todo!(),
-        ResourceType::FileTypeTlk => Rc::new(serde_json::from_slice::<Lookup>(buffer).unwrap()),
+        ResourceType::FileTypeTlk => todo!(),
         ResourceType::FileTypeMenu => todo!(),
         ResourceType::FileTypeTtf => todo!(),
         ResourceType::FileTypePng => todo!(),

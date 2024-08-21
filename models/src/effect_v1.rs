@@ -3,7 +3,6 @@ use serde::{Deserialize, Serialize};
 
 use crate::common::resref::Resref;
 use crate::model::Model;
-use crate::tlk::Lookup;
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/eff_v1.htm#effv1_Header
 #[derive(Debug, PartialEq, BinRead, BinWrite, Serialize, Deserialize)]
@@ -31,10 +30,6 @@ impl Model for EffectV1 {
     fn new(buffer: &[u8]) -> Self {
         let mut reader = Cursor::new(buffer);
         reader.read_le().unwrap()
-    }
-
-    fn name(&self, _lookup: &Lookup) -> String {
-        todo!()
     }
 
     fn to_bytes(&self) -> Vec<u8> {

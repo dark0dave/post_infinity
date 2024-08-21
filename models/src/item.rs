@@ -1,10 +1,10 @@
 use binrw::{io::Cursor, BinRead, BinReaderExt, BinWrite};
 use serde::{Deserialize, Serialize};
 
+use crate::common::char_array::CharArray;
 use crate::common::feature_block::FeatureBlock;
 use crate::common::resref::Resref;
 use crate::model::Model;
-use crate::tlk::Lookup;
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/itm_v1.htm
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
@@ -27,10 +27,6 @@ impl Model for Item {
         }
     }
 
-    fn name(&self, _lookup: &Lookup) -> String {
-        todo!()
-    }
-
     fn to_bytes(&self) -> Vec<u8> {
         let mut writer = Cursor::new(Vec::new());
         self.write_le(&mut writer).unwrap();
@@ -42,13 +38,9 @@ impl Model for Item {
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct ItemHeader {
     #[br(count = 4)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    signature: String,
+    signature: CharArray,
     #[br(count = 4)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    version: String,
+    version: CharArray,
     unidentified_item_name: u32,
     identified_item_name: u32,
     replacement_item: Resref,
@@ -130,11 +122,9 @@ type ItemFeatureBlock = FeatureBlock;
 mod tests {
 
     use super::*;
+    use binrw::io::{BufReader, Read};
     use pretty_assertions::assert_eq;
-    use std::{
-        fs::File,
-        io::{BufReader, Read},
-    };
+    use std::fs::File;
 
     #[test]
     fn valid_item_file_parsed() {

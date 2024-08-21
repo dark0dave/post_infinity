@@ -3,7 +3,6 @@ use serde::{Deserialize, Serialize};
 
 use crate::common::resref::Resref;
 use crate::model::Model;
-use crate::tlk::Lookup;
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/cre_v1.htm#CREV1_0_Item
 #[derive(Debug, PartialEq, BinRead, BinWrite, Serialize, Deserialize)]
@@ -29,10 +28,6 @@ impl Model for ItemReferenceTable {
     fn new(buffer: &[u8]) -> Self {
         let mut reader = Cursor::new(buffer);
         reader.read_le().unwrap()
-    }
-
-    fn name(&self, _lookup: &Lookup) -> String {
-        self.resource_name.0.clone()
     }
 
     fn to_bytes(&self) -> Vec<u8> {
@@ -94,10 +89,6 @@ impl Model for ItemSlots {
         reader.read_le().unwrap()
     }
 
-    fn name(&self, _lookup: &Lookup) -> String {
-        todo!()
-    }
-
     fn to_bytes(&self) -> Vec<u8> {
         let mut writer = Cursor::new(Vec::new());
         self.write_le(&mut writer).unwrap();
@@ -111,11 +102,9 @@ mod tests {
     use crate::creature::Creature;
 
     use super::*;
+    use binrw::io::{BufReader, Read};
     use pretty_assertions::assert_eq;
-    use std::{
-        fs::File,
-        io::{BufReader, Read},
-    };
+    use std::fs::File;
 
     #[test]
     fn valid_creature_file_item_table_parsed() {

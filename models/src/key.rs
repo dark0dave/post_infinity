@@ -1,9 +1,9 @@
-use std::fmt::Debug;
+use std::{fmt::Debug, fs::File};
 
-use binrw::{io::Cursor, BinRead, BinReaderExt, BinWrite};
+use binrw::{io::BufReader, BinRead, BinReaderExt, BinWrite};
 use serde::{Deserialize, Serialize};
 
-use crate::common::resref::Resref;
+use crate::common::{char_array::CharArray, resref::Resref};
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/key_v1.htm
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
@@ -31,12 +31,11 @@ fn read_key_strings(s: &[u8], entries: &Vec<BiffEntry>) -> Vec<String> {
 }
 
 impl Key {
-    pub fn new(buffer: &[u8]) -> Self {
-        let mut reader = Cursor::new(buffer);
+    pub fn new(reader: &mut BufReader<File>) -> Self {
         match reader.read_le() {
             Ok(res) => res,
             Err(err) => {
-                panic!("Errored with {:?}, dumping buffer: {:?}", err, buffer);
+                panic!("Errored with {:?}", err);
             }
         }
     }
@@ -46,13 +45,9 @@ impl Key {
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct KeyHeader {
     #[br(count = 4)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    signature: String,
+    signature: CharArray,
     #[br(count = 4)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    version: String,
+    version: CharArray,
     count_of_bif_entries: u32,
     count_of_resource_entries: u32,
     offset_to_bif_entries: u32,
@@ -81,20 +76,12 @@ mod tests {
 
     use super::*;
     use pretty_assertions::assert_eq;
-    use std::{
-        fs::File,
-        io::{BufReader, Read},
-    };
 
     #[test]
     fn valid_key_file_parsed() {
         let file = File::open("fixtures/chitin.key").unwrap();
         let mut reader = BufReader::new(file);
-        let mut buffer = Vec::new();
-        reader
-            .read_to_end(&mut buffer)
-            .expect("Could not read to buffer");
-        let key = Key::new(&buffer);
+        let key = Key::new(&mut reader);
         assert_eq!(
             key.bif_entries.len(),
             key.header.count_of_bif_entries as usize

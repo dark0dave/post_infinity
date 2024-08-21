@@ -1,23 +1,30 @@
 use binrw::{
-    io::{Cursor, SeekFrom},
-    BinRead, BinReaderExt, BinWrite,
+    io::{Cursor, Read, Seek, SeekFrom},
+    BinRead, BinReaderExt, BinResult, BinWrite,
 };
 use serde::{Deserialize, Serialize};
 
-use crate::common::{resref::Resref, strref::Strref};
+use crate::common::char_array::CharArray;
 use crate::model::Model;
-use crate::tlk::Lookup;
+use crate::{
+    common::{resref::Resref, strref::Strref},
+    creature::Creature,
+};
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/gam_v2.0.htm
 #[derive(Debug, PartialEq, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct Game {
     #[serde(flatten)]
     pub header: BGEEGameHeader,
-    #[br(count=header.count_of_npc_structs_for_party_members, seek_before=SeekFrom::Start(header.offset_to_npc_structs_for_party_members as u64))]
+    #[br(count=header.count_of_npc_structs_for_party_members)]
     pub party_npcs: Vec<GameNPC>,
-    #[br(count=header.count_of_npc_structs_for_npcs, seek_before=SeekFrom::Start(header.offset_to_npc_structs_for_npcs as u64))]
+    #[br(parse_with = |reader, _, _:()| parse_creatures(reader, &party_npcs))]
+    pub party_npcs_cres: Vec<Creature>,
+    #[br(count=header.count_of_npc_structs_for_npcs)]
     pub non_party_npcs: Vec<GameNPC>,
-    #[br(count=header.count_of_global_namespace_variables, seek_before=SeekFrom::Start(header.offset_to_global_namespace_variables as u64))]
+    #[br(parse_with = |reader, _, _:()| parse_creatures(reader, &non_party_npcs))]
+    pub non_party_npcs_cres: Vec<Creature>,
+    #[br(count=header.count_of_global_namespace_variables)]
     pub global_variables: Vec<GlobalVariables>,
     #[br(count=header.count_of_journal_entries, seek_before=SeekFrom::Start(header.offset_to_journal_entries as u64))]
     pub journal_entries: Vec<JournalEntries>,
@@ -31,14 +38,29 @@ pub struct Game {
     pub familiar_extra: Vec<FamiliarExtra>,
 }
 
+fn parse_creatures<R: Read + Seek>(
+    reader: &mut R,
+    npcs: &Vec<GameNPC>,
+) -> BinResult<Vec<Creature>> {
+    let mut buff = vec![];
+
+    let mut creatures = Vec::with_capacity(npcs.len());
+    for npc in npcs {
+        let end = npc.size_of_cre_resource as u64;
+        if end == 0 {
+            continue;
+        }
+        let mut handler = reader.take(end);
+        handler.read_to_end(&mut buff).unwrap();
+        creatures.push(Creature::new(&buff));
+    }
+    Ok(creatures)
+}
+
 impl Model for Game {
     fn new(buffer: &[u8]) -> Self {
         let mut reader = Cursor::new(buffer);
         reader.read_le().unwrap()
-    }
-
-    fn name(&self, _lookup: &Lookup) -> String {
-        "BALDUR.GAM".to_string()
     }
 
     fn to_bytes(&self) -> Vec<u8> {
@@ -52,13 +74,9 @@ impl Model for Game {
 #[derive(Debug, PartialEq, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct BGEEGameHeader {
     #[br(count = 4)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub signature: String,
+    pub signature: CharArray,
     #[br(count = 4)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub version: String,
+    pub version: CharArray,
     pub game_time: u32,
     pub selected_formation: u16,
     pub formation_button_1: u16,
@@ -112,14 +130,10 @@ pub struct BGEEGameHeader {
     pub random_encounter_area: Resref,
     pub current_world_map: Resref,
     #[br(count = 8)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub current_campaign: String,
+    pub current_campaign: CharArray,
     pub familiar_owner: u32,
     #[br(count = 20)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub random_encounter_script: String,
+    pub random_encounter_script: CharArray,
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/gam_v2.0.htm#GAMEV2_0_NPC
@@ -131,9 +145,7 @@ pub struct GameNPC {
     pub offset_to_cre_resource: u32,
     pub size_of_cre_resource: u32,
     #[br(count = 8)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub character_name: String,
+    pub character_name: CharArray,
     pub character_orientation: u32,
     pub characters_current_area: Resref,
     pub character_x_coordinate: u16,
@@ -176,9 +188,7 @@ pub struct GameNPC {
     // (0/1/2 or -1 disabled)
     pub quick_item_slot_3_ability: u16,
     #[br(count = 32)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub name: String,
+    pub name: CharArray,
     pub talk_count: u32,
     #[serde(flatten)]
     pub character_kill_stats: CharacterKillStats,
@@ -220,9 +230,7 @@ pub struct CharacterKillStats {
 #[derive(Debug, PartialEq, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct GlobalVariables {
     #[br(count = 32)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub name: String,
+    pub name: CharArray,
     /*
       bit 0: int
       bit 1: float
@@ -237,9 +245,7 @@ pub struct GlobalVariables {
     pub int_value: u32,
     pub double_value: u64,
     #[br(count = 32)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub script_name_value: String,
+    pub script_name_value: CharArray,
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/gam_v2.0.htm#GAMEV2_0_Journal
@@ -376,11 +382,9 @@ pub struct FamiliarExtra {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use binrw::io::{BufReader, Read};
     use pretty_assertions::{assert_eq, assert_ne};
-    use std::{
-        fs::File,
-        io::{BufReader, Read},
-    };
+    use std::fs::File;
 
     #[test]
     fn valid_headers_parsed() {
@@ -392,8 +396,8 @@ mod tests {
             .expect("Could not read to buffer");
 
         let header = Game::new(&buffer).header;
-        assert_eq!(header.signature, "GAME".to_string());
-        assert_eq!(header.version, "V2.0".to_string());
+        assert_eq!(header.signature, "GAME".into());
+        assert_eq!(header.version, "V2.0".into());
         assert_eq!(header.party_gold, 109741);
         assert_eq!(header.game_time, 1664811);
         assert_eq!(header.count_of_journal_entries, 188);
@@ -420,9 +424,9 @@ mod tests {
                 party_order: 0,
                 offset_to_cre_resource: 2292,
                 size_of_cre_resource: 19752,
-                character_name: "*AV_PALA".to_string(),
+                character_name: "*AV_PALA".into(),
                 character_orientation: 6,
-                characters_current_area: Resref("AR0800\0\0".to_string()),
+                characters_current_area: Resref("AR0800\0\0".into()),
                 character_x_coordinate: 968,
                 character_y_coordinate: 318,
                 viewing_rectangle_x_coordinate: 366,
@@ -438,16 +442,16 @@ mod tests {
                 quick_weapon_slot_2_ability: 0,
                 quick_weapon_slot_3_ability: 0,
                 quick_weapon_slot_4_ability: 0,
-                quick_spell_1_resource: Resref("\0\0\0\0\0\0\0\0".to_string()),
-                quick_spell_2_resource: Resref("\0\0\0\0\0\0\0\0".to_string()),
-                quick_spell_3_resource: Resref("\0\0\0\0\0\0\0\0".to_string()),
+                quick_spell_1_resource: Resref("\0\0\0\0\0\0\0\0".into()),
+                quick_spell_2_resource: Resref("\0\0\0\0\0\0\0\0".into()),
+                quick_spell_3_resource: Resref("\0\0\0\0\0\0\0\0".into()),
                 index_of_quick_item_1: 15,
                 index_of_quick_item_2: 16,
                 index_of_quick_item_3: 17,
                 quick_item_slot_1_ability: 0,
                 quick_item_slot_2_ability: 0,
                 quick_item_slot_3_ability: 0,
-                name: "Nimi Iluvia\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0".to_string(),
+                name: "Nimi Iluvia\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0".into(),
                 talk_count: 0,
                 character_kill_stats: CharacterKillStats {
                     most_powerful_vanquished_name: Strref(14430),
@@ -462,17 +466,17 @@ mod tests {
                     game_kills_xp_gained: 2111235,
                     game_kills_number: 701,
                     favourite_spells: vec![
-                        Resref("SPCL211\0".to_string()),
-                        Resref("SPPR111\0".to_string()),
-                        Resref("SPIN101\0".to_string()),
-                        Resref("SPIN103\0".to_string())
+                        Resref("SPCL211\0".into()),
+                        Resref("SPPR111\0".into()),
+                        Resref("SPIN101\0".into()),
+                        Resref("SPIN103\0".into())
                     ],
                     favourite_spell_count: vec![3, 660, 294, 76],
                     favourite_weapons: vec![
-                        Resref("SW1H62\0\0".to_string()),
-                        Resref("SW1H24\0\0".to_string()),
-                        Resref("SW1H25\0\0".to_string()),
-                        Resref("SW1H51\0\0".to_string())
+                        Resref("SW1H62\0\0".into()),
+                        Resref("SW1H24\0\0".into()),
+                        Resref("SW1H25\0\0".into()),
+                        Resref("SW1H51\0\0".into())
                     ],
                     favourite_weapon_time: vec![200, 14644, 13948, 49692]
                 },
@@ -486,9 +490,9 @@ mod tests {
                 party_order: 4,
                 offset_to_cre_resource: 71292,
                 size_of_cre_resource: 17084,
-                character_name: "*ERIE6\0\0".to_string(),
+                character_name: "*ERIE6\0\0".into(),
                 character_orientation: 6,
-                characters_current_area: Resref("AR0800\0\0".to_string()),
+                characters_current_area: Resref("AR0800\0\0".into()),
                 character_x_coordinate: 1000,
                 character_y_coordinate: 366,
                 viewing_rectangle_x_coordinate: 366,
@@ -504,9 +508,9 @@ mod tests {
                 quick_weapon_slot_2_ability: 0,
                 quick_weapon_slot_3_ability: 0,
                 quick_weapon_slot_4_ability: 0,
-                quick_spell_1_resource: Resref("SPWI302\0".to_string()),
-                quick_spell_2_resource: Resref("SPWI427\0".to_string()),
-                quick_spell_3_resource: Resref("\0\0\0\0\0\0\0\0".to_string()),
+                quick_spell_1_resource: Resref("SPWI302\0".into()),
+                quick_spell_2_resource: Resref("SPWI427\0".into()),
+                quick_spell_3_resource: Resref("\0\0\0\0\0\0\0\0".into()),
                 index_of_quick_item_1: 15,
                 index_of_quick_item_2: 65535,
                 index_of_quick_item_3: 65535,
@@ -528,17 +532,17 @@ mod tests {
                     game_kills_xp_gained: 153155,
                     game_kills_number: 113,
                     favourite_spells: vec![
-                        Resref("SPWI112\0".to_string()),
-                        Resref("SPWI617\0".to_string()),
-                        Resref("SPPR208\0".to_string()),
-                        Resref("SPWI408\0".to_string())
+                        Resref("SPWI112\0".into()),
+                        Resref("SPWI617\0".into()),
+                        Resref("SPPR208\0".into()),
+                        Resref("SPWI408\0".into())
                     ],
                     favourite_spell_count: vec![8, 1, 57, 33],
                     favourite_weapons: vec![
-                        Resref("BULL01\0\0".to_string()),
-                        Resref("WAFLAIL\0".to_string()),
-                        Resref("FIST\0\0\0\0".to_string()),
-                        Resref("WASLING\0".to_string())
+                        Resref("BULL01\0\0".into()),
+                        Resref("WAFLAIL\0".into()),
+                        Resref("FIST\0\0\0\0".into()),
+                        Resref("WASLING\0".into())
                     ],
                     favourite_weapon_time: vec![1910, 126, 1716, 11844]
                 },
@@ -568,7 +572,7 @@ mod tests {
                 size_of_cre_resource: 1868,
                 character_name: "*AZZY8\0\0".into(),
                 character_orientation: 14,
-                characters_current_area: Resref("AR2002\0\0".to_string()),
+                characters_current_area: Resref("AR2002\0\0".into()),
                 character_x_coordinate: 341,
                 character_y_coordinate: 400,
                 viewing_rectangle_x_coordinate: 0,
@@ -584,17 +588,16 @@ mod tests {
                 quick_weapon_slot_2_ability: 0,
                 quick_weapon_slot_3_ability: 0,
                 quick_weapon_slot_4_ability: 0,
-                quick_spell_1_resource: Resref("\0\0\0\0\0\0\0\0".to_string()),
-                quick_spell_2_resource: Resref("\0\0\0\0\0\0\0\0".to_string()),
-                quick_spell_3_resource: Resref("\0\0\0\0\0\0\0\0".to_string()),
+                quick_spell_1_resource: Resref("\0\0\0\0\0\0\0\0".into()),
+                quick_spell_2_resource: Resref("\0\0\0\0\0\0\0\0".into()),
+                quick_spell_3_resource: Resref("\0\0\0\0\0\0\0\0".into()),
                 index_of_quick_item_1: 65535,
                 index_of_quick_item_2: 65535,
                 index_of_quick_item_3: 65535,
                 quick_item_slot_1_ability: 65535,
                 quick_item_slot_2_ability: 65535,
                 quick_item_slot_3_ability: 65535,
-                name: "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
-                    .to_string(),
+                name: "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0".into(),
                 talk_count: 1,
                 character_kill_stats: CharacterKillStats {
                     most_powerful_vanquished_name: Strref(4294967295),
@@ -609,17 +612,17 @@ mod tests {
                     game_kills_xp_gained: 0,
                     game_kills_number: 0,
                     favourite_spells: vec![
-                        Resref("\0\0\0\0\0\0\0\0".to_string()),
-                        Resref("\0\0\0\0\0\0\0\0".to_string()),
-                        Resref("\0\0\0\0\0\0\0\0".to_string()),
-                        Resref("\0\0\0\0\0\0\0\0".to_string())
+                        Resref("\0\0\0\0\0\0\0\0".into()),
+                        Resref("\0\0\0\0\0\0\0\0".into()),
+                        Resref("\0\0\0\0\0\0\0\0".into()),
+                        Resref("\0\0\0\0\0\0\0\0".into())
                     ],
                     favourite_spell_count: vec![0, 0, 0, 0],
                     favourite_weapons: vec![
-                        Resref("\0\0\0\0\0\0\0\0".to_string()),
-                        Resref("\0\0\0\0\0\0\0\0".to_string()),
-                        Resref("\0\0\0\0\0\0\0\0".to_string()),
-                        Resref("\0\0\0\0\0\0\0\0".to_string())
+                        Resref("\0\0\0\0\0\0\0\0".into()),
+                        Resref("\0\0\0\0\0\0\0\0".into()),
+                        Resref("\0\0\0\0\0\0\0\0".into()),
+                        Resref("\0\0\0\0\0\0\0\0".into())
                     ],
                     favourite_weapon_time: vec![0, 0, 0, 0]
                 },
@@ -638,39 +641,21 @@ mod tests {
             .expect("Could not read to buffer");
 
         let familiar = Game::new(&buffer).familiar.unwrap();
-        assert_eq!(
-            familiar.lawful_good_familiar,
-            Resref("FAMPSD\0\0".to_string())
-        );
+        assert_eq!(familiar.lawful_good_familiar, Resref("FAMPSD\0\0".into()));
         assert_eq!(
             familiar.lawful_neutral_familiar,
-            Resref("FAMFER\0\0".to_string())
+            Resref("FAMFER\0\0".into())
         );
-        assert_eq!(
-            familiar.lawful_evil_familiar,
-            Resref("FAMIMP\0\0".to_string())
-        );
-        assert_eq!(
-            familiar.neutral_good_familiar,
-            Resref("FAMPSD\0\0".to_string())
-        );
-        assert_eq!(familiar.neutral_familiar, Resref("FAMRAB\0\0".to_string()));
-        assert_eq!(
-            familiar.neutral_evil_familiar,
-            Resref("FAMDUST\0".to_string())
-        );
-        assert_eq!(
-            familiar.chaotic_good_familiar,
-            Resref("FAMFAIR\0".to_string())
-        );
+        assert_eq!(familiar.lawful_evil_familiar, Resref("FAMIMP\0\0".into()));
+        assert_eq!(familiar.neutral_good_familiar, Resref("FAMPSD\0\0".into()));
+        assert_eq!(familiar.neutral_familiar, Resref("FAMRAB\0\0".into()));
+        assert_eq!(familiar.neutral_evil_familiar, Resref("FAMDUST\0".into()));
+        assert_eq!(familiar.chaotic_good_familiar, Resref("FAMFAIR\0".into()));
         assert_eq!(
             familiar.chaotic_neutral_familiar,
-            Resref("FAMCAT\0\0".to_string())
+            Resref("FAMCAT\0\0".into())
         );
-        assert_eq!(
-            familiar.chaotic_evil_familiar,
-            Resref("FAMQUAS\0".to_string())
-        );
+        assert_eq!(familiar.chaotic_evil_familiar, Resref("FAMQUAS\0".into()));
         assert_eq!(familiar.offset_to_familiar_resources, 318688);
     }
 

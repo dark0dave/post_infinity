@@ -1,57 +1,45 @@
+use std::fs::File;
+use std::path::Path;
 use std::rc::Rc;
 
-use std::path::Path;
-
-use binrw::{io::Cursor, io::Read, BinRead, BinReaderExt, BinWrite};
+use binrw::{io::BufReader, io::Read, BinRead, BinReaderExt, BinWrite};
 use flate2::bufread::ZlibDecoder;
 use serde::{Deserialize, Serialize};
 
-use crate::{common::types::ResourceType, from_buffer, model::Model, tlk::Lookup};
+use crate::{
+    common::{char_array::CharArray, types::ResourceType},
+    from_buffer,
+    model::Model,
+};
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/sav_v1.htm
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct Save {
     #[br(count = 4)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    signature: String,
+    signature: CharArray,
     #[br(count = 4)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    version: String,
+    version: CharArray,
     #[br(parse_with=binrw::helpers::until_eof)]
-    pub files: Vec<File>,
+    pub files: Vec<SavedFile>,
 }
 
-impl Model for Save {
-    fn new(buffer: &[u8]) -> Self {
-        let mut reader = Cursor::new(buffer);
+impl Save {
+    pub fn new(reader: &mut BufReader<File>) -> Self {
         match reader.read_le() {
             Ok(res) => res,
             Err(err) => {
-                panic!("Errored with {:?}, dumping buffer: {:?}", err, buffer);
+                panic!("Errored with {:?}", err);
             }
         }
-    }
-
-    fn name(&self, _lookup: &Lookup) -> String {
-        todo!()
-    }
-
-    fn to_bytes(&self) -> Vec<u8> {
-        let mut writer = Cursor::new(Vec::new());
-        self.write_le(&mut writer).unwrap();
-        writer.into_inner()
     }
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/sav_v1.htm#savv1_File
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
-pub struct File {
+pub struct SavedFile {
     pub length_of_filename: u32,
-    #[br(count=length_of_filename,map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub filename: String,
+    #[br(count=length_of_filename)]
+    pub filename: CharArray,
     pub uncompressed_data_length: u32,
     pub compressed_data_length: u32,
     #[br(count=compressed_data_length, restore_position)]
@@ -62,12 +50,12 @@ pub struct File {
     pub uncompressed_data: Option<Rc<dyn Model>>,
 }
 
-fn parse_compressed_data(buff: &[u8], file_name: &str) -> Option<Rc<dyn Model>> {
+fn parse_compressed_data(buff: &[u8], file_name: &CharArray) -> Option<Rc<dyn Model>> {
     let mut d = ZlibDecoder::new(buff);
     let mut buffer = vec![];
     match d.read_to_end(&mut buffer) {
         Ok(_) => {
-            let extension = Path::new(file_name)
+            let extension = Path::new(&file_name.to_string())
                 .extension()
                 .unwrap_or_default()
                 .to_ascii_lowercase()
@@ -87,25 +75,15 @@ fn parse_compressed_data(buff: &[u8], file_name: &str) -> Option<Rc<dyn Model>> 
 #[cfg(test)]
 mod tests {
 
-    use crate::area::Area;
-
     use super::*;
-    use std::{
-        fs::File,
-        io::{BufReader, Read},
-    };
-
+    use crate::area::Area;
     use pretty_assertions::assert_eq;
 
     #[test]
     fn uncompress_files() {
         let file = File::open("fixtures/BALDUR.SAV").unwrap();
         let mut reader = BufReader::new(file);
-        let mut buffer = Vec::new();
-        reader
-            .read_to_end(&mut buffer)
-            .expect("Could not read to buffer");
-        let save = Save::new(&buffer);
+        let save = Save::new(&mut reader);
         let model = save.files[0].uncompressed_data.clone().unwrap();
         let ptr = Rc::into_raw(model) as *const Area;
         let area: Area = unsafe { ptr.read() };
@@ -118,11 +96,7 @@ mod tests {
     fn read_save() {
         let file = File::open("fixtures/BALDUR.SAV").unwrap();
         let mut reader = BufReader::new(file);
-        let mut buffer = Vec::new();
-        reader
-            .read_to_end(&mut buffer)
-            .expect("Could not read to buffer");
-        let save = Save::new(&buffer);
+        let save = Save::new(&mut reader);
         assert_eq!(save.files[0].compressed_data_length, 1316);
         assert_eq!(save.files[0].uncompressed_data_length, 9395);
         let file_names = vec![

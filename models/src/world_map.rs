@@ -1,10 +1,10 @@
 use binrw::{io::Cursor, io::SeekFrom, BinRead, BinReaderExt, BinWrite};
 use serde::{Deserialize, Serialize};
 
+use crate::common::char_array::CharArray;
 use crate::common::resref::Resref;
 use crate::common::strref::Strref;
 use crate::model::Model;
-use crate::tlk::Lookup;
 
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct WorldMap {
@@ -29,10 +29,6 @@ impl Model for WorldMap {
         }
     }
 
-    fn name(&self, _lookup: &Lookup) -> String {
-        todo!()
-    }
-
     fn to_bytes(&self) -> Vec<u8> {
         let mut writer = Cursor::new(Vec::new());
         self.write_le(&mut writer).unwrap();
@@ -44,13 +40,9 @@ impl Model for WorldMap {
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct WorldMapHeader {
     #[br(count = 4)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub signature: String,
+    pub signature: CharArray,
     #[br(count = 4)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub version: String,
+    pub version: CharArray,
     pub count_of_worldmap_entries: u32,
     pub offset_to_worldmap_entries: u32,
 }
@@ -83,9 +75,7 @@ pub struct AreaEntry {
     pub area_resref: Resref,
     pub area_name_short: Resref,
     #[br(count = 32)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub area_name_long: String,
+    pub area_name_long: CharArray,
     #[br(count = 4)]
     pub bitmask_indicating_status_of_area: Vec<u8>,
     pub bam_file_sequence_icons: u32,
@@ -112,9 +102,7 @@ pub struct AreaEntry {
 pub struct AreaLink {
     pub index_of_destination_area: u32,
     #[br(count = 32)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub entry_point: String,
+    pub entry_point: CharArray,
     pub travel_time: u32,
     pub default_entry_location: u32,
     pub random_encounter_area_1: Resref,
@@ -134,10 +122,8 @@ mod tests {
 
     use pretty_assertions::assert_eq;
 
-    use std::{
-        fs::File,
-        io::{BufReader, Read},
-    };
+    use binrw::io::{BufReader, Read};
+    use std::fs::File;
 
     #[test]
     fn world_test() {

@@ -1,28 +1,25 @@
-use binrw::{
-    io::{Cursor, SeekFrom},
-    BinRead, BinReaderExt, BinWrite,
-};
+use binrw::{io::Cursor, BinRead, BinReaderExt, BinWrite};
 use serde::{Deserialize, Serialize};
 
+use crate::common::char_array::CharArray;
 use crate::common::resref::Resref;
 use crate::common::strref::Strref;
 use crate::model::Model;
-use crate::tlk::Lookup;
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/dlg_v1.htm
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct Dialogue {
     #[serde(flatten)]
     pub header: DialogueHeader,
-    #[br(count=header.count_of_state_tables, seek_before=SeekFrom::Start(header.offset_to_state_table as u64))]
+    #[br(count=header.count_of_state_tables)]
     pub state_tables: Vec<StateTable>,
-    #[br(count=header.count_of_transitions, seek_before=SeekFrom::Start(header.offset_to_transition_table as u64))]
+    #[br(count=header.count_of_transitions)]
     pub transitions: Vec<Transition>,
-    #[br(count=header.count_of_state_triggers, seek_before=SeekFrom::Start(header.offset_to_state_trigger_table as u64))]
+    #[br(count=header.count_of_state_triggers)]
     pub state_triggers: Vec<StateTrigger>,
-    #[br(count=header.count_of_transition_triggers, seek_before=SeekFrom::Start(header.offset_to_transition_trigger_table as u64))]
+    #[br(count=header.count_of_transition_triggers)]
     pub transition_triggers: Vec<TransitionTrigger>,
-    #[br(count=header.count_of_action_tables, seek_before=SeekFrom::Start(header.offset_to_action_table as u64))]
+    #[br(count=header.count_of_action_tables)]
     pub action_tables: Vec<ActionTable>,
 }
 
@@ -30,10 +27,6 @@ impl Model for Dialogue {
     fn new(buffer: &[u8]) -> Self {
         let mut reader = Cursor::new(buffer);
         reader.read_le().unwrap()
-    }
-
-    fn name(&self, _lookup: &Lookup) -> String {
-        todo!()
     }
 
     fn to_bytes(&self) -> Vec<u8> {
@@ -47,13 +40,9 @@ impl Model for Dialogue {
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct DialogueHeader {
     #[br(count = 4)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub signature: String,
+    pub signature: CharArray,
     #[br(count = 4)]
-    #[br(map = |s: Vec<u8>| String::from_utf8(s).unwrap_or_default())]
-    #[bw(map = |x| x.as_bytes())]
-    pub version: String,
+    pub version: CharArray,
     pub count_of_state_tables: u32,
     pub offset_to_state_table: u32,
     pub count_of_transitions: u32,
@@ -116,10 +105,8 @@ pub struct ActionTable {
 mod tests {
 
     use super::*;
-    use std::{
-        fs::File,
-        io::{BufReader, Read},
-    };
+    use binrw::io::{BufReader, Read};
+    use std::fs::File;
 
     #[test]
     fn valid_dialog() {
