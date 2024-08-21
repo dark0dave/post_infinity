@@ -1,6 +1,12 @@
 # Post Infinity
+[![](./docs/rust.svg)](https://www.rust-lang.org/tools/install)
+[![](https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black)](https://github.com/dark0dave/post_infinity/releases/latest)
+[![](https://img.shields.io/badge/Windows-0078D6?&style=for-the-badge&logoColor=white&logo=git-for-windows)](https://github.com/dark0dave/post_infinity/releases/latest)
+[![](https://img.shields.io/badge/mac%20os-grey?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/dark0dave/post_infinity/releases/latest)
+[![](https://img.shields.io/github/actions/workflow/status/dark0dave/post_infinity/main.yaml?style=for-the-badge)](https://github.com/dark0dave/post_infinity/actions/workflows/main.yaml)
+[![](https://img.shields.io/github/license/dark0dave/post_infinity?style=for-the-badge)](./LICENSE)
 
-This tool can read infinity engine binary game files for BGEE and BG2EE. Similar to NearInfinity. It prints the binary game data files.
+This tool can read infinity engine binary game files for BGEE and BG2EE. Similar to NearInfinity. It prints the binary game data files into human readable text. With optional json output.
 
 ### Supported files
 
@@ -43,12 +49,12 @@ Ensure rust is installed via rustup
 cargo run <path to chitin.key> / or target file
 ```
 
-Example:
+## Demo
 
-[example.webm](https://github.com/dark0dave/post_infinity/assets/52840419/5d5974ad-83fe-4abd-b5fd-18c1b94ff49a)
+![](./docs/demo.gif)
 
 ```sh
-post_infinity models/fixtures/gate1.spl
+post_infinity(.exe) models/fixtures/gate1.spl
 {
   "signature": "SPL ",
   "version": "V1  ",
