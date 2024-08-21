@@ -40,7 +40,7 @@ pub fn from_buffer(buffer: &[u8], resource_type: ResourceType) -> Option<Rc<dyn 
     match resource_type {
         // I am skipping image files
         ResourceType::FileTypeBmp => None,
-        ResourceType::FileTypeMve => todo!(),
+        ResourceType::FileTypeMve => None,
         // I am skipping music files
         ResourceType::FileTypeWav => None,
         // Skipping play back sounds
@@ -69,7 +69,7 @@ pub fn from_buffer(buffer: &[u8], resource_type: ResourceType) -> Option<Rc<dyn 
         ResourceType::FileTypeSto => Some(Rc::new(Store::new(buffer))),
         ResourceType::FileTypeWmap => Some(Rc::new(WorldMap::new(buffer))),
         ResourceType::FileTypeEff => Some(Rc::new(EffectV2::new(buffer))),
-        ResourceType::FileTypeBs => todo!(),
+        ResourceType::FileTypeBs => None,
         ResourceType::FileTypeChr => Some(Rc::new(ExpandedCharacter::new(buffer))),
         // I am skipping spell casting graphics
         ResourceType::FileTypeVvc => None,
@@ -88,8 +88,8 @@ pub fn from_buffer(buffer: &[u8], resource_type: ResourceType) -> Option<Rc<dyn 
         ResourceType::FileTypeTlk => None,
         ResourceType::FileTypeMenu => None,
         ResourceType::FileTypeTtf => None,
-        ResourceType::FileTypePng => todo!(),
-        ResourceType::FileTypeBah => todo!(),
+        ResourceType::FileTypePng => None,
+        ResourceType::FileTypeBah => None,
         ResourceType::FileTypeIni => None,
         // Skipping sounds/ out of dialog text
         ResourceType::FileTypeSrc => None,
