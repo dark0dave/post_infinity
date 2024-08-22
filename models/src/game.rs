@@ -26,7 +26,7 @@ pub struct Game {
     pub non_party_npcs_cres: Vec<Creature>,
     #[br(count=header.count_of_global_namespace_variables)]
     pub global_variables: Vec<GlobalVariables>,
-    #[br(count=header.count_of_journal_entries, seek_before=SeekFrom::Start(header.offset_to_journal_entries as u64))]
+    #[br(if(header.offset_to_journal_entries != u32::MAX), count=header.count_of_journal_entries, seek_before=SeekFrom::Start(header.offset_to_journal_entries as u64))]
     pub journal_entries: Vec<JournalEntries>,
     #[br(seek_before=SeekFrom::Start(header.offset_to_familiar as u64))]
     pub familiar: Option<Familiar>,
@@ -34,7 +34,7 @@ pub struct Game {
     pub stored_locations: Vec<Location>,
     #[br(count=header.count_of_pocket_plane_locations, seek_before=SeekFrom::Start(header.offset_to_pocket_plane_locations as u64))]
     pub pocket_plane_locations: Vec<Location>,
-    #[br(if(familiar.is_some()), parse_with=binrw::helpers::until_eof, seek_before=SeekFrom::Start(header.offset_to_familiar_extra as u64))]
+    #[br(if(header.offset_to_familiar_extra != u32::MAX), parse_with=binrw::helpers::until_eof, seek_before=SeekFrom::Start(header.offset_to_familiar_extra as u64))]
     pub familiar_extra: Vec<FamiliarExtra>,
 }
 
