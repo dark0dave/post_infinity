@@ -1,4 +1,4 @@
-use std::{fs::File, path::Path, process::exit, str};
+use std::{fs::File, io::Read, path::Path, process::exit, str};
 
 use binrw::io::{BufReader, Write};
 use models::{
@@ -129,8 +129,11 @@ pub fn read_files(args: &Args) -> (Vec<Biff>, Option<TLK>) {
                 .join("lang")
                 .join(args.game_lang.clone())
                 .join("dialog.tlk");
-            let mut reader = read_file(&path);
-            Some(TLK::new(&mut reader))
+            let mut reader: BufReader<File> = read_file(&path);
+            let mut buffer = vec![];
+            reader.read_to_end(&mut buffer).unwrap();
+            let static_buffer: &'static [u8] = Box::leak(buffer.into_boxed_slice());
+            TLK::parse(static_buffer)
         }
         _ => None,
     };
