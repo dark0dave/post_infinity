@@ -1,6 +1,6 @@
 use std::{fs::File, path::Path, process::exit, str};
 
-use binrw::io::{BufReader, Read, Write};
+use binrw::io::{BufReader, Write};
 use models::{
     biff::Biff, common::types::ResourceType, from_buffer, from_json, key::Key, model::Model,
     save::Save, tlk::TLK,
@@ -28,10 +28,8 @@ fn json_back_to_ie_type(path: &Path) {
         .unwrap_or_default();
 
     let resource_type = ResourceType::from(extension.as_str());
-    let mut file_reader = read_file(path);
-    let mut buffer = vec![];
-    file_reader.read_to_end(&mut buffer).unwrap();
-    let out = from_json(&buffer, resource_type);
+    let file_reader = read_file(path);
+    let out = from_json(file_reader.buffer(), resource_type);
     write_file(path, &extension, &out);
 }
 
@@ -61,8 +59,8 @@ fn parse_key_file(path: &Path, reader: &mut BufReader<File>) -> Vec<Biff> {
     key.bif_file_names
         .iter()
         .map(|file_name| {
-            let mut buffer = read_file(&parent.join(file_name.replace('\0', "")));
-            Biff::new(&mut buffer)
+            let mut reader = read_file(&parent.join(file_name.to_string().replace('\0', "")));
+            Biff::new(&mut reader)
         })
         .collect()
 }
@@ -95,9 +93,7 @@ fn get_model_from_file(path: &Path, json: bool) -> Vec<Biff> {
             };
         }
         resource_type => {
-            let mut buffer = vec![];
-            reader.read_to_end(&mut buffer).unwrap();
-            let model = from_buffer(&buffer, resource_type).expect("Could not parse file");
+            let model = from_buffer(reader.buffer(), resource_type).expect("Could not parse file");
             if json {
                 write_model(path, model, resource_type);
             } else {
@@ -126,7 +122,7 @@ pub fn read_files(args: &Args) -> (Vec<Biff>, Option<TLK>) {
         get_model_from_file(dir_or_file, args.json)
     };
 
-    let lookup = match args.process_tlk {
+    let tlk = match args.process_tlk {
         true if dir_or_file.parent().is_some() => {
             let game_directory = dir_or_file.parent().unwrap();
             let path = game_directory
@@ -139,5 +135,5 @@ pub fn read_files(args: &Args) -> (Vec<Biff>, Option<TLK>) {
         _ => None,
     };
 
-    (biffs, lookup)
+    (biffs, tlk)
 }

@@ -27,6 +27,6 @@ impl Model for Tileset {
     }
 
     fn to_bytes(&self) -> Vec<u8> {
-        vec![]
+        self.data.clone()
     }
 }

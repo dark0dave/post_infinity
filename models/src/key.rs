@@ -16,18 +16,18 @@ pub struct Key {
     #[br(count=header.count_of_bif_entries)]
     pub bif_entries: Vec<BiffEntry>,
     #[br(count=header.offset_to_resource_entries - (header.offset_to_bif_entries + 12 * bif_entries.len() as u32), map = |s: Vec<u8>| read_key_strings(&s, &bif_entries))]
-    #[bw(map = |x : &Vec<String>| x.iter().flat_map(|x: &String| x.as_bytes().to_vec()).collect::<Vec<u8>>())]
-    pub bif_file_names: Vec<String>,
+    #[bw(map = |x : &Vec<CharArray>| x.iter().flat_map(|x: &CharArray| x.0.clone()).collect::<Vec<u8>>())]
+    pub bif_file_names: Vec<CharArray>,
     #[br(count=header.count_of_resource_entries)]
     pub resource_entries: Vec<ResourceEntry>,
 }
 
-fn read_key_strings(s: &[u8], entries: &Vec<BiffEntry>) -> Vec<String> {
-    let mut out: Vec<String> = Vec::with_capacity(entries.len());
+fn read_key_strings(s: &[u8], entries: &Vec<BiffEntry>) -> Vec<CharArray> {
+    let mut out: Vec<CharArray> = Vec::with_capacity(entries.len());
     let mut start = 0;
     for entry in entries {
         let end = entry.file_name_length as usize + start;
-        out.push(String::from_utf8_lossy(s.get(start..end).unwrap_or_default()).to_string());
+        out.push(CharArray(s.get(start..end).unwrap_or_default().to_vec()));
         start = end;
     }
     out
@@ -94,11 +94,11 @@ mod tests {
         );
         assert_eq!(
             key.bif_file_names.first(),
-            Some(&"data/Default.bif\0".to_string())
+            Some(&"data/Default.bif\0".into())
         );
         assert_eq!(
             key.bif_file_names.last(),
-            Some(&"data/BDTP_DLC.BIF\0".to_string())
+            Some(&"data/BDTP_DLC.BIF\0".into())
         );
         assert_eq!(
             key.resource_entries.len(),

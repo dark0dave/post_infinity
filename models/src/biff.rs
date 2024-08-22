@@ -34,7 +34,8 @@ fn parse_contained_files<R: Read + Seek>(
     let mut buffer = vec![];
     reader.read_to_end(&mut buffer).unwrap();
 
-    let mut out: Vec<Rc<dyn Model>> = Vec::with_capacity(fileset_entries.len());
+    let mut out: Vec<Rc<dyn Model>> =
+        Vec::with_capacity(fileset_entries.len() + tileset_entries.len());
     for fileset_entry in fileset_entries {
         let start: usize = fileset_entry.offset as usize;
         let end: usize = start + fileset_entry.size as usize;
