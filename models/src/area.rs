@@ -210,6 +210,12 @@ pub struct Region {
     #[serde(skip)]
     #[br(count = 32)]
     _unknown_2: Vec<u8>,
+    // PST, PSTEE fields
+    pub sound: Resref,
+    pub talk_location_point_x: u16,
+    pub talk_location_point_y: u16,
+    pub speaker_name: Strref,
+    pub dialog_file: Resref,
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/are_v1.htm#formAREAV1_0_Spawn
@@ -334,7 +340,7 @@ pub struct Item {
 
 // An array of points used to create the outlines of regions and containers. Elements are 16-bit words stored x0, y0, x1, y1 etc.
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
-pub struct Vertice(pub u16);
+pub struct Vertice(pub [u16; 2]);
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/are_v1.htm#formAREAV1_0_Ambient
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
