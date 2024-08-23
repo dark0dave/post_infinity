@@ -1,4 +1,4 @@
-use std::{fs::File, path::Path, process::exit, str};
+use std::{fs::File, io::Read, path::Path, process::exit, str};
 
 use binrw::io::{BufReader, Write};
 use models::{
@@ -28,8 +28,10 @@ fn json_back_to_ie_type(path: &Path) {
         .unwrap_or_default();
 
     let resource_type = ResourceType::from(extension.as_str());
-    let file_reader = read_file(path);
-    let out = from_json(file_reader.buffer(), resource_type);
+    let mut reader = read_file(path);
+    let mut buffer = vec![];
+    reader.read_to_end(&mut buffer).unwrap();
+    let out = from_json(&buffer, resource_type);
     write_file(path, &extension, &out);
 }
 
@@ -93,7 +95,9 @@ fn get_model_from_file(path: &Path, json: bool) -> Vec<Biff> {
             };
         }
         resource_type => {
-            let model = from_buffer(reader.buffer(), resource_type).expect("Could not parse file");
+            let mut buffer = vec![];
+            reader.read_to_end(&mut buffer).unwrap();
+            let model = from_buffer(&buffer, resource_type).expect("Could not parse file");
             if json {
                 write_model(path, model, resource_type);
             } else {
