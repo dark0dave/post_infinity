@@ -12,10 +12,13 @@ pub struct Item {
     #[serde(skip)]
     #[br(parse_with = until_eof, restore_position)]
     pub original_bytes: Vec<u8>,
+    #[bw(ignore)]
     #[serde(flatten)]
     pub header: ItemHeader,
+    #[bw(ignore)]
     #[br(count=header.count_of_extended_headers)]
     pub extended_headers: Vec<ItemExtendedHeader>,
+    #[bw(ignore)]
     #[br(count=header.count_of_feature_blocks)]
     pub equipping_feature_blocks: Vec<ItemFeatureBlock>,
 }

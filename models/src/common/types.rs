@@ -1,5 +1,7 @@
 #![allow(dead_code, unused_variables)]
 
+use std::{error::Error, path::Path};
+
 use binrw::{BinRead, BinWrite};
 use serde::{Deserialize, Serialize};
 
@@ -103,6 +105,16 @@ impl std::fmt::Display for ResourceType {
         }
         .to_string();
         write!(f, "{}", ext)
+    }
+}
+
+impl TryFrom<&Path> for ResourceType {
+    type Error = Box<dyn Error>;
+    fn try_from(value: &Path) -> Result<Self, Self::Error> {
+        let extension = value.extension().ok_or("Path has no extension")?;
+        Ok(Self::from(
+            extension.to_str().ok_or("Could not convert to string")?,
+        ))
     }
 }
 

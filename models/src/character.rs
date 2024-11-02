@@ -12,8 +12,10 @@ pub struct ExpandedCharacter {
     #[serde(skip)]
     #[br(parse_with = until_eof, restore_position)]
     pub original_bytes: Vec<u8>,
+    #[bw(ignore)]
     #[serde(flatten)]
     pub character: BGCharacter,
+    #[bw(ignore)]
     #[serde(flatten)]
     pub creature: Creature,
 }

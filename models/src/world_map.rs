@@ -13,10 +13,13 @@ pub struct WorldMap {
     pub original_bytes: Vec<u8>,
     #[serde(flatten)]
     pub header: WorldMapHeader,
+    #[bw(ignore)]
     #[br(count=header.count_of_worldmap_entries, seek_before=SeekFrom::Start(header.offset_to_worldmap_entries as u64))]
     pub world_map_entries: Vec<WorldMapEntry>,
+    #[bw(ignore)]
     #[br(count=world_map_entries.iter().map(|x| x.count_of_area_entries).reduce(|a,b| a+b).unwrap_or_default())]
     pub area_entries: Vec<AreaEntry>,
+    #[bw(ignore)]
     #[br(parse_with = binrw::helpers::until_eof)]
     pub area_link_entries: Vec<AreaLink>,
 }

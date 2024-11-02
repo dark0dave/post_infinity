@@ -17,10 +17,13 @@ pub struct Save {
     #[serde(skip)]
     #[br(parse_with = until_eof, restore_position)]
     pub original_bytes: Vec<u8>,
+    #[bw(ignore)]
     #[br(count = 4)]
-    signature: CharArray,
+    pub signature: CharArray,
+    #[bw(ignore)]
     #[br(count = 4)]
-    version: CharArray,
+    pub version: CharArray,
+    #[bw(ignore)]
     #[br(parse_with=binrw::helpers::until_eof)]
     pub files: Vec<SavedFile>,
 }

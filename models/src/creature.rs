@@ -24,18 +24,25 @@ pub struct Creature {
     pub original_bytes: Vec<u8>,
     #[serde(flatten)]
     pub header: BGEECreatureHeader,
+    #[bw(ignore)]
     #[br(count=header.count_of_known_spells, seek_before=SeekFrom::Start(header.offset_to_known_spells as u64))]
     pub known_spells: Vec<KnownSpells>,
+    #[bw(ignore)]
     #[br(count=header.count_of_spell_memorization_info, seek_before=SeekFrom::Start(header.offset_to_spell_memorization_info as u64))]
     pub memorized_spell_info: Vec<SpellMemorizationInfo>,
+    #[bw(ignore)]
     #[br(count=header.count_of_memorized_spell_table, seek_before=SeekFrom::Start(header.offset_to_memorized_spell_table as u64))]
     pub memorized_spells: Vec<SpellMemorizationTable>,
+    #[bw(ignore)]
     #[br(if(header.effstructure == 0), count=header.count_of_effects, seek_before=SeekFrom::Start(header.offset_to_effects as u64))]
     pub effects_v1: Vec<EffectV1>,
+    #[bw(ignore)]
     #[br(if(header.effstructure == 1), count=header.count_of_effects, seek_before=SeekFrom::Start(header.offset_to_effects as u64))]
     pub effects_v2: Vec<EffectV2Body>,
+    #[bw(ignore)]
     #[br(count=header.count_of_items, seek_before=SeekFrom::Start(header.offset_to_items as u64))]
     pub item_table: Vec<ItemReferenceTable>,
+    #[bw(ignore)]
     #[br(seek_before=SeekFrom::Start(header.offset_to_item_slots as u64))]
     pub item_slots: Option<ItemSlots>,
 }
