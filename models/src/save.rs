@@ -1,7 +1,7 @@
 use std::path::Path;
 use std::rc::Rc;
 
-use binrw::{io::Read, io::Seek, BinRead, BinReaderExt, BinWrite};
+use binrw::{helpers::until_eof, io::Read, io::Seek, BinRead, BinReaderExt, BinWrite};
 use flate2::bufread::ZlibDecoder;
 use serde::{Deserialize, Serialize};
 
@@ -14,6 +14,9 @@ use crate::{
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/sav_v1.htm
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct Save {
+    #[serde(skip)]
+    #[br(parse_with = until_eof, restore_position)]
+    pub original_bytes: Vec<u8>,
     #[br(count = 4)]
     signature: CharArray,
     #[br(count = 4)]

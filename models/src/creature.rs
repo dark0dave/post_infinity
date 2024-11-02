@@ -1,4 +1,5 @@
 use binrw::{
+    helpers::until_eof,
     io::{Cursor, SeekFrom},
     BinRead, BinReaderExt, BinWrite,
 };
@@ -18,6 +19,9 @@ use crate::{
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/cre_v1.htm
 #[derive(Debug, PartialEq, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct Creature {
+    #[serde(skip)]
+    #[br(parse_with = until_eof, restore_position)]
+    pub original_bytes: Vec<u8>,
     #[serde(flatten)]
     pub header: BGEECreatureHeader,
     #[br(count=header.count_of_known_spells, seek_before=SeekFrom::Start(header.offset_to_known_spells as u64))]

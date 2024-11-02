@@ -1,4 +1,4 @@
-use binrw::{io::Cursor, io::SeekFrom, BinRead, BinReaderExt, BinWrite};
+use binrw::{helpers::until_eof, io::Cursor, io::SeekFrom, BinRead, BinReaderExt, BinWrite};
 use serde::{Deserialize, Serialize};
 
 use crate::common::char_array::CharArray;
@@ -9,41 +9,62 @@ use crate::model::Model;
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/are_v1.htm
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct Area {
+    #[serde(skip)]
+    #[br(parse_with = until_eof, restore_position)]
+    pub original_bytes: Vec<u8>,
+    #[bw(ignore)]
     #[serde(flatten)]
     pub header: FileHeader,
+    #[bw(ignore)]
     #[br(count=header.count_of_actors, seek_before=SeekFrom::Start(header.offset_to_actors as u64))]
     pub actors: Vec<Actor>,
+    #[bw(ignore)]
     #[br(count=header.count_of_regions, seek_before=SeekFrom::Start(header.offset_to_regions as u64))]
     pub regions: Vec<Region>,
+    #[bw(ignore)]
     #[br(count=header.count_of_spawn_points, seek_before=SeekFrom::Start(header.offset_to_spawn_points as u64))]
     pub spawn_points: Vec<SpawnPoint>,
+    #[bw(ignore)]
     #[br(count=header.count_of_entrances, seek_before=SeekFrom::Start(header.offset_to_entrances as u64))]
     pub entrances: Vec<Entrance>,
+    #[bw(ignore)]
     #[br(count=header.count_of_containers, seek_before=SeekFrom::Start(header.offset_to_containers as u64))]
     pub containers: Vec<Container>,
+    #[bw(ignore)]
     #[br(count=header.count_of_items, seek_before=SeekFrom::Start(header.offset_to_items as u64))]
     pub items: Vec<Item>,
+    #[bw(ignore)]
     #[br(count=header.count_of_vertices, seek_before=SeekFrom::Start(header.offset_to_vertices as u64))]
     pub vertices: Vec<Vertice>,
+    #[bw(ignore)]
     #[br(count=header.count_of_ambients, seek_before=SeekFrom::Start(header.offset_to_ambients as u64))]
     pub ambients: Vec<Ambient>,
+    #[bw(ignore)]
     #[br(count=header.count_of_variables, seek_before=SeekFrom::Start(header.offset_to_variables as u64))]
     pub variables: Vec<Variable>,
+    #[bw(ignore)]
     #[br(count=header.size_of_explored_bitmask, seek_before=SeekFrom::Start(header.offset_to_explored_bitmask as u64))]
     pub explored_bitmasks: Vec<ExploredBitmask>,
+    #[bw(ignore)]
     #[br(count=header.count_of_doors, seek_before=SeekFrom::Start(header.offset_to_doors as u64))]
     pub doors: Vec<Door>,
+    #[bw(ignore)]
     #[br(count=header.count_of_animations, seek_before=SeekFrom::Start(header.offset_to_animations as u64))]
     pub animations: Vec<Animation>,
+    #[bw(ignore)]
     #[br(count=header.count_of_automap_notes, seek_before=SeekFrom::Start(header.offset_to_automap_notes as u64))]
     pub automap_notes: Vec<AutomapNotesBGEE>,
+    #[bw(ignore)]
     #[br(count=header.count_of_tiled_objects,seek_before=SeekFrom::Start(header.offset_to_tiled_objects as u64))]
     pub tiled_objects: Vec<TiledObject>,
+    #[bw(ignore)]
     #[br(count=header.number_of_entries_in_the_projectile_traps, seek_before=SeekFrom::Start(header.offset_to_projectile_traps as u64))]
     pub projectile_traps: Vec<ProjectileTrap>,
+    #[bw(ignore)]
     #[serde(flatten)]
     #[br(seek_before=SeekFrom::Start(header.offset_to_song_entries as u64))]
     pub songs: SongEntry,
+    #[bw(ignore)]
     #[serde(flatten)]
     #[br(seek_before=SeekFrom::Start(header.offset_to_rest_interruptions as u64))]
     pub rest_interruptions: RestInterruption,
