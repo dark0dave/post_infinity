@@ -18,26 +18,37 @@ pub struct Game {
     #[serde(skip)]
     #[br(parse_with = until_eof, restore_position)]
     pub original_bytes: Vec<u8>,
+    #[bw(ignore)]
     #[serde(flatten)]
     pub header: BGEEGameHeader,
+    #[bw(ignore)]
     #[br(count=header.count_of_npc_structs_for_party_members)]
     pub party_npcs: Vec<GameNPC>,
+    #[bw(ignore)]
     #[br(parse_with = |reader, _, _:()| parse_creatures(reader, &party_npcs))]
     pub party_npcs_cres: Vec<Creature>,
+    #[bw(ignore)]
     #[br(count=header.count_of_npc_structs_for_npcs)]
     pub non_party_npcs: Vec<GameNPC>,
+    #[bw(ignore)]
     #[br(parse_with = |reader, _, _:()| parse_creatures(reader, &non_party_npcs))]
     pub non_party_npcs_cres: Vec<Creature>,
+    #[bw(ignore)]
     #[br(count=header.count_of_global_namespace_variables)]
     pub global_variables: Vec<GlobalVariables>,
+    #[bw(ignore)]
     #[br(if(header.offset_to_journal_entries != u32::MAX), count=header.count_of_journal_entries, seek_before=SeekFrom::Start(header.offset_to_journal_entries as u64))]
     pub journal_entries: Vec<JournalEntries>,
+    #[bw(ignore)]
     #[br(seek_before=SeekFrom::Start(header.offset_to_familiar as u64))]
     pub familiar: Option<Familiar>,
+    #[bw(ignore)]
     #[br(count=header.count_of_stored_locations, seek_before=SeekFrom::Start(header.offset_to_stored_locations as u64))]
     pub stored_locations: Vec<Location>,
+    #[bw(ignore)]
     #[br(count=header.count_of_pocket_plane_locations, seek_before=SeekFrom::Start(header.offset_to_pocket_plane_locations as u64))]
     pub pocket_plane_locations: Vec<Location>,
+    #[bw(ignore)]
     #[br(if(header.offset_to_familiar_extra != u32::MAX), parse_with=binrw::helpers::until_eof, seek_before=SeekFrom::Start(header.offset_to_familiar_extra as u64))]
     pub familiar_extra: Vec<FamiliarExtra>,
 }

@@ -13,6 +13,7 @@ pub struct Ids {
     #[serde(skip)]
     #[br(parse_with = until_eof, restore_position)]
     pub original_bytes: Vec<u8>,
+    #[bw(ignore)]
     #[br(parse_with = |reader, _, _:()| read_to_end(reader))]
     pub data: CharArray,
 }

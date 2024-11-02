@@ -12,14 +12,19 @@ pub struct Store {
     #[serde(skip)]
     #[br(parse_with = until_eof, restore_position)]
     pub original_bytes: Vec<u8>,
+    #[bw(ignore)]
     #[serde(flatten)]
     pub header: StoreHeader,
+    #[bw(ignore)]
     #[br(count=header.count_of_items_for_sale_section)]
     pub items_for_sale: Vec<ItemsForSale>,
+    #[bw(ignore)]
     #[br(count=header.count_of_drinks_section)]
     pub drinks_for_sale: Vec<DrinksForSale>,
+    #[bw(ignore)]
     #[br(count=header.count_of_cures_section)]
     pub cures_for_sale: Vec<CuresForSale>,
+    #[bw(ignore)]
     #[br(count=header.count_of_items_in_items_purchased_section)]
     pub items_purchased_here: Vec<u32>,
 }

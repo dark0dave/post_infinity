@@ -13,10 +13,13 @@ pub struct Spell {
     #[serde(skip)]
     #[br(parse_with = until_eof, restore_position)]
     pub original_bytes: Vec<u8>,
+    #[bw(ignore)]
     #[serde(flatten)]
     pub header: SpellHeader,
+    #[bw(ignore)]
     #[br(count=header.count_of_extended_headers)]
     pub extended_headers: Vec<SpellExtendedHeader>,
+    #[bw(ignore)]
     #[br(parse_with=binrw::helpers::until_eof)]
     pub equipping_feature_blocks: Vec<SpellFeatureBlock>,
 }

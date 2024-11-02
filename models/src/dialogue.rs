@@ -12,16 +12,22 @@ pub struct Dialogue {
     #[serde(skip)]
     #[br(parse_with = until_eof, restore_position)]
     pub original_bytes: Vec<u8>,
+    #[bw(ignore)]
     #[serde(flatten)]
     pub header: DialogueHeader,
+    #[bw(ignore)]
     #[br(count=header.count_of_state_tables)]
     pub state_tables: Vec<StateTable>,
+    #[bw(ignore)]
     #[br(count=header.count_of_transitions)]
     pub transitions: Vec<Transition>,
+    #[bw(ignore)]
     #[br(count=header.count_of_state_triggers)]
     pub state_triggers: Vec<StateTrigger>,
+    #[bw(ignore)]
     #[br(count=header.count_of_transition_triggers)]
     pub transition_triggers: Vec<TransitionTrigger>,
+    #[bw(ignore)]
     #[br(count=header.count_of_action_tables)]
     pub action_tables: Vec<ActionTable>,
 }
