@@ -1,4 +1,4 @@
-use binrw::{io::Cursor, BinRead, BinReaderExt, BinWrite};
+use binrw::{helpers::until_eof, io::Cursor, BinRead, BinReaderExt, BinWrite};
 use serde::{Deserialize, Serialize};
 
 use crate::common::char_array::CharArray;
@@ -10,6 +10,9 @@ use crate::model::Model;
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/spl_v1.htm
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct Spell {
+    #[serde(skip)]
+    #[br(parse_with = until_eof, restore_position)]
+    pub original_bytes: Vec<u8>,
     #[serde(flatten)]
     pub header: SpellHeader,
     #[br(count=header.count_of_extended_headers)]

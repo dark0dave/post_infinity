@@ -1,4 +1,8 @@
-use binrw::{io::Cursor, io::Read, BinRead, BinReaderExt, BinWrite};
+use binrw::{
+    helpers::until_eof,
+    io::{Cursor, Read},
+    BinRead, BinReaderExt, BinWrite,
+};
 use flate2::bufread::ZlibDecoder;
 use serde::{Deserialize, Serialize};
 
@@ -19,52 +23,68 @@ const VERSION2: &[u8; 4] = &[118, 50, 32, 32];
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/bamcv1.htm
 #[derive(Debug, PartialEq, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct Bam {
+    #[serde(skip)]
+    #[br(parse_with = until_eof, restore_position)]
+    pub original_bytes: Vec<u8>,
+    #[bw(ignore)]
     #[serde(flatten)]
     pub header: BamHeader,
     // If BAM v1
+    #[bw(ignore)]
     #[serde(flatten)]
-    #[brw(if(header.signature.0 == BAM_SIGNATURE && header.version.0 == VERSION1))]
+    #[br(if(header.signature.0 == BAM_SIGNATURE && header.version.0 == VERSION1))]
     pub bamv1header: BamV1Header,
-    #[brw(if(header.signature.0 == BAM_SIGNATURE && header.version.0 == VERSION1))]
+    #[bw(ignore)]
+    #[br(if(header.signature.0 == BAM_SIGNATURE && header.version.0 == VERSION1))]
     #[br(count=bamv1header.count_of_frame_entries)]
     pub bamv1_frame_entries: Vec<BamV1FrameEntry>,
-    #[brw(if(header.signature.0 == BAM_SIGNATURE && header.version.0 == VERSION1))]
+    #[bw(ignore)]
+    #[br(if(header.signature.0 == BAM_SIGNATURE && header.version.0 == VERSION1))]
     #[br(count=bamv1header.count_of_cycles)]
     pub bamv1_cycle_entries: Vec<CycleEntry>,
     // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/bam_v1.htm#bamv1_Palette
-    #[brw(if(header.signature.0 == BAM_SIGNATURE && header.version.0 == VERSION1))]
+    #[bw(ignore)]
+    #[br(if(header.signature.0 == BAM_SIGNATURE && header.version.0 == VERSION1))]
     #[br(count=bamv1header.offset_to_lookup_table-bamv1header.offset_to_palette)]
     pub bamv1_palette: Vec<u8>,
     // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/bam_v1.htm#bamv1_FrameLUT
-    #[brw(if(header.signature.0 == BAM_SIGNATURE && header.version.0 == VERSION1))]
+    #[bw(ignore)]
+    #[br(if(header.signature.0 == BAM_SIGNATURE && header.version.0 == VERSION1))]
     #[br(count=lookup_table_size(&bamv1_cycle_entries))]
     pub bamv1_lookup_table: Vec<u8>,
     // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/bam_v1.htm#bamv1_Data
-    #[brw(if(header.signature.0 == BAM_SIGNATURE && header.version.0 == VERSION1))]
+    #[bw(ignore)]
+    #[br(if(header.signature.0 == BAM_SIGNATURE && header.version.0 == VERSION1))]
     #[br(parse_with=binrw::helpers::until_eof)]
     pub bamv1_frame_data: Vec<u8>,
     // If BAMC
-    #[brw(if(header.signature.0 == BAMC_SIGNATURE))]
+    #[bw(ignore)]
+    #[br(if(header.signature.0 == BAMC_SIGNATURE))]
     pub uncompressed_length: u32,
-    #[brw(if(header.signature.0 == BAMC_SIGNATURE))]
+    #[bw(ignore)]
+    #[br(if(header.signature.0 == BAMC_SIGNATURE))]
     #[br(parse_with=binrw::helpers::until_eof, restore_position)]
     pub compressed_data: Vec<u8>,
-    #[brw(if(header.signature.0 == BAMC_SIGNATURE))]
-    #[br(parse_with=binrw::helpers::until_eof, map = |s: Vec<u8>| parse_compressed_data(&s))]
     #[bw(ignore)]
+    #[br(if(header.signature.0 == BAMC_SIGNATURE))]
+    #[br(parse_with=binrw::helpers::until_eof, map = |s: Vec<u8>| parse_compressed_data(&s))]
     pub uncompressed_data: Vec<u8>,
     // If BAM v2
+    #[bw(ignore)]
     #[serde(flatten)]
-    #[brw(if(header.signature.0 == BAM_SIGNATURE && header.version.0 == VERSION2))]
+    #[br(if(header.signature.0 == BAM_SIGNATURE && header.version.0 == VERSION2))]
     pub bamv2header: BamV2Header,
-    #[brw(if(header.signature.0 == BAM_SIGNATURE && header.version.0 == VERSION2))]
+    #[bw(ignore)]
+    #[br(if(header.signature.0 == BAM_SIGNATURE && header.version.0 == VERSION2))]
     #[br(count=bamv2header.count_of_frame_entries)]
     pub bamv2_frame_entries: Vec<BamV2FrameEntry>,
     // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/bam_v2.htm#bamv2_CycleEntry
-    #[brw(if(header.signature.0 == BAM_SIGNATURE && header.version.0 == VERSION2))]
+    #[bw(ignore)]
+    #[br(if(header.signature.0 == BAM_SIGNATURE && header.version.0 == VERSION2))]
     #[br(count=bamv2header.count_of_cycle_entries)]
     pub bamv2_cycle_entries: Vec<CycleEntry>,
-    #[brw(if(header.signature.0 == BAM_SIGNATURE && header.version.0 == VERSION2))]
+    #[bw(ignore)]
+    #[br(if(header.signature.0 == BAM_SIGNATURE && header.version.0 == VERSION2))]
     #[br(count=bamv2header.count_of_data_blocks)]
     pub bamv2_data_blocks: Vec<DataBlock>,
 }

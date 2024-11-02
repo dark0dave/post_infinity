@@ -1,4 +1,5 @@
 use binrw::{
+    helpers::until_eof,
     io::{Cursor, Read, Seek, SeekFrom},
     BinRead, BinReaderExt, BinResult, BinWrite,
 };
@@ -14,6 +15,9 @@ use crate::{
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/gam_v2.0.htm
 #[derive(Debug, PartialEq, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct Game {
+    #[serde(skip)]
+    #[br(parse_with = until_eof, restore_position)]
+    pub original_bytes: Vec<u8>,
     #[serde(flatten)]
     pub header: BGEEGameHeader,
     #[br(count=header.count_of_npc_structs_for_party_members)]

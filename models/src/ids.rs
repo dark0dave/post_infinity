@@ -1,4 +1,5 @@
 use binrw::{
+    helpers::until_eof,
     io::{Cursor, Read, Seek},
     BinRead, BinReaderExt, BinResult, BinWrite,
 };
@@ -9,6 +10,9 @@ use crate::{common::char_array::CharArray, model::Model};
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/ids.htm
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct Ids {
+    #[serde(skip)]
+    #[br(parse_with = until_eof, restore_position)]
+    pub original_bytes: Vec<u8>,
     #[br(parse_with = |reader, _, _:()| read_to_end(reader))]
     pub data: CharArray,
 }

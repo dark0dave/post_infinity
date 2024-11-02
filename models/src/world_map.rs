@@ -1,4 +1,4 @@
-use binrw::{io::Cursor, io::SeekFrom, BinRead, BinReaderExt, BinWrite};
+use binrw::{helpers::until_eof, io::Cursor, io::SeekFrom, BinRead, BinReaderExt, BinWrite};
 use serde::{Deserialize, Serialize};
 
 use crate::common::char_array::CharArray;
@@ -8,6 +8,9 @@ use crate::model::Model;
 
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct WorldMap {
+    #[serde(skip)]
+    #[br(parse_with = until_eof, restore_position)]
+    pub original_bytes: Vec<u8>,
     #[serde(flatten)]
     pub header: WorldMapHeader,
     #[br(count=header.count_of_worldmap_entries, seek_before=SeekFrom::Start(header.offset_to_worldmap_entries as u64))]
