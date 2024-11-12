@@ -403,7 +403,7 @@ mod tests {
 
     #[test]
     fn valid_headers_parsed() {
-        let file = File::open("fixtures/BG2EEBALDUR.gam").unwrap();
+        let file = File::open("fixtures/bg2eebaldur.gam").unwrap();
         let mut reader = BufReader::new(file);
         let mut buffer = Vec::new();
         reader
@@ -423,7 +423,7 @@ mod tests {
 
     #[test]
     fn valid_party_npc_parsed() {
-        let file = File::open("fixtures/BG2EEBALDUR.gam").unwrap();
+        let file = File::open("fixtures/bg2eebaldur.gam").unwrap();
         let mut reader = BufReader::new(file);
         let mut buffer = Vec::new();
         reader
@@ -568,7 +568,7 @@ mod tests {
 
     #[test]
     fn valid_npc_parsed() {
-        let file = File::open("fixtures/BG2EEBALDUR.gam").unwrap();
+        let file = File::open("fixtures/bg2eebaldur.gam").unwrap();
         let mut reader = BufReader::new(file);
         let mut buffer = Vec::new();
         reader
@@ -648,7 +648,7 @@ mod tests {
 
     #[test]
     fn valid_familar_parsed() {
-        let file = File::open("fixtures/BG2EEBALDUR.gam").unwrap();
+        let file = File::open("fixtures/bg2eebaldur.gam").unwrap();
         let mut reader = BufReader::new(file);
         let mut buffer = Vec::new();
         reader
@@ -676,7 +676,7 @@ mod tests {
 
     #[test]
     fn valid_journal_entries_parsed() {
-        let file = File::open("fixtures/BG2EEBALDUR.gam").unwrap();
+        let file = File::open("fixtures/bg2eebaldur.gam").unwrap();
         let mut reader = BufReader::new(file);
         let mut buffer = Vec::new();
         reader

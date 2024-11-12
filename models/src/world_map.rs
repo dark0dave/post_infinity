@@ -133,7 +133,7 @@ mod tests {
 
     #[test]
     fn world_test() {
-        let file = File::open("fixtures/WORLDMAP.WMP").unwrap();
+        let file = File::open("fixtures/worldmap.wmp").unwrap();
         let mut reader = BufReader::new(file);
         let mut buffer = Vec::new();
         reader

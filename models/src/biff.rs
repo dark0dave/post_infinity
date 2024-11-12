@@ -112,7 +112,7 @@ mod tests {
 
     #[test]
     fn valid_biff_file_parsed() {
-        let file = File::open("fixtures/Effects.bif").unwrap();
+        let file = File::open("fixtures/effects.bif").unwrap();
         let mut reader = BufReader::new(file);
         let biff = Biff::new(&mut reader);
         assert_eq!(

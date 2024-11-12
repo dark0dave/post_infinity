@@ -604,7 +604,7 @@ mod tests {
 
     #[test]
     fn test_ambients() {
-        let file = File::open("fixtures/AR0011.ARE").expect("Fixture missing");
+        let file = File::open("fixtures/ar0011.are").expect("Fixture missing");
         let mut buffer = Vec::new();
         BufReader::new(file)
             .read_to_end(&mut buffer)
@@ -626,7 +626,7 @@ mod tests {
 
     #[test]
     fn test_projectile_traps() {
-        let file = File::open("fixtures/AR0002.ARE").expect("Fixture missing");
+        let file = File::open("fixtures/ar0002.are").expect("Fixture missing");
         let mut buffer = Vec::new();
         BufReader::new(file)
             .read_to_end(&mut buffer)
@@ -637,7 +637,7 @@ mod tests {
 
     #[test]
     fn test_actors() {
-        let file = File::open("fixtures/AR0002.ARE").expect("Fixture missing");
+        let file = File::open("fixtures/ar0002.are").expect("Fixture missing");
         let mut buffer = Vec::new();
         BufReader::new(file)
             .read_to_end(&mut buffer)
@@ -686,7 +686,7 @@ mod tests {
 
     #[test]
     fn test_spawn_point() {
-        let file = File::open("fixtures/AR0226.ARE").expect("Fixture missing");
+        let file = File::open("fixtures/ar0226.are").expect("Fixture missing");
         let mut buffer = Vec::new();
         BufReader::new(file)
             .read_to_end(&mut buffer)
