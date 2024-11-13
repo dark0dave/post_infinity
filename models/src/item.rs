@@ -119,6 +119,9 @@ pub struct ItemExtendedHeader {
     is_arrow: u16,
     is_bolt: u16,
     is_bullet: u16,
+    #[bw(ignore)]
+    #[br(count=feature_blocks_count)]
+    effects: Vec<FeatureBlock>,
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/itm_v1.htm#itmv1_Feature_Block
@@ -156,5 +159,19 @@ mod tests {
         let item = Item::new(&buffer);
         assert_eq!(item.extended_headers.len(), 1);
         assert_eq!(item.equipping_feature_blocks.len(), 4);
+    }
+
+    #[test]
+    fn baeloth_book_parse() {
+        let file = File::open("fixtures/zbpdnote.itm").unwrap();
+        let mut reader = BufReader::new(file);
+        let mut buffer = Vec::new();
+        reader
+            .read_to_end(&mut buffer)
+            .expect("Could not read to buffer");
+        let item = Item::new(&buffer);
+        assert_eq!(item.extended_headers.len(), 1);
+        assert_eq!(item.extended_headers[0].effects.len(), 1);
+        assert_eq!(item.equipping_feature_blocks.len(), 0);
     }
 }

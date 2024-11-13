@@ -89,7 +89,7 @@ mod tests {
 
     #[test]
     fn uncompress_files() {
-        let file = File::open("fixtures/BALDUR.SAV").unwrap();
+        let file = File::open("fixtures/baldur.sav").unwrap();
         let mut reader = BufReader::new(file);
         let save = Save::new(&mut reader);
         let model = save.files[0].uncompressed_data.clone().unwrap();
@@ -102,7 +102,7 @@ mod tests {
 
     #[test]
     fn read_save() {
-        let file = File::open("fixtures/BALDUR.SAV").unwrap();
+        let file = File::open("fixtures/baldur.sav").unwrap();
         let mut reader = BufReader::new(file);
         let save = Save::new(&mut reader);
         assert_eq!(save.files[0].compressed_data_length, 1316);
