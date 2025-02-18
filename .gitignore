@@ -5,3 +5,5 @@ target/
 CHANGELOG.md
 perf*
 flamegraph*
+result
+.envrc
