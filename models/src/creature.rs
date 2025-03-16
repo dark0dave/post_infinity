@@ -5,7 +5,7 @@ use binrw::{
 };
 use serde::{Deserialize, Serialize};
 
-use crate::common::{resref::Resref, strref::Strref};
+use crate::common::{header::Header, strref::Strref, Resref};
 use crate::effect_v1::EffectV1;
 use crate::item_table::ItemReferenceTable;
 use crate::{common::char_array::CharArray, effect_v2::EffectV2Body};
@@ -68,10 +68,8 @@ impl Model for Creature {
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/cre_v1.htm#CREV1_0_Header
 #[derive(Debug, PartialEq, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct BGEECreatureHeader {
-    #[br(count = 4)]
-    pub signature: CharArray,
-    #[br(count = 4)]
-    pub version: CharArray,
+    #[serde(flatten)]
+    pub header: Header,
     pub long_creature_name: u32,
     pub short_creature_name: u32,
     // see CRE_FLAG_* above for possible flags
@@ -148,8 +146,7 @@ pub struct BGEECreatureHeader {
     pub turn_undead_level: u8,
     pub tracking_skill: u8,
     // The following entry applies to BG1, BG2 and BGEE
-    #[br(count = 32)]
-    pub tracking: CharArray,
+    pub tracking: CharArray<32>,
     // Strrefs pertaining to the character.
     // Most are connected with the sound-set (see SOUNDOFF.IDS (BG1) and SNDSLOT.IDS for (BG2)).
     // This is broken, it should be 100 u32s
@@ -190,8 +187,7 @@ pub struct BGEECreatureHeader {
     pub global_actor_enumeration: u16,
     pub local_actor_enumeration: u16,
     // death variable: sprite_is_dead on death
-    #[br(count = 32)]
-    pub death_variable: CharArray,
+    pub death_variable: CharArray<32>,
     pub offset_to_known_spells: u32,
     pub count_of_known_spells: u32,
     pub offset_to_spell_memorization_info: u32,
@@ -226,8 +222,10 @@ mod tests {
         assert_eq!(
             header,
             BGEECreatureHeader {
-                signature: "CRE ".into(),
-                version: "V1.0".into(),
+                header: Header {
+                    signature: "CRE ".into(),
+                    version: "V1.0".into(),
+                },
                 long_creature_name: 15855,
                 short_creature_name: 15856,
                 flags: 0,
@@ -246,8 +244,8 @@ mod tests {
                 armor_color: 28,
                 hair_color: 200,
                 effstructure: 1,
-                small_portrait: Resref("S9BEGG4\0".into(),),
-                large_portrait: Resref("None\0\0\0\0".into(),),
+                small_portrait: "S9BEGG4\0".into(),
+                large_portrait: "None\0\0\0\0".into(),
                 reputation: 0,
                 hide_in_shadows: 0,
                 nac_1: 10,
@@ -419,11 +417,11 @@ mod tests {
                 racial_enemy: 255,
                 morale_recovery_time: 60,
                 kit: 0,
-                override_script: Resref("shoutdl3".into(),),
-                class_script: Resref("None\0\0\0\0".into(),),
-                race_script: Resref("None\0\0\0\0".into(),),
-                general_script: Resref("None\0\0\0\0".into(),),
-                creature_script_default: Resref("WTRUNSGT".into(),),
+                override_script: "shoutdl3".into(),
+                class_script: "None\0\0\0\0".into(),
+                race_script: "None\0\0\0\0".into(),
+                general_script: "None\0\0\0\0".into(),
+                creature_script_default: "WTRUNSGT".into(),
                 enemy_ally: 128,
                 general: 1,
                 race: 1,
@@ -447,7 +445,7 @@ mod tests {
                 count_of_items: 0,
                 offset_to_effects: 996,
                 count_of_effects: 0,
-                dialog_ref: Resref("dbeggar\0".into(),),
+                dialog_ref: "dbeggar\0".into(),
             }
         )
     }
@@ -483,7 +481,7 @@ mod tests {
         assert_eq!(
             creature.known_spells.last(),
             Some(&KnownSpells {
-                spell_name: Resref("SPWI113\0".into(),),
+                spell_name: "SPWI113\0".into(),
                 spell_level: 0,
                 spell_type: 1,
             },)
@@ -503,139 +501,139 @@ mod tests {
             creature.memorized_spells,
             vec![
                 SpellMemorizationTable {
-                    spell_name: Resref("SPPR103\0".into()),
+                    spell_name: "SPPR103\0".into(),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: Resref("SPPR103\0".into()),
+                    spell_name: "SPPR103\0".into(),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: Resref("SPPR109\0".into()),
+                    spell_name: "SPPR109\0".into(),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: Resref("SPPR101\0".into()),
+                    spell_name: "SPPR101\0".into(),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: Resref("SPPR203\0".into()),
+                    spell_name: "SPPR203\0".into(),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: Resref("SPPR208\0".into()),
+                    spell_name: "SPPR208\0".into(),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: Resref("SPPR211\0".into()),
+                    spell_name: "SPPR211\0".into(),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: Resref("SPPR212\0".into()),
+                    spell_name: "SPPR212\0".into(),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: Resref("SPPR312\0".into()),
+                    spell_name: "SPPR312\0".into(),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: Resref("SPPR313\0".into()),
+                    spell_name: "SPPR313\0".into(),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: Resref("SPPR315\0".into()),
+                    spell_name: "SPPR315\0".into(),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: Resref("SPPR401\0".into()),
+                    spell_name: "SPPR401\0".into(),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: Resref("SPPR413\0".into()),
+                    spell_name: "SPPR413\0".into(),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: Resref("SPPR411\0".into()),
+                    spell_name: "SPPR411\0".into(),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: Resref("SPPR502\0".into()),
+                    spell_name: "SPPR502\0".into(),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: Resref("SPPR503\0".into()),
+                    spell_name: "SPPR503\0".into(),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: Resref("SPWI113\0".into()),
+                    spell_name: "SPWI113\0".into(),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: Resref("SPWI112\0".into()),
+                    spell_name: "SPWI112\0".into(),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: Resref("SPWI110\0".into()),
+                    spell_name: "SPWI110\0".into(),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: Resref("SPWI105\0".into()),
+                    spell_name: "SPWI105\0".into(),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: Resref("SPWI213\0".into()),
+                    spell_name: "SPWI213\0".into(),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: Resref("SPWI220\0".into()),
+                    spell_name: "SPWI220\0".into(),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: Resref("SPWI211\0".into()),
+                    spell_name: "SPWI211\0".into(),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: Resref("SPWI203\0".into()),
+                    spell_name: "SPWI203\0".into(),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: Resref("SPWI312\0".into()),
+                    spell_name: "SPWI312\0".into(),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: Resref("SPWI311\0".into()),
+                    spell_name: "SPWI311\0".into(),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: Resref("SPWI318\0".into()),
+                    spell_name: "SPWI318\0".into(),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: Resref("SPWI308\0".into()),
+                    spell_name: "SPWI308\0".into(),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: Resref("SPWI408\0".into()),
+                    spell_name: "SPWI408\0".into(),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: Resref("SPWI405\0".into()),
+                    spell_name: "SPWI405\0".into(),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: Resref("SPWI406\0".into()),
+                    spell_name: "SPWI406\0".into(),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: Resref("SPWI510\0".into()),
+                    spell_name: "SPWI510\0".into(),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: Resref("SPWI505\0".into()),
+                    spell_name: "SPWI505\0".into(),
                     memorised: 1,
                 },
                 SpellMemorizationTable {
-                    spell_name: Resref("SPWI522\0".into()),
+                    spell_name: "SPWI522\0".into(),
                     memorised: 1,
                 },
             ]

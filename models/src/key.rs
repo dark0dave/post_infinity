@@ -6,7 +6,7 @@ use binrw::{
 };
 use serde::{Deserialize, Serialize};
 
-use crate::common::{char_array::CharArray, resref::Resref};
+use crate::common::{header::Header, Resref};
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/key_v1.htm
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
@@ -16,18 +16,19 @@ pub struct Key {
     #[br(count=header.count_of_bif_entries)]
     pub bif_entries: Vec<BiffEntry>,
     #[br(count=header.offset_to_resource_entries - (header.offset_to_bif_entries + 12 * bif_entries.len() as u32), map = |s: Vec<u8>| read_key_strings(&s, &bif_entries))]
-    #[bw(map = |x : &Vec<CharArray>| x.iter().flat_map(|x: &CharArray| x.0.clone()).collect::<Vec<u8>>())]
-    pub bif_file_names: Vec<CharArray>,
+    #[bw(map = |x : &Vec<String>| x.iter().flat_map(|x: &String| x.clone().into_bytes()).collect::<Vec<u8>>())]
+    pub bif_file_names: Vec<String>,
     #[br(count=header.count_of_resource_entries)]
     pub resource_entries: Vec<ResourceEntry>,
 }
 
-fn read_key_strings(s: &[u8], entries: &Vec<BiffEntry>) -> Vec<CharArray> {
-    let mut out: Vec<CharArray> = Vec::with_capacity(entries.len());
+fn read_key_strings(s: &[u8], entries: &Vec<BiffEntry>) -> Vec<String> {
+    let mut out: Vec<String> = Vec::with_capacity(entries.len());
     let mut start = 0;
     for entry in entries {
         let end = entry.file_name_length as usize + start;
-        out.push(CharArray(s.get(start..end).unwrap_or_default().to_vec()));
+        let slice = s.get(start..end).unwrap_or_default();
+        out.push(String::from_utf8(slice.to_vec()).unwrap_or_default());
         start = end;
     }
     out
@@ -47,10 +48,8 @@ impl Key {
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/key_v1.htm#keyv1_Header
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct KeyHeader {
-    #[br(count = 4)]
-    signature: CharArray,
-    #[br(count = 4)]
-    version: CharArray,
+    #[serde(flatten)]
+    pub header: Header,
     count_of_bif_entries: u32,
     count_of_resource_entries: u32,
     offset_to_bif_entries: u32,

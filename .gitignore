@@ -2,6 +2,7 @@ target/
 .vscode
 *.swp
 *json
+!models/fixtures/*json
 CHANGELOG.md
 perf*
 flamegraph*

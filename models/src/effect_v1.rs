@@ -1,7 +1,7 @@
 use binrw::{io::Cursor, BinRead, BinReaderExt, BinWrite};
 use serde::{Deserialize, Serialize};
 
-use crate::common::resref::Resref;
+use crate::common::Resref;
 use crate::model::Model;
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/eff_v1.htm#effv1_Header

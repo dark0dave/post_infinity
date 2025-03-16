@@ -5,10 +5,10 @@ use binrw::{
 };
 use serde::{Deserialize, Serialize};
 
-use crate::common::char_array::CharArray;
+use crate::common::{char_array::CharArray, header::Header};
 use crate::model::Model;
 use crate::{
-    common::{resref::Resref, strref::Strref},
+    common::{strref::Strref, Resref},
     creature::Creature,
 };
 
@@ -88,10 +88,8 @@ impl Model for Game {
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/gam_v2.0.htm#GAMEV2_0_Header
 #[derive(Debug, PartialEq, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct BGEEGameHeader {
-    #[br(count = 4)]
-    pub signature: CharArray,
-    #[br(count = 4)]
-    pub version: CharArray,
+    #[serde(flatten)]
+    pub header: Header,
     pub game_time: u32,
     pub selected_formation: u16,
     pub formation_button_1: u16,
@@ -144,11 +142,9 @@ pub struct BGEEGameHeader {
     pub zoom_level: u32,
     pub random_encounter_area: Resref,
     pub current_world_map: Resref,
-    #[br(count = 8)]
-    pub current_campaign: CharArray,
+    pub current_campaign: CharArray<8>,
     pub familiar_owner: u32,
-    #[br(count = 20)]
-    pub random_encounter_script: CharArray,
+    pub random_encounter_script: CharArray<20>,
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/gam_v2.0.htm#GAMEV2_0_NPC
@@ -159,8 +155,7 @@ pub struct GameNPC {
     pub party_order: u16,
     pub offset_to_cre_resource: u32,
     pub size_of_cre_resource: u32,
-    #[br(count = 8)]
-    pub character_name: CharArray,
+    pub character_name: CharArray<8>,
     pub character_orientation: u32,
     pub characters_current_area: Resref,
     pub character_x_coordinate: u16,
@@ -202,8 +197,7 @@ pub struct GameNPC {
     pub quick_item_slot_2_ability: u16,
     // (0/1/2 or -1 disabled)
     pub quick_item_slot_3_ability: u16,
-    #[br(count = 32)]
-    pub name: CharArray,
+    pub name: CharArray<32>,
     pub talk_count: u32,
     #[serde(flatten)]
     pub character_kill_stats: CharacterKillStats,
@@ -244,8 +238,7 @@ pub struct CharacterKillStats {
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/gam_v2.0.htm#GAMEV2_0_Variable
 #[derive(Debug, PartialEq, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct GlobalVariables {
-    #[br(count = 32)]
-    pub name: CharArray,
+    pub name: CharArray<32>,
     /*
       bit 0: int
       bit 1: float
@@ -259,8 +252,7 @@ pub struct GlobalVariables {
     pub dword_value: u32,
     pub int_value: u32,
     pub double_value: u64,
-    #[br(count = 32)]
-    pub script_name_value: CharArray,
+    pub script_name_value: CharArray<32>,
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/gam_v2.0.htm#GAMEV2_0_Journal
@@ -397,314 +389,48 @@ pub struct FamiliarExtra {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use binrw::io::{BufReader, Read};
-    use pretty_assertions::{assert_eq, assert_ne};
-    use std::fs::File;
+    use binrw::io::Read;
+    use pretty_assertions::assert_eq;
+    use serde_json::Value;
+    use std::{error::Error, fs::File};
 
-    #[test]
-    fn valid_headers_parsed() {
-        let file = File::open("fixtures/bg2eebaldur.gam").unwrap();
-        let mut reader = BufReader::new(file);
+    const GAME_FIXTURE: &str = "fixtures/bg2eebaldur.gam";
+    const GAME_JSON_FIXTURE: &str = "fixtures/bg2eebaldur.gam.json";
+
+    fn read_file(path: &str) -> Result<Vec<u8>, Box<dyn Error>> {
+        let mut file = File::open(path)?;
         let mut buffer = Vec::new();
-        reader
-            .read_to_end(&mut buffer)
-            .expect("Could not read to buffer");
-
-        let header = Game::new(&buffer).header;
-        assert_eq!(header.signature, "GAME".into());
-        assert_eq!(header.version, "V2.0".into());
-        assert_eq!(header.party_gold, 109741);
-        assert_eq!(header.game_time, 1664811);
-        assert_eq!(header.count_of_journal_entries, 188);
-        assert_eq!(header.game_time_real_seconds, 2774117);
-        assert_eq!(header.zoom_level, 58);
-        assert_eq!(header.familiar_owner, 0);
+        file.read_to_end(&mut buffer)?;
+        Ok(buffer)
     }
 
     #[test]
-    fn valid_party_npc_parsed() {
-        let file = File::open("fixtures/bg2eebaldur.gam").unwrap();
-        let mut reader = BufReader::new(file);
-        let mut buffer = Vec::new();
-        reader
-            .read_to_end(&mut buffer)
-            .expect("Could not read to buffer");
+    fn parse_party_npcs() -> Result<(), Box<dyn Error>> {
+        let game: Game = Game::new(&read_file(GAME_FIXTURE)?);
+        let expected: Value = serde_json::from_slice(&read_file(GAME_JSON_FIXTURE)?)?;
 
-        let game = Game::new(&buffer);
-        let party = game.party_npcs;
-        assert_eq!(
-            *party.first().unwrap(),
-            GameNPC {
-                character_selection: 0,
-                party_order: 0,
-                offset_to_cre_resource: 2292,
-                size_of_cre_resource: 19752,
-                character_name: "*AV_PALA".into(),
-                character_orientation: 6,
-                characters_current_area: Resref("AR0800\0\0".into()),
-                character_x_coordinate: 968,
-                character_y_coordinate: 318,
-                viewing_rectangle_x_coordinate: 366,
-                viewing_rectangle_y_coordinate: 81,
-                modal_action: 0,
-                happiness: 80,
-                num_times_interacted: [0; 24],
-                index_of_quick_weapon_1: 35,
-                index_of_quick_weapon_2: 36,
-                index_of_quick_weapon_3: 37,
-                index_of_quick_weapon_4: 10,
-                quick_weapon_slot_1_ability: 0,
-                quick_weapon_slot_2_ability: 0,
-                quick_weapon_slot_3_ability: 0,
-                quick_weapon_slot_4_ability: 0,
-                quick_spell_1_resource: Resref("\0\0\0\0\0\0\0\0".into()),
-                quick_spell_2_resource: Resref("\0\0\0\0\0\0\0\0".into()),
-                quick_spell_3_resource: Resref("\0\0\0\0\0\0\0\0".into()),
-                index_of_quick_item_1: 15,
-                index_of_quick_item_2: 16,
-                index_of_quick_item_3: 17,
-                quick_item_slot_1_ability: 0,
-                quick_item_slot_2_ability: 0,
-                quick_item_slot_3_ability: 0,
-                name: "Nimi Iluvia\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0".into(),
-                talk_count: 0,
-                character_kill_stats: CharacterKillStats {
-                    most_powerful_vanquished_name: Strref(14430),
-                    most_powerful_vanquished_xp_reward: 25000,
-                    time_in_party: 0,
-                    time_joined: 31499,
-                    party_member: 1,
-                    unused: 0,
-                    first_letter_of_cre_resref: 42,
-                    chapter_kills_xp_gained: 109150,
-                    chapter_kills_number: 27,
-                    game_kills_xp_gained: 2111235,
-                    game_kills_number: 701,
-                    favourite_spells: vec![
-                        Resref("SPCL211\0".into()),
-                        Resref("SPPR111\0".into()),
-                        Resref("SPIN101\0".into()),
-                        Resref("SPIN103\0".into())
-                    ],
-                    favourite_spell_count: vec![3, 660, 294, 76],
-                    favourite_weapons: vec![
-                        Resref("SW1H62\0\0".into()),
-                        Resref("SW1H24\0\0".into()),
-                        Resref("SW1H25\0\0".into()),
-                        Resref("SW1H51\0\0".into())
-                    ],
-                    favourite_weapon_time: vec![200, 14644, 13948, 49692]
-                },
-                voice_set: vec![0, 0, 0, 0, 0, 0, 0, 0]
-            }
-        );
-        assert_eq!(
-            *party.last().unwrap(),
-            GameNPC {
-                character_selection: 0,
-                party_order: 4,
-                offset_to_cre_resource: 71292,
-                size_of_cre_resource: 17084,
-                character_name: "*ERIE6\0\0".into(),
-                character_orientation: 6,
-                characters_current_area: Resref("AR0800\0\0".into()),
-                character_x_coordinate: 1000,
-                character_y_coordinate: 366,
-                viewing_rectangle_x_coordinate: 366,
-                viewing_rectangle_y_coordinate: 81,
-                modal_action: 0,
-                happiness: 80,
-                num_times_interacted: [0; 24],
-                index_of_quick_weapon_1: 35,
-                index_of_quick_weapon_2: 36,
-                index_of_quick_weapon_3: 10,
-                index_of_quick_weapon_4: 10,
-                quick_weapon_slot_1_ability: 0,
-                quick_weapon_slot_2_ability: 0,
-                quick_weapon_slot_3_ability: 0,
-                quick_weapon_slot_4_ability: 0,
-                quick_spell_1_resource: Resref("SPWI302\0".into()),
-                quick_spell_2_resource: Resref("SPWI427\0".into()),
-                quick_spell_3_resource: Resref("\0\0\0\0\0\0\0\0".into()),
-                index_of_quick_item_1: 15,
-                index_of_quick_item_2: 65535,
-                index_of_quick_item_3: 65535,
-                quick_item_slot_1_ability: 0,
-                quick_item_slot_2_ability: 65535,
-                quick_item_slot_3_ability: 65535,
-                name: "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0".into(),
-                talk_count: 6,
-                character_kill_stats: CharacterKillStats {
-                    most_powerful_vanquished_name: Strref(34947),
-                    most_powerful_vanquished_xp_reward: 64000,
-                    time_in_party: 8320583,
-                    time_joined: 24563462,
-                    party_member: 1,
-                    unused: 0,
-                    first_letter_of_cre_resref: 42,
-                    chapter_kills_xp_gained: 1551,
-                    chapter_kills_number: 5,
-                    game_kills_xp_gained: 153155,
-                    game_kills_number: 113,
-                    favourite_spells: vec![
-                        Resref("SPWI112\0".into()),
-                        Resref("SPWI617\0".into()),
-                        Resref("SPPR208\0".into()),
-                        Resref("SPWI408\0".into())
-                    ],
-                    favourite_spell_count: vec![8, 1, 57, 33],
-                    favourite_weapons: vec![
-                        Resref("BULL01\0\0".into()),
-                        Resref("WAFLAIL\0".into()),
-                        Resref("FIST\0\0\0\0".into()),
-                        Resref("WASLING\0".into())
-                    ],
-                    favourite_weapon_time: vec![1910, 126, 1716, 11844]
-                },
-                voice_set: vec![0, 0, 0, 0, 0, 0, 0, 0],
-            }
-        );
+        let party_npcs: Vec<GameNPC> = serde_json::from_value(
+            (expected
+                .get("party_npcs")
+                .ok_or("Failed to get party npcs")?)
+            .clone(),
+        )?;
+        assert_eq!(game.party_npcs, party_npcs);
+        Ok(())
     }
 
     #[test]
-    fn valid_npc_parsed() {
-        let file = File::open("fixtures/bg2eebaldur.gam").unwrap();
-        let mut reader = BufReader::new(file);
-        let mut buffer = Vec::new();
-        reader
-            .read_to_end(&mut buffer)
-            .expect("Could not read to buffer");
+    fn parse_non_party_npcs() -> Result<(), Box<dyn Error>> {
+        let game: Game = Game::new(&read_file(GAME_FIXTURE)?);
+        let expected: Value = serde_json::from_slice(&read_file(GAME_JSON_FIXTURE)?)?;
 
-        let game = Game::new(&buffer);
-        let non_party = game.non_party_npcs;
-        assert_ne!(non_party.first(), None);
-        assert_eq!(
-            *non_party.last().unwrap(),
-            GameNPC {
-                character_selection: 0,
-                party_order: 65535,
-                offset_to_cre_resource: 196144,
-                size_of_cre_resource: 1868,
-                character_name: "*AZZY8\0\0".into(),
-                character_orientation: 14,
-                characters_current_area: Resref("AR2002\0\0".into()),
-                character_x_coordinate: 341,
-                character_y_coordinate: 400,
-                viewing_rectangle_x_coordinate: 0,
-                viewing_rectangle_y_coordinate: 0,
-                modal_action: 0,
-                happiness: 0,
-                num_times_interacted: [0; 24],
-                index_of_quick_weapon_1: 11,
-                index_of_quick_weapon_2: 36,
-                index_of_quick_weapon_3: 10,
-                index_of_quick_weapon_4: 10,
-                quick_weapon_slot_1_ability: 0,
-                quick_weapon_slot_2_ability: 0,
-                quick_weapon_slot_3_ability: 0,
-                quick_weapon_slot_4_ability: 0,
-                quick_spell_1_resource: Resref("\0\0\0\0\0\0\0\0".into()),
-                quick_spell_2_resource: Resref("\0\0\0\0\0\0\0\0".into()),
-                quick_spell_3_resource: Resref("\0\0\0\0\0\0\0\0".into()),
-                index_of_quick_item_1: 65535,
-                index_of_quick_item_2: 65535,
-                index_of_quick_item_3: 65535,
-                quick_item_slot_1_ability: 65535,
-                quick_item_slot_2_ability: 65535,
-                quick_item_slot_3_ability: 65535,
-                name: "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0".into(),
-                talk_count: 1,
-                character_kill_stats: CharacterKillStats {
-                    most_powerful_vanquished_name: Strref(4294967295),
-                    most_powerful_vanquished_xp_reward: 0,
-                    time_in_party: 0,
-                    time_joined: 0,
-                    party_member: 0,
-                    unused: 0,
-                    first_letter_of_cre_resref: 42,
-                    chapter_kills_xp_gained: 0,
-                    chapter_kills_number: 0,
-                    game_kills_xp_gained: 0,
-                    game_kills_number: 0,
-                    favourite_spells: vec![
-                        Resref("\0\0\0\0\0\0\0\0".into()),
-                        Resref("\0\0\0\0\0\0\0\0".into()),
-                        Resref("\0\0\0\0\0\0\0\0".into()),
-                        Resref("\0\0\0\0\0\0\0\0".into())
-                    ],
-                    favourite_spell_count: vec![0, 0, 0, 0],
-                    favourite_weapons: vec![
-                        Resref("\0\0\0\0\0\0\0\0".into()),
-                        Resref("\0\0\0\0\0\0\0\0".into()),
-                        Resref("\0\0\0\0\0\0\0\0".into()),
-                        Resref("\0\0\0\0\0\0\0\0".into())
-                    ],
-                    favourite_weapon_time: vec![0, 0, 0, 0]
-                },
-                voice_set: vec![0, 0, 0, 0, 0, 0, 0, 0],
-            }
-        )
-    }
-
-    #[test]
-    fn valid_familar_parsed() {
-        let file = File::open("fixtures/bg2eebaldur.gam").unwrap();
-        let mut reader = BufReader::new(file);
-        let mut buffer = Vec::new();
-        reader
-            .read_to_end(&mut buffer)
-            .expect("Could not read to buffer");
-
-        let familiar = Game::new(&buffer).familiar.unwrap();
-        assert_eq!(familiar.lawful_good_familiar, Resref("FAMPSD\0\0".into()));
-        assert_eq!(
-            familiar.lawful_neutral_familiar,
-            Resref("FAMFER\0\0".into())
-        );
-        assert_eq!(familiar.lawful_evil_familiar, Resref("FAMIMP\0\0".into()));
-        assert_eq!(familiar.neutral_good_familiar, Resref("FAMPSD\0\0".into()));
-        assert_eq!(familiar.neutral_familiar, Resref("FAMRAB\0\0".into()));
-        assert_eq!(familiar.neutral_evil_familiar, Resref("FAMDUST\0".into()));
-        assert_eq!(familiar.chaotic_good_familiar, Resref("FAMFAIR\0".into()));
-        assert_eq!(
-            familiar.chaotic_neutral_familiar,
-            Resref("FAMCAT\0\0".into())
-        );
-        assert_eq!(familiar.chaotic_evil_familiar, Resref("FAMQUAS\0".into()));
-        assert_eq!(familiar.offset_to_familiar_resources, 318688);
-    }
-
-    #[test]
-    fn valid_journal_entries_parsed() {
-        let file = File::open("fixtures/bg2eebaldur.gam").unwrap();
-        let mut reader = BufReader::new(file);
-        let mut buffer = Vec::new();
-        reader
-            .read_to_end(&mut buffer)
-            .expect("Could not read to buffer");
-
-        let journal = Game::new(&buffer).journal_entries;
-        assert_eq!(
-            journal.first(),
-            Some(&JournalEntries {
-                journal_text: Strref(34089),
-                time: 31595,
-                current_chapter_number: 1,
-                read_by_character: 255,
-                journal_section: 4,
-                location_flag: 255
-            })
-        );
-        assert_eq!(
-            journal.last(),
-            Some(&JournalEntries {
-                journal_text: Strref(97343),
-                time: 24711890,
-                current_chapter_number: 6,
-                read_by_character: 255,
-                journal_section: 1,
-                location_flag: 255
-            })
-        );
+        let party_npcs: Vec<GameNPC> = serde_json::from_value(
+            (expected
+                .get("non_party_npcs")
+                .ok_or("Failed to get non party npcs")?)
+            .clone(),
+        )?;
+        assert_eq!(game.non_party_npcs, party_npcs);
+        Ok(())
     }
 }

@@ -1,10 +1,10 @@
 use binrw::{helpers::until_eof, io::Cursor, BinRead, BinReaderExt, BinWrite};
 use serde::{Deserialize, Serialize};
 
-use crate::common::char_array::CharArray;
 use crate::common::feature_block::FeatureBlock;
-use crate::common::resref::Resref;
+use crate::common::header::Header;
 use crate::common::strref::Strref;
+use crate::common::Resref;
 use crate::model::Model;
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/spl_v1.htm
@@ -45,71 +45,69 @@ impl Model for Spell {
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/spl_v1.htm#splv1_Header
 #[derive(Debug, PartialEq, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct SpellHeader {
-    #[br(count = 4)]
-    signature: CharArray,
-    #[br(count = 4)]
-    version: CharArray,
-    unidentified_spell_name: u32,
-    identified_spell_name: u32,
-    completion_sound: Resref,
+    #[serde(flatten)]
+    pub header: Header,
+    pub unidentified_spell_name: u32,
+    pub identified_spell_name: u32,
+    pub completion_sound: Resref,
     // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/spl_v2.htm#Header_Flags
-    flags: u32,
-    spell_type: u16,
-    exclusion_flags: u32,
-    casting_graphics: u16,
-    min_level: u8,
-    primary_spell_school: u8,
-    min_strength: u8,
-    secondary_spell_school: u8,
-    min_strength_bonus: u8,
-    kit_usability_1: u8,
-    min_intelligence: u8,
-    kit_usability_2: u8,
-    min_dexterity: u8,
-    kit_usability_3: u8,
-    min_wisdom: u8,
-    kit_usability_4: u8,
-    min_constitution: u16,
-    min_charisma: u16,
-    spell_level: u32,
-    max_stackable: u16,
-    spell_book_icon: Resref,
-    lore: u16,
-    ground_icon: Resref,
-    base_weight: u32,
-    spell_description_generic: Strref,
-    spell_description_identified: Strref,
-    description_icon: Resref,
-    enchantment: u32,
-    offset_to_extended_headers: u32,
-    count_of_extended_headers: u16,
-    offset_to_feature_block_table: u32,
-    offset_to_casting_feature_blocks: u16,
-    count_of_casting_feature_blocks: u16,
+    pub flags: u32,
+    pub spell_type: u16,
+    pub exclusion_flags: u32,
+    pub casting_graphics: u16,
+    pub min_level: u8,
+    pub primary_spell_school: u8,
+    pub min_strength: u8,
+    pub secondary_spell_school: u8,
+    pub min_strength_bonus: u8,
+    pub kit_usability_1: u8,
+    pub min_intelligence: u8,
+    pub kit_usability_2: u8,
+    pub min_dexterity: u8,
+    pub kit_usability_3: u8,
+    pub min_wisdom: u8,
+    pub kit_usability_4: u8,
+    pub min_constitution: u16,
+    pub min_charisma: u16,
+    pub spell_level: u32,
+    pub max_stackable: u16,
+    pub spell_book_icon: Resref,
+    pub lore: u16,
+    pub ground_icon: Resref,
+    pub base_weight: u32,
+    pub spell_description_generic: Strref,
+    pub spell_description_identified: Strref,
+    pub description_icon: Resref,
+    pub enchantment: u32,
+    pub offset_to_extended_headers: u32,
+    pub count_of_extended_headers: u16,
+    pub offset_to_feature_block_table: u32,
+    pub offset_to_casting_feature_blocks: u16,
+    pub count_of_casting_feature_blocks: u16,
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/spl_v1.htm#splv1_Extended_Header
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct SpellExtendedHeader {
-    spell_form: u8,
-    friendly: u8,
-    location: u16,
-    memorised_icon: Resref,
-    target_type: u8,
-    target_count: u8,
-    range: u16,
-    level_required: u16,
-    casting_time: u16,
-    times_per_day: u16,
-    dice_sides: u16,
-    dice_thrown: u16,
-    enchanted: u16,
-    damage_type: u16,
-    count_of_feature_blocks: u16,
-    offset_to_feature_blocks: u16,
-    charges: u16,
-    charge_depletion_behaviour: u16,
-    projectile: u16,
+    pub spell_form: u8,
+    pub friendly: u8,
+    pub location: u16,
+    pub memorised_icon: Resref,
+    pub target_type: u8,
+    pub target_count: u8,
+    pub range: u16,
+    pub level_required: u16,
+    pub casting_time: u16,
+    pub times_per_day: u16,
+    pub dice_sides: u16,
+    pub dice_thrown: u16,
+    pub enchanted: u16,
+    pub damage_type: u16,
+    pub count_of_feature_blocks: u16,
+    pub offset_to_feature_blocks: u16,
+    pub charges: u16,
+    pub charge_depletion_behaviour: u16,
+    pub projectile: u16,
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/spl_v1.htm#splv1_Feature_Block
@@ -118,9 +116,8 @@ type SpellFeatureBlock = FeatureBlock;
 #[cfg(test)]
 mod tests {
 
-    use crate::common::resref::Resref;
-
     use super::*;
+    use crate::common::char_array::CharArray;
     use binrw::io::{BufReader, Read};
     use pretty_assertions::assert_eq;
     use std::fs::File;
@@ -138,11 +135,13 @@ mod tests {
         assert_eq!(
             spell.header,
             SpellHeader {
-                signature: "SPL ".into(),
-                version: "V1  ".into(),
+                header: Header {
+                    signature: "SPL ".into(),
+                    version: "V1  ".into(),
+                },
                 unidentified_spell_name: 14260,
                 identified_spell_name: 9999999,
-                completion_sound: Resref("CAS_M03\0".into()),
+                completion_sound: "CAS_M03\0".into(),
                 flags: 0,
                 spell_type: 1,
                 exclusion_flags: 0,
@@ -163,13 +162,13 @@ mod tests {
                 min_charisma: 0,
                 spell_level: 9,
                 max_stackable: 1,
-                spell_book_icon: Resref("SPWI905C".into()),
+                spell_book_icon: "SPWI905C".into(),
                 lore: 0,
-                ground_icon: Resref("\0\0rb\0\0Un".into()),
+                ground_icon: "\0\0rb\0\0Un".into(),
                 base_weight: 0,
                 spell_description_generic: Strref(4294967295),
                 spell_description_identified: Strref(9999999),
-                description_icon: Resref(vec![0, 0, 0, 104, 134, 64, 0, 5,]),
+                description_icon: CharArray(vec![0, 0, 0, 104, 134, 64, 0, 5]),
                 enchantment: 0,
                 offset_to_extended_headers: 114,
                 count_of_extended_headers: 1,
@@ -191,10 +190,10 @@ mod tests {
                 duration: 100000,
                 probability_1: 39,
                 probability_2: 0,
-                resource: Resref("balorsu\0".into()),
+                resource: "balorsu\0".into(),
                 dice_thrown_max_level: 0,
                 dice_sides_min_level: 0,
-                saving_throw_type: vec![0, 0, 0, 0],
+                saving_throw_type: "".into(),
                 saving_throw_bonus: 0,
                 stacking_id: 0
             }]

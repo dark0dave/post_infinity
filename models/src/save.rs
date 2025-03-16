@@ -6,7 +6,11 @@ use flate2::bufread::ZlibDecoder;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    common::{char_array::CharArray, types::ResourceType},
+    common::{
+        header::Header,
+        parsers::{read_string, write_string},
+        types::ResourceType,
+    },
     from_buffer,
     model::Model,
 };
@@ -17,12 +21,8 @@ pub struct Save {
     #[serde(skip)]
     #[br(parse_with = until_eof, restore_position)]
     pub original_bytes: Vec<u8>,
-    #[bw(ignore)]
-    #[br(count = 4)]
-    pub signature: CharArray,
-    #[bw(ignore)]
-    #[br(count = 4)]
-    pub version: CharArray,
+    #[serde(flatten)]
+    pub header: Header,
     #[bw(ignore)]
     #[br(parse_with=binrw::helpers::until_eof)]
     pub files: Vec<SavedFile>,
@@ -43,8 +43,9 @@ impl Save {
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct SavedFile {
     pub length_of_filename: u32,
-    #[br(count=length_of_filename)]
-    pub filename: CharArray,
+    #[bw(write_with = write_string)]
+    #[br(parse_with = |reader, _, _:()| read_string(reader, length_of_filename.into()))]
+    pub filename: String,
     pub uncompressed_data_length: u32,
     pub compressed_data_length: u32,
     #[br(count=compressed_data_length, restore_position)]
@@ -55,7 +56,7 @@ pub struct SavedFile {
     pub uncompressed_data: Option<Rc<dyn Model>>,
 }
 
-fn parse_compressed_data(buff: &[u8], file_name: &CharArray) -> Option<Rc<dyn Model>> {
+fn parse_compressed_data(buff: &[u8], file_name: &String) -> Option<Rc<dyn Model>> {
     let mut d = ZlibDecoder::new(buff);
     let mut buffer = vec![];
     match d.read_to_end(&mut buffer) {

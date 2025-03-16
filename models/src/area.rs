@@ -2,8 +2,9 @@ use binrw::{helpers::until_eof, io::Cursor, io::SeekFrom, BinRead, BinReaderExt,
 use serde::{Deserialize, Serialize};
 
 use crate::common::char_array::CharArray;
-use crate::common::resref::Resref;
+use crate::common::header::Header;
 use crate::common::strref::Strref;
+use crate::common::Resref;
 use crate::model::Model;
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/are_v1.htm
@@ -91,10 +92,8 @@ impl Model for Area {
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/are_v1.htm#formAREAV1_0_Header
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct FileHeader {
-    #[br(count = 4)]
-    pub signature: CharArray,
-    #[br(count = 4)]
-    pub version: CharArray,
+    #[serde(flatten)]
+    pub header: Header,
     pub area_wed: Resref,
     pub last_saved: u32,
     pub area_flags: u32,
@@ -160,8 +159,7 @@ pub struct FileHeader {
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/are_v1.htm#formAREAV1_0_Actor
 #[derive(Debug, PartialEq, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct Actor {
-    #[br(count = 32)]
-    pub name: CharArray,
+    pub name: CharArray<32>,
     pub current_x_coordinate: u16,
     pub current_y_coordinate: u16,
     pub destination_x_coordinate: u16,
@@ -199,8 +197,7 @@ pub struct Actor {
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/are_v1.htm#formAREAV1_0_Info
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct Region {
-    #[br(count = 32)]
-    pub name: CharArray,
+    pub name: CharArray<32>,
     pub region_type: u16,
     pub minimum_bounding_box_of_this_point: [u16; 4],
     pub count_of_vertices_composing_the_perimeter: u16,
@@ -210,8 +207,7 @@ pub struct Region {
     // for travel regions
     pub destination_area: Resref,
     // for travel regions
-    #[br(count = 32)]
-    pub entrance_name_in_destination_area: CharArray,
+    pub entrance_name_in_destination_area: CharArray<32>,
     pub flags: u32,
     // for info points
     pub information_text: Strref,
@@ -242,8 +238,7 @@ pub struct Region {
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/are_v1.htm#formAREAV1_0_Spawn
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct SpawnPoint {
-    #[br(count = 32)]
-    pub name: CharArray,
+    pub name: CharArray<32>,
     pub x_coordinate: u16,
     pub y_coordinate: u16,
     pub resref_of_creature_to_spawn_1st: Resref,
@@ -300,8 +295,7 @@ pub struct SpawnPoint {
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/are_v1.htm#formAREAV1_0_Entrance
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct Entrance {
-    #[br(count = 32)]
-    pub name: CharArray,
+    pub name: CharArray<32>,
     pub x_coordinate: u16,
     pub y_coordinate: u16,
     pub orientation: u16,
@@ -313,8 +307,7 @@ pub struct Entrance {
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/are_v1.htm#formAREAV1_0_Container
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct Container {
-    #[br(count = 32)]
-    pub name: CharArray,
+    pub name: CharArray<32>,
     pub x_coordinate: u16,
     pub y_coordinate: u16,
     pub container_type: u16,
@@ -338,8 +331,7 @@ pub struct Container {
     pub index_to_first_vertex_of_the_outline: u32,
     pub count_of_vertices_making_up_the_outline: u16,
     pub trigger_range: u16,
-    #[br(count = 32)]
-    pub owner_script_name: CharArray,
+    pub owner_script_name: CharArray<32>,
     pub key_item: Resref,
     pub break_difficulty: u32,
     pub lockpick_string: Strref,
@@ -366,8 +358,7 @@ pub struct Vertice(pub [u16; 2]);
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/are_v1.htm#formAREAV1_0_Ambient
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct Ambient {
-    #[br(count = 32)]
-    pub name: CharArray,
+    pub name: CharArray<32>,
     pub x_coordinate: u16,
     pub y_coordinate: u16,
     pub radius: u16,
@@ -400,8 +391,7 @@ pub struct Ambient {
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/are_v1.htm#formAREAV1_0_Variable
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct Variable {
-    #[br(count = 32)]
-    pub name: CharArray,
+    pub name: CharArray<32>,
     /*
       bit 0: int
       bit 1: float
@@ -415,8 +405,7 @@ pub struct Variable {
     pub dword_value: u32,
     pub int_value: u32,
     pub double_value: i64,
-    #[br(count = 32)]
-    pub script_name_value: CharArray,
+    pub script_name_value: CharArray<32>,
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/are_v1.htm#formAREAV1_0_Explored
@@ -426,11 +415,9 @@ pub struct ExploredBitmask(pub u8);
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/are_v1.htm#formAREAV1_0_Door
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct Door {
-    #[br(count = 32)]
-    pub name: CharArray,
+    pub name: CharArray<32>,
     // Link with WED
-    #[br(count = 8)]
-    pub door_id: CharArray,
+    pub door_id: CharArray<8>,
     pub flags: u32,
     pub index_of_first_vertex_of_the_door_outline_when_open: u32,
     pub count_of_vertices_of_the_door_outline_when_open: u16,
@@ -462,8 +449,7 @@ pub struct Door {
     pub lock_difficulty: u32,
     pub two_points: [u16; 4],
     pub lockpick_string: Strref,
-    #[br(count = 24)]
-    pub travel_trigger_name: CharArray,
+    pub travel_trigger_name: CharArray<24>,
     pub dialog_speaker_name: Strref,
     pub dialog_resref: Resref,
     #[serde(skip)]
@@ -474,8 +460,7 @@ pub struct Door {
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/are_v1.htm#formAREAV1_0_Anim
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct Animation {
-    #[br(count = 32)]
-    pub name: CharArray,
+    pub name: CharArray<32>,
     pub x_coordinate: u16,
     pub y_coordinate: u16,
     pub animation_appearence_schedule: u32,
@@ -517,8 +502,7 @@ pub struct AutomapNotesBGEE {
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/are_v1.htm#formAREAV1_0_TiledObj
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct TiledObject {
-    #[br(count = 32)]
-    pub name: CharArray,
+    pub name: CharArray<32>,
     pub tile_id: Resref,
     pub flags: u32,
     pub offset_to_open_search_squares: u32,
@@ -574,10 +558,8 @@ pub struct SongEntry {
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/are_v1.htm#formAREAV1_0_Rest_Interruptions
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct RestInterruption {
-    #[br(count = 32)]
-    pub name: CharArray,
-    #[br(count = 40)]
-    pub interruption_explanation_text: CharArray,
+    pub name: CharArray<32>,
+    pub interruption_explanation_text: CharArray<40>,
     #[br(count = 10)]
     pub resref_of_creature_to_spawn: Vec<Resref>,
     pub count_of_creatures_in_spawn_table: u16,
@@ -614,10 +596,7 @@ mod tests {
             area.ambients[0].name,
             "Main Ambient\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0".into()
         );
-        assert_eq!(
-            area.ambients[0].resref_of_sound_1,
-            Resref("AM0011\0\0".into())
-        );
+        assert_eq!(area.ambients[0].resref_of_sound_1, "AM0011\0\0".into());
         assert_eq!(
             area.ambients[1].name,
             "SS-wispers\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0".into()
@@ -663,14 +642,14 @@ mod tests {
                 movement_restriction_distance_move_to_object: 0,
                 actor_appearence_schedule: 4294967295,
                 num_times_talked_to: 0,
-                dialog: Resref("\0\0\0\0\0\0\0\0".into()),
-                script_override: Resref("\0\0\0\0\0\0\0\0".into()),
-                script_general: Resref("\0\0\0\0\0\0\0\0".into()),
-                script_class: Resref("\0\0\0\0\0\0\0\0".into()),
-                script_race: Resref("\0\0\0\0\0\0\0\0".into()),
-                script_default: Resref("\0\0\0\0\0\0\0\0".into()),
-                script_specific: Resref("\0\0\0\0\0\0\0\0".into()),
-                cre_file: Resref("PRIHEL\0\0".into()),
+                dialog: "\0\0\0\0\0\0\0\0".into(),
+                script_override: "\0\0\0\0\0\0\0\0".into(),
+                script_general: "\0\0\0\0\0\0\0\0".into(),
+                script_class: "\0\0\0\0\0\0\0\0".into(),
+                script_race: "\0\0\0\0\0\0\0\0".into(),
+                script_default: "\0\0\0\0\0\0\0\0".into(),
+                script_specific: "\0\0\0\0\0\0\0\0".into(),
+                cre_file: "PRIHEL\0\0".into(),
                 offset_to_cre_structure: 0,
                 size_of_stored_cre_structure: 0,
                 _unused_2: vec![
