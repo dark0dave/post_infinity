@@ -122,22 +122,29 @@ pub struct AreaLink {
 #[cfg(test)]
 mod tests {
     use super::*;
-
+    use binrw::io::Read;
     use pretty_assertions::assert_eq;
+    use serde_json::Value;
+    use std::{error::Error, fs::File};
 
-    use binrw::io::{BufReader, Read};
-    use std::fs::File;
+    const FIXTURES: [(&str, &str); 1] = [("fixtures/worldmap.wmp", "fixtures/worldmap.wmp.json")];
+
+    fn read_file(path: &str) -> Result<Vec<u8>, Box<dyn Error>> {
+        let mut file = File::open(path)?;
+        let mut buffer = Vec::new();
+        file.read_to_end(&mut buffer)?;
+        Ok(buffer)
+    }
 
     #[test]
-    fn world_test() {
-        let file = File::open("fixtures/worldmap.wmp").unwrap();
-        let mut reader = BufReader::new(file);
-        let mut buffer = Vec::new();
-        reader
-            .read_to_end(&mut buffer)
-            .expect("Could not read to buffer");
-        let world = WorldMap::new(&buffer);
-        assert_eq!(world.area_entries.len(), 58);
-        assert_eq!(world.area_link_entries.len(), 208)
+    fn parse() -> Result<(), Box<dyn Error>> {
+        for (file_path, json_file_path) in FIXTURES {
+            let world_map: WorldMap = WorldMap::new(&read_file(file_path)?);
+            let result: Value = serde_json::to_value(world_map)?;
+            let expected: Value = serde_json::from_slice(&read_file(json_file_path)?)?;
+
+            assert_eq!(result, expected);
+        }
+        Ok(())
     }
 }

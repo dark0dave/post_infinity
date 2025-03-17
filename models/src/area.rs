@@ -579,98 +579,41 @@ pub struct RestInterruption {
 
 #[cfg(test)]
 mod tests {
-
     use super::*;
-    use binrw::io::{BufReader, Read};
-    use std::fs::File;
+    use binrw::io::Read;
+    use pretty_assertions::assert_eq;
+    use serde_json::Value;
+    use std::{error::Error, fs::File};
 
-    #[test]
-    fn test_ambients() {
-        let file = File::open("fixtures/ar0011.are").expect("Fixture missing");
+    const AREA_FIXTURES: [&str; 3] = [
+        "fixtures/ar0002.are",
+        "fixtures/ar0011.are",
+        "fixtures/ar0226.are",
+    ];
+
+    const AREA_JSON_FIXTURES: [&str; 3] = [
+        "fixtures/ar0002.are.json",
+        "fixtures/ar0011.are.json",
+        "fixtures/ar0226.are.json",
+    ];
+
+    fn read_file(path: &str) -> Result<Vec<u8>, Box<dyn Error>> {
+        let mut file = File::open(path)?;
         let mut buffer = Vec::new();
-        BufReader::new(file)
-            .read_to_end(&mut buffer)
-            .expect("Could not read to buffer");
-        let area: Area = Area::new(&buffer);
-        assert_eq!(
-            area.ambients[0].name,
-            "Main Ambient\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0".into()
-        );
-        assert_eq!(area.ambients[0].resref_of_sound_1, "AM0011\0\0".into());
-        assert_eq!(
-            area.ambients[1].name,
-            "SS-wispers\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0".into()
-        );
+        file.read_to_end(&mut buffer)?;
+        Ok(buffer)
     }
 
     #[test]
-    fn test_projectile_traps() {
-        let file = File::open("fixtures/ar0002.are").expect("Fixture missing");
-        let mut buffer = Vec::new();
-        BufReader::new(file)
-            .read_to_end(&mut buffer)
-            .expect("Could not read to buffer");
-        let area: Area = Area::new(&buffer);
-        assert_eq!(area.projectile_traps, vec![])
-    }
+    fn parse() -> Result<(), Box<dyn Error>> {
+        for (index, file_path) in AREA_FIXTURES.iter().enumerate() {
+            let area: Area = Area::new(&read_file(file_path)?);
+            let result: Value = serde_json::to_value(area)?;
+            let json_fixture_file = AREA_JSON_FIXTURES.get(index).ok_or("Missing fixture")?;
+            let expected: Value = serde_json::from_slice(&read_file(json_fixture_file)?)?;
 
-    #[test]
-    fn test_actors() {
-        let file = File::open("fixtures/ar0002.are").expect("Fixture missing");
-        let mut buffer = Vec::new();
-        BufReader::new(file)
-            .read_to_end(&mut buffer)
-            .expect("Could not read to buffer");
-        let area: Area = Area::new(&buffer);
-        assert_eq!(
-            area.actors[0],
-            Actor {
-                name: "Priest of Helm\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0".into(),
-                current_x_coordinate: 446,
-                current_y_coordinate: 333,
-                destination_x_coordinate: 446,
-                destination_y_coordinate: 333,
-                flags: 1,
-                has_been_spawned: 0,
-                first_letter_of_cre_resref: 0,
-                _unused_1: 0,
-                actor_animation: 24576,
-                actor_orientation: 0,
-                _unused: 0,
-                actor_removal_timer: 4294967295,
-                movement_restriction_distance: 0,
-                movement_restriction_distance_move_to_object: 0,
-                actor_appearence_schedule: 4294967295,
-                num_times_talked_to: 0,
-                dialog: "\0\0\0\0\0\0\0\0".into(),
-                script_override: "\0\0\0\0\0\0\0\0".into(),
-                script_general: "\0\0\0\0\0\0\0\0".into(),
-                script_class: "\0\0\0\0\0\0\0\0".into(),
-                script_race: "\0\0\0\0\0\0\0\0".into(),
-                script_default: "\0\0\0\0\0\0\0\0".into(),
-                script_specific: "\0\0\0\0\0\0\0\0".into(),
-                cre_file: "PRIHEL\0\0".into(),
-                offset_to_cre_structure: 0,
-                size_of_stored_cre_structure: 0,
-                _unused_2: vec![
-                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-                ]
-            }
-        )
-    }
-
-    #[test]
-    fn test_spawn_point() {
-        let file = File::open("fixtures/ar0226.are").expect("Fixture missing");
-        let mut buffer = Vec::new();
-        BufReader::new(file)
-            .read_to_end(&mut buffer)
-            .expect("Could not read to buffer");
-        let automapnotes = Area::new(&buffer).automap_notes;
-        assert_eq!(automapnotes, vec![])
+            assert_eq!(result, expected);
+        }
+        Ok(())
     }
 }

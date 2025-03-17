@@ -1,0 +1,3445 @@
+{
+  "signature": "AREA",
+  "version": "V1.0",
+  "area_wed": "AR0226\u0000\u0000",
+  "last_saved": 0,
+  "area_flags": 0,
+  "resref_of_the_area_to_the_north_of_this_area": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+  "north_area_flags": 0,
+  "resref_of_the_area_to_the_east_of_this_area": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+  "east_area_flags": 0,
+  "resref_of_the_area_to_the_south_of_this_area": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+  "south_area_flags": 0,
+  "resref_of_the_area_to_the_west_of_this_area": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+  "west_area_flags": 0,
+  "area_type_flags": 32,
+  "rain_probability": 0,
+  "snow_probability": 0,
+  "fog_probability": 0,
+  "lightning_probability": 0,
+  "wind_speed": 151,
+  "offset_to_actors": 284,
+  "count_of_actors": 12,
+  "count_of_regions": 14,
+  "offset_to_regions": 3548,
+  "offset_to_spawn_points": 6292,
+  "count_of_spawn_points": 3,
+  "offset_to_entrances": 6892,
+  "count_of_entrances": 14,
+  "offset_to_containers": 8348,
+  "count_of_containers": 4,
+  "count_of_items": 14,
+  "offset_to_items": 9116,
+  "offset_to_vertices": 12788,
+  "count_of_vertices": 358,
+  "count_of_ambients": 16,
+  "offset_to_ambients": 9396,
+  "offset_to_variables": 12788,
+  "count_of_variables": 0,
+  "offset_to_tiled_object_flags": 0,
+  "count_of_tiled_object_flags": 0,
+  "area_script": "AR0226\u0000\u0000",
+  "size_of_explored_bitmask": 0,
+  "offset_to_explored_bitmask": 15284,
+  "count_of_doors": 0,
+  "offset_to_doors": 12788,
+  "count_of_animations": 14,
+  "offset_to_animations": 14220,
+  "count_of_tiled_objects": 0,
+  "offset_to_tiled_objects": 12788,
+  "offset_to_song_entries": 15284,
+  "offset_to_rest_interruptions": 15428,
+  "offset_to_automap_notes": 15656,
+  "count_of_automap_notes": 0,
+  "offset_to_projectile_traps": 15656,
+  "number_of_entries_in_the_projectile_traps": 0,
+  "rest_movie_day": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+  "rest_movie_night": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+  "actors": [
+    {
+      "name": "Phase Spider\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "current_x_coordinate": 2436,
+      "current_y_coordinate": 1895,
+      "destination_x_coordinate": 2436,
+      "destination_y_coordinate": 1895,
+      "flags": 1,
+      "has_been_spawned": 0,
+      "first_letter_of_cre_resref": 0,
+      "actor_animation": 31234,
+      "actor_orientation": 0,
+      "actor_removal_timer": 4294967295,
+      "movement_restriction_distance": 0,
+      "movement_restriction_distance_move_to_object": 0,
+      "actor_appearence_schedule": 4294967295,
+      "num_times_talked_to": 0,
+      "dialog": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_override": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_general": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_class": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_race": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_default": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_specific": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "cre_file": "SPIDPH\u0000\u0000",
+      "offset_to_cre_structure": 0,
+      "size_of_stored_cre_structure": 0
+    },
+    {
+      "name": "Phase Spider\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "current_x_coordinate": 2985,
+      "current_y_coordinate": 1719,
+      "destination_x_coordinate": 2985,
+      "destination_y_coordinate": 1719,
+      "flags": 1,
+      "has_been_spawned": 0,
+      "first_letter_of_cre_resref": 0,
+      "actor_animation": 31234,
+      "actor_orientation": 0,
+      "actor_removal_timer": 4294967295,
+      "movement_restriction_distance": 0,
+      "movement_restriction_distance_move_to_object": 0,
+      "actor_appearence_schedule": 4294967295,
+      "num_times_talked_to": 0,
+      "dialog": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_override": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_general": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_class": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_race": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_default": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_specific": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "cre_file": "SPIDPH\u0000\u0000",
+      "offset_to_cre_structure": 0,
+      "size_of_stored_cre_structure": 0
+    },
+    {
+      "name": "Ogre Mage\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "current_x_coordinate": 1199,
+      "current_y_coordinate": 1586,
+      "destination_x_coordinate": 1199,
+      "destination_y_coordinate": 1586,
+      "flags": 1,
+      "has_been_spawned": 0,
+      "first_letter_of_cre_resref": 0,
+      "actor_animation": 36864,
+      "actor_orientation": 0,
+      "actor_removal_timer": 4294967295,
+      "movement_restriction_distance": 0,
+      "movement_restriction_distance_move_to_object": 0,
+      "actor_appearence_schedule": 4294967295,
+      "num_times_talked_to": 0,
+      "dialog": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_override": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_general": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_class": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_race": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_default": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_specific": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "cre_file": "OGRMBA\u0000\u0000",
+      "offset_to_cre_structure": 0,
+      "size_of_stored_cre_structure": 0
+    },
+    {
+      "name": "Carrion Crawler\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0001",
+      "current_x_coordinate": 1458,
+      "current_y_coordinate": 1255,
+      "destination_x_coordinate": 1458,
+      "destination_y_coordinate": 1255,
+      "flags": 1,
+      "has_been_spawned": 0,
+      "first_letter_of_cre_resref": 0,
+      "actor_animation": 41216,
+      "actor_orientation": 0,
+      "actor_removal_timer": 4294967295,
+      "movement_restriction_distance": 0,
+      "movement_restriction_distance_move_to_object": 0,
+      "actor_appearence_schedule": 4294967295,
+      "num_times_talked_to": 0,
+      "dialog": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_override": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_general": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_class": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_race": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_default": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_specific": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "cre_file": "CARRIO\u0000\u0000",
+      "offset_to_cre_structure": 0,
+      "size_of_stored_cre_structure": 0
+    },
+    {
+      "name": "Carrion Crawler\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000Ó",
+      "current_x_coordinate": 1070,
+      "current_y_coordinate": 1644,
+      "destination_x_coordinate": 1070,
+      "destination_y_coordinate": 1644,
+      "flags": 1,
+      "has_been_spawned": 0,
+      "first_letter_of_cre_resref": 0,
+      "actor_animation": 41216,
+      "actor_orientation": 12,
+      "actor_removal_timer": 4294967295,
+      "movement_restriction_distance": 0,
+      "movement_restriction_distance_move_to_object": 0,
+      "actor_appearence_schedule": 4294967295,
+      "num_times_talked_to": 0,
+      "dialog": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_override": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_general": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_class": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_race": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_default": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_specific": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "cre_file": "CARRIO\u0000\u0000",
+      "offset_to_cre_structure": 0,
+      "size_of_stored_cre_structure": 0
+    },
+    {
+      "name": "Carrion Crawler\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u000b",
+      "current_x_coordinate": 1402,
+      "current_y_coordinate": 1587,
+      "destination_x_coordinate": 1402,
+      "destination_y_coordinate": 1587,
+      "flags": 1,
+      "has_been_spawned": 0,
+      "first_letter_of_cre_resref": 3,
+      "actor_animation": 41216,
+      "actor_orientation": 0,
+      "actor_removal_timer": 4294967295,
+      "movement_restriction_distance": 0,
+      "movement_restriction_distance_move_to_object": 0,
+      "actor_appearence_schedule": 4294967295,
+      "num_times_talked_to": 0,
+      "dialog": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_override": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_general": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_class": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_race": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_default": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_specific": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "cre_file": "CARRIO\u0000\u0000",
+      "offset_to_cre_structure": 0,
+      "size_of_stored_cre_structure": 0
+    },
+    {
+      "name": "Carrion Crawler\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000Ó",
+      "current_x_coordinate": 1295,
+      "current_y_coordinate": 1666,
+      "destination_x_coordinate": 1295,
+      "destination_y_coordinate": 1666,
+      "flags": 1,
+      "has_been_spawned": 0,
+      "first_letter_of_cre_resref": 0,
+      "actor_animation": 41216,
+      "actor_orientation": 14,
+      "actor_removal_timer": 4294967295,
+      "movement_restriction_distance": 0,
+      "movement_restriction_distance_move_to_object": 0,
+      "actor_appearence_schedule": 4294967295,
+      "num_times_talked_to": 0,
+      "dialog": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_override": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_general": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_class": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_race": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_default": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_specific": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "cre_file": "CARRIO\u0000\u0000",
+      "offset_to_cre_structure": 0,
+      "size_of_stored_cre_structure": 0
+    },
+    {
+      "name": "Carrion Crawler\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u000b",
+      "current_x_coordinate": 1656,
+      "current_y_coordinate": 842,
+      "destination_x_coordinate": 1656,
+      "destination_y_coordinate": 842,
+      "flags": 1,
+      "has_been_spawned": 0,
+      "first_letter_of_cre_resref": 0,
+      "actor_animation": 41216,
+      "actor_orientation": 0,
+      "actor_removal_timer": 4294967295,
+      "movement_restriction_distance": 0,
+      "movement_restriction_distance_move_to_object": 0,
+      "actor_appearence_schedule": 4294967295,
+      "num_times_talked_to": 0,
+      "dialog": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_override": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_general": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_class": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_race": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_default": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_specific": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "cre_file": "CARRIO\u0000\u0000",
+      "offset_to_cre_structure": 0,
+      "size_of_stored_cre_structure": 0
+    },
+    {
+      "name": "Rat\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "current_x_coordinate": 1772,
+      "current_y_coordinate": 513,
+      "destination_x_coordinate": 1772,
+      "destination_y_coordinate": 513,
+      "flags": 1,
+      "has_been_spawned": 0,
+      "first_letter_of_cre_resref": 0,
+      "actor_animation": 49920,
+      "actor_orientation": 6,
+      "actor_removal_timer": 4294967295,
+      "movement_restriction_distance": 0,
+      "movement_restriction_distance_move_to_object": 0,
+      "actor_appearence_schedule": 4294967295,
+      "num_times_talked_to": 0,
+      "dialog": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_override": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_general": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_class": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_race": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_default": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_specific": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "cre_file": "RAT\u0000\u0000\u0000\u0000\u0000",
+      "offset_to_cre_structure": 0,
+      "size_of_stored_cre_structure": 0
+    },
+    {
+      "name": "Rat\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "current_x_coordinate": 1759,
+      "current_y_coordinate": 490,
+      "destination_x_coordinate": 1759,
+      "destination_y_coordinate": 490,
+      "flags": 1,
+      "has_been_spawned": 0,
+      "first_letter_of_cre_resref": 0,
+      "actor_animation": 49920,
+      "actor_orientation": 0,
+      "actor_removal_timer": 4294967295,
+      "movement_restriction_distance": 0,
+      "movement_restriction_distance_move_to_object": 0,
+      "actor_appearence_schedule": 4294967295,
+      "num_times_talked_to": 0,
+      "dialog": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_override": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_general": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_class": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_race": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_default": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_specific": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "cre_file": "RAT\u0000\u0000\u0000\u0000\u0000",
+      "offset_to_cre_structure": 0,
+      "size_of_stored_cre_structure": 0
+    },
+    {
+      "name": "Rat\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "current_x_coordinate": 1570,
+      "current_y_coordinate": 1026,
+      "destination_x_coordinate": 1570,
+      "destination_y_coordinate": 1026,
+      "flags": 1,
+      "has_been_spawned": 0,
+      "first_letter_of_cre_resref": 0,
+      "actor_animation": 49920,
+      "actor_orientation": 12,
+      "actor_removal_timer": 4294967295,
+      "movement_restriction_distance": 0,
+      "movement_restriction_distance_move_to_object": 0,
+      "actor_appearence_schedule": 4294967295,
+      "num_times_talked_to": 0,
+      "dialog": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_override": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_general": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_class": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_race": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_default": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_specific": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "cre_file": "RAT\u0000\u0000\u0000\u0000\u0000",
+      "offset_to_cre_structure": 0,
+      "size_of_stored_cre_structure": 0
+    },
+    {
+      "name": "Rat\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000-",
+      "current_x_coordinate": 2351,
+      "current_y_coordinate": 3523,
+      "destination_x_coordinate": 2351,
+      "destination_y_coordinate": 3523,
+      "flags": 1,
+      "has_been_spawned": 0,
+      "first_letter_of_cre_resref": 0,
+      "actor_animation": 49920,
+      "actor_orientation": 6,
+      "actor_removal_timer": 4294967295,
+      "movement_restriction_distance": 0,
+      "movement_restriction_distance_move_to_object": 0,
+      "actor_appearence_schedule": 4294967295,
+      "num_times_talked_to": 0,
+      "dialog": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_override": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_general": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_class": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_race": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_default": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "script_specific": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "cre_file": "RAT\u0000\u0000\u0000\u0000\u0000",
+      "offset_to_cre_structure": 0,
+      "size_of_stored_cre_structure": 0
+    }
+  ],
+  "regions": [
+    {
+      "name": "Door0225\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "region_type": 2,
+      "minimum_bounding_box_of_this_point": [
+        27,
+        108,
+        203,
+        291
+      ],
+      "count_of_vertices_composing_the_perimeter": 4,
+      "index_to_first_vertex": 0,
+      "trigger_value": 0,
+      "cursor_index": 34,
+      "destination_area": "AR0225\u0000\u0000",
+      "entrance_name_in_destination_area": "ext0224a\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "flags": 4,
+      "information_text": 0,
+      "trap_detection_difficulty_percent": 0,
+      "trap_removal_difficulty_percent": 0,
+      "region_is_trapped": 0,
+      "trap_detected": 0,
+      "trap_launch_location": [
+        404,
+        340
+      ],
+      "key_item": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "region_script": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "alternative_use_point_x_coordinate": 42153,
+      "alternative_use_point_y_coordinate": 120,
+      "sound": "ÙÔ\u0000áÝ§\u0000",
+      "talk_location_point_x": 54233,
+      "talk_location_point_y": 136,
+      "speaker_name": 8893881,
+      "dialog_file": "95&\u0000\t\u0005\u0003\u0000"
+    },
+    {
+      "name": "Door0225b\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "region_type": 2,
+      "minimum_bounding_box_of_this_point": [
+        5,
+        710,
+        165,
+        879
+      ],
+      "count_of_vertices_composing_the_perimeter": 4,
+      "index_to_first_vertex": 4,
+      "trigger_value": 0,
+      "cursor_index": 34,
+      "destination_area": "AR0225\u0000\u0000",
+      "entrance_name_in_destination_area": "ext0224b\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "flags": 4,
+      "information_text": 0,
+      "trap_detection_difficulty_percent": 0,
+      "trap_removal_difficulty_percent": 0,
+      "region_is_trapped": 0,
+      "trap_detected": 0,
+      "trap_launch_location": [
+        404,
+        916
+      ],
+      "key_item": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "region_script": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "alternative_use_point_x_coordinate": 46533,
+      "alternative_use_point_y_coordinate": 89,
+      "sound": "´ªg\u0000yuW\u0000",
+      "talk_location_point_x": 1289,
+      "talk_location_point_y": 3,
+      "speaker_name": 396053,
+      "dialog_file": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000"
+    },
+    {
+      "name": "Door1300\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "region_type": 2,
+      "minimum_bounding_box_of_this_point": [
+        3505,
+        2603,
+        3581,
+        2718
+      ],
+      "count_of_vertices_composing_the_perimeter": 4,
+      "index_to_first_vertex": 8,
+      "trigger_value": 0,
+      "cursor_index": 28,
+      "destination_area": "AR1300\u0000\u0000",
+      "entrance_name_in_destination_area": "ext0226f\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "flags": 4,
+      "information_text": 0,
+      "trap_detection_difficulty_percent": 0,
+      "trap_removal_difficulty_percent": 0,
+      "region_is_trapped": 0,
+      "trap_detected": 0,
+      "trap_launch_location": [
+        3540,
+        2708
+      ],
+      "key_item": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "region_script": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "alternative_use_point_x_coordinate": 40099,
+      "alternative_use_point_y_coordinate": 118,
+      "sound": "\u0000ÿ\u0000\u0000\u0000ÿ\u0000\u0000",
+      "talk_location_point_x": 65280,
+      "talk_location_point_y": 0,
+      "speaker_name": 65280,
+      "dialog_file": "\u0000ÿ\u0000\u0000\u0015\u000b\u0006\u0000"
+    },
+    {
+      "name": "Door0800\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "region_type": 2,
+      "minimum_bounding_box_of_this_point": [
+        3377,
+        1442,
+        3446,
+        1523
+      ],
+      "count_of_vertices_composing_the_perimeter": 4,
+      "index_to_first_vertex": 12,
+      "trigger_value": 0,
+      "cursor_index": 28,
+      "destination_area": "AR0800\u0000\u0000",
+      "entrance_name_in_destination_area": "ext0226e\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "flags": 4,
+      "information_text": 0,
+      "trap_detection_difficulty_percent": 0,
+      "trap_removal_difficulty_percent": 0,
+      "region_is_trapped": 0,
+      "trap_detected": 0,
+      "trap_launch_location": [
+        3156,
+        1300
+      ],
+      "key_item": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "region_script": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "alternative_use_point_x_coordinate": 2837,
+      "alternative_use_point_y_coordinate": 6,
+      "sound": "\u0000ÿ\u0000\u0000\u0000ÿ\u0000\u0000",
+      "talk_location_point_x": 65280,
+      "talk_location_point_y": 0,
+      "speaker_name": 5733507,
+      "dialog_file": "g\u0000g\u0000"
+    },
+    {
+      "name": "Door0300\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "region_type": 2,
+      "minimum_bounding_box_of_this_point": [
+        1828,
+        440,
+        1880,
+        510
+      ],
+      "count_of_vertices_composing_the_perimeter": 4,
+      "index_to_first_vertex": 16,
+      "trigger_value": 0,
+      "cursor_index": 28,
+      "destination_area": "AR0300\u0000\u0000",
+      "entrance_name_in_destination_area": "ext0226d\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "flags": 4,
+      "information_text": 0,
+      "trap_detection_difficulty_percent": 0,
+      "trap_removal_difficulty_percent": 0,
+      "region_is_trapped": 0,
+      "trap_detected": 0,
+      "trap_launch_location": [
+        3732,
+        980
+      ],
+      "key_item": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "region_script": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "alternative_use_point_x_coordinate": 2837,
+      "alternative_use_point_y_coordinate": 6,
+      "sound": "©¤x\u0000¹µ\u0000",
+      "talk_location_point_x": 46521,
+      "talk_location_point_y": 135,
+      "speaker_name": 8895682,
+      "dialog_file": "ØÕ¦\u0000ØÕ¦\u0000"
+    },
+    {
+      "name": "Door1300\u0000oint 8\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "region_type": 2,
+      "minimum_bounding_box_of_this_point": [
+        2171,
+        2288,
+        2249,
+        2379
+      ],
+      "count_of_vertices_composing_the_perimeter": 4,
+      "index_to_first_vertex": 20,
+      "trigger_value": 0,
+      "cursor_index": 28,
+      "destination_area": "AR1300\u0000\u0000",
+      "entrance_name_in_destination_area": "Exit0226a\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "flags": 4,
+      "information_text": 0,
+      "trap_detection_difficulty_percent": 0,
+      "trap_removal_difficulty_percent": 0,
+      "region_is_trapped": 0,
+      "trap_detected": 0,
+      "trap_launch_location": [
+        2196,
+        2324
+      ],
+      "key_item": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "region_script": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "alternative_use_point_x_coordinate": 1,
+      "alternative_use_point_y_coordinate": 0,
+      "sound": "\u0001\u0000\u0000\u0000\u0000\u0000a\u0000",
+      "talk_location_point_x": 65535,
+      "talk_location_point_y": 1,
+      "speaker_name": 0,
+      "dialog_file": "b\u0000ÿÿ\u0001\u0000\u0000\u0000"
+    },
+    {
+      "name": "Door1300\u0000oint 9\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "region_type": 2,
+      "minimum_bounding_box_of_this_point": [
+        1751,
+        2754,
+        1803,
+        2820
+      ],
+      "count_of_vertices_composing_the_perimeter": 4,
+      "index_to_first_vertex": 24,
+      "trigger_value": 0,
+      "cursor_index": 28,
+      "destination_area": "AR1300\u0000\u0000",
+      "entrance_name_in_destination_area": "Exit0226b\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "flags": 4,
+      "information_text": 0,
+      "trap_detection_difficulty_percent": 0,
+      "trap_removal_difficulty_percent": 0,
+      "region_is_trapped": 0,
+      "trap_detected": 0,
+      "trap_launch_location": [
+        1812,
+        2964
+      ],
+      "key_item": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "region_script": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "alternative_use_point_x_coordinate": 0,
+      "alternative_use_point_y_coordinate": 0,
+      "sound": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "talk_location_point_x": 0,
+      "talk_location_point_y": 0,
+      "speaker_name": 0,
+      "dialog_file": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000"
+    },
+    {
+      "name": "Door0800\u0000oint 10\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "region_type": 2,
+      "minimum_bounding_box_of_this_point": [
+        1521,
+        1600,
+        1599,
+        1685
+      ],
+      "count_of_vertices_composing_the_perimeter": 4,
+      "index_to_first_vertex": 28,
+      "trigger_value": 0,
+      "cursor_index": 28,
+      "destination_area": "AR0800\u0000\u0000",
+      "entrance_name_in_destination_area": "Exit0226a\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "flags": 4,
+      "information_text": 0,
+      "trap_detection_difficulty_percent": 0,
+      "trap_removal_difficulty_percent": 0,
+      "region_is_trapped": 0,
+      "trap_detected": 0,
+      "trap_launch_location": [
+        1620,
+        1684
+      ],
+      "key_item": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "region_script": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "alternative_use_point_x_coordinate": 0,
+      "alternative_use_point_y_coordinate": 0,
+      "sound": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "talk_location_point_x": 0,
+      "talk_location_point_y": 0,
+      "speaker_name": 0,
+      "dialog_file": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000"
+    },
+    {
+      "name": "Door0800\u0000oint 11\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "region_type": 2,
+      "minimum_bounding_box_of_this_point": [
+        1066,
+        1522,
+        1135,
+        1557
+      ],
+      "count_of_vertices_composing_the_perimeter": 4,
+      "index_to_first_vertex": 32,
+      "trigger_value": 0,
+      "cursor_index": 28,
+      "destination_area": "AR0800\u0000\u0000",
+      "entrance_name_in_destination_area": "Exit0226b\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "flags": 4,
+      "information_text": 0,
+      "trap_detection_difficulty_percent": 0,
+      "trap_removal_difficulty_percent": 0,
+      "region_is_trapped": 0,
+      "trap_detected": 0,
+      "trap_launch_location": [
+        1172,
+        1620
+      ],
+      "key_item": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "region_script": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "alternative_use_point_x_coordinate": 0,
+      "alternative_use_point_y_coordinate": 0,
+      "sound": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "talk_location_point_x": 0,
+      "talk_location_point_y": 0,
+      "speaker_name": 0,
+      "dialog_file": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000"
+    },
+    {
+      "name": "Door0800\u0000oint 12\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "region_type": 2,
+      "minimum_bounding_box_of_this_point": [
+        3123,
+        1313,
+        3190,
+        1383
+      ],
+      "count_of_vertices_composing_the_perimeter": 4,
+      "index_to_first_vertex": 36,
+      "trigger_value": 0,
+      "cursor_index": 28,
+      "destination_area": "AR0800\u0000\u0000",
+      "entrance_name_in_destination_area": "Exit0226c\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "flags": 4,
+      "information_text": 0,
+      "trap_detection_difficulty_percent": 0,
+      "trap_removal_difficulty_percent": 0,
+      "region_is_trapped": 0,
+      "trap_detected": 0,
+      "trap_launch_location": [
+        3284,
+        1428
+      ],
+      "key_item": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "region_script": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "alternative_use_point_x_coordinate": 0,
+      "alternative_use_point_y_coordinate": 0,
+      "sound": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "talk_location_point_x": 0,
+      "talk_location_point_y": 0,
+      "speaker_name": 0,
+      "dialog_file": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000"
+    },
+    {
+      "name": "Door0800\u0000oint 13\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "region_type": 2,
+      "minimum_bounding_box_of_this_point": [
+        2757,
+        1795,
+        2803,
+        1856
+      ],
+      "count_of_vertices_composing_the_perimeter": 4,
+      "index_to_first_vertex": 40,
+      "trigger_value": 0,
+      "cursor_index": 28,
+      "destination_area": "AR0800\u0000\u0000",
+      "entrance_name_in_destination_area": "Exit0226d\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "flags": 4,
+      "information_text": 0,
+      "trap_detection_difficulty_percent": 0,
+      "trap_removal_difficulty_percent": 0,
+      "region_is_trapped": 0,
+      "trap_detected": 0,
+      "trap_launch_location": [
+        2836,
+        1940
+      ],
+      "key_item": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "region_script": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "alternative_use_point_x_coordinate": 0,
+      "alternative_use_point_y_coordinate": 0,
+      "sound": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "talk_location_point_x": 0,
+      "talk_location_point_y": 0,
+      "speaker_name": 0,
+      "dialog_file": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000"
+    },
+    {
+      "name": "Door0300\u0000oint 14\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "region_type": 2,
+      "minimum_bounding_box_of_this_point": [
+        3733,
+        810,
+        3802,
+        890
+      ],
+      "count_of_vertices_composing_the_perimeter": 4,
+      "index_to_first_vertex": 44,
+      "trigger_value": 0,
+      "cursor_index": 28,
+      "destination_area": "AR0300\u0000\u0000",
+      "entrance_name_in_destination_area": "Exit0226e\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "flags": 4,
+      "information_text": 0,
+      "trap_detection_difficulty_percent": 0,
+      "trap_removal_difficulty_percent": 0,
+      "region_is_trapped": 0,
+      "trap_detected": 0,
+      "trap_launch_location": [
+        3796,
+        724
+      ],
+      "key_item": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "region_script": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "alternative_use_point_x_coordinate": 0,
+      "alternative_use_point_y_coordinate": 0,
+      "sound": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "talk_location_point_x": 0,
+      "talk_location_point_y": 0,
+      "speaker_name": 0,
+      "dialog_file": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000"
+    },
+    {
+      "name": "Door0800\u0000oint 15\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "region_type": 2,
+      "minimum_bounding_box_of_this_point": [
+        2572,
+        1975,
+        2619,
+        2030
+      ],
+      "count_of_vertices_composing_the_perimeter": 4,
+      "index_to_first_vertex": 48,
+      "trigger_value": 0,
+      "cursor_index": 28,
+      "destination_area": "AR0800\u0000\u0000",
+      "entrance_name_in_destination_area": "Exit0226e\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "flags": 4,
+      "information_text": 0,
+      "trap_detection_difficulty_percent": 0,
+      "trap_removal_difficulty_percent": 0,
+      "region_is_trapped": 0,
+      "trap_detected": 0,
+      "trap_launch_location": [
+        2772,
+        1940
+      ],
+      "key_item": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "region_script": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "alternative_use_point_x_coordinate": 0,
+      "alternative_use_point_y_coordinate": 0,
+      "sound": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "talk_location_point_x": 0,
+      "talk_location_point_y": 0,
+      "speaker_name": 0,
+      "dialog_file": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000"
+    },
+    {
+      "name": "Door0112\u0000oint 14\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "region_type": 2,
+      "minimum_bounding_box_of_this_point": [
+        30,
+        1292,
+        206,
+        1500
+      ],
+      "count_of_vertices_composing_the_perimeter": 4,
+      "index_to_first_vertex": 52,
+      "trigger_value": 0,
+      "cursor_index": 34,
+      "destination_area": "AR0112\u0000\u0000",
+      "entrance_name_in_destination_area": "Exit0226\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "flags": 4,
+      "information_text": 0,
+      "trap_detection_difficulty_percent": 0,
+      "trap_removal_difficulty_percent": 0,
+      "region_is_trapped": 0,
+      "trap_detected": 0,
+      "trap_launch_location": [
+        404,
+        1236
+      ],
+      "key_item": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "region_script": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "alternative_use_point_x_coordinate": 65280,
+      "alternative_use_point_y_coordinate": 0,
+      "sound": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "talk_location_point_x": 0,
+      "talk_location_point_y": 0,
+      "speaker_name": 0,
+      "dialog_file": "\u0000@@\u0000\u0000@@\u0000"
+    }
+  ],
+  "spawn_points": [
+    {
+      "name": "Spawn Point 1\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "x_coordinate": 1435,
+      "y_coordinate": 1632,
+      "resref_of_creature_to_spawn_1st": "CARRIO\u0000\u0000",
+      "resref_of_creature_to_spawn_2nd": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_creature_to_spawn_3rd": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_creature_to_spawn_4th": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_creature_to_spawn_5th": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_creature_to_spawn_6th": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_creature_to_spawn_7th": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_creature_to_spawn_8th": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_creature_to_spawn_9th": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_creature_to_spawn_10th": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "count_of_spawn_creatures": 1,
+      "base_creature_number_to_spawn": 1000,
+      "frequency": 6,
+      "spawn_method": 1,
+      "actor_removal_timer": 1000,
+      "movement_restriction_distance": 1000,
+      "movement_restriction_distance_move_to_object": 1000,
+      "maximum_creatures_to_spawn": 4,
+      "spawn_point_enabled": 1,
+      "spawn_point_appearence_schedule": 4294967295,
+      "probability_day": 100,
+      "probability_night": 100,
+      "spawn_frequency": 1186599,
+      "countdown": 197897,
+      "spawn_weight_of_1st_creature_slot": 24,
+      "spawn_weight_of_2nd_creature_slot": 25,
+      "spawn_weight_of_3rd_creature_slot": 21,
+      "spawn_weight_of_4th_creature_slot": 0,
+      "spawn_weight_of_5th_creature_slot": 39,
+      "spawn_weight_of_6th_creature_slot": 42,
+      "spawn_weight_of_7th_creature_slot": 38,
+      "spawn_weight_of_8th_creature_slot": 0,
+      "spawn_weight_of_9th_creature_slot": 23,
+      "spawn_weight_of_10th_creature_slot": 30
+    },
+    {
+      "name": "Spawn Point 2\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "x_coordinate": 1826,
+      "y_coordinate": 551,
+      "resref_of_creature_to_spawn_1st": "CARRIO\u0000\u0000",
+      "resref_of_creature_to_spawn_2nd": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_creature_to_spawn_3rd": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_creature_to_spawn_4th": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_creature_to_spawn_5th": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_creature_to_spawn_6th": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_creature_to_spawn_7th": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_creature_to_spawn_8th": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_creature_to_spawn_9th": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_creature_to_spawn_10th": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "count_of_spawn_creatures": 1,
+      "base_creature_number_to_spawn": 200,
+      "frequency": 6,
+      "spawn_method": 1,
+      "actor_removal_timer": 1000,
+      "movement_restriction_distance": 1000,
+      "movement_restriction_distance_move_to_object": 1000,
+      "maximum_creatures_to_spawn": 4,
+      "spawn_point_enabled": 1,
+      "spawn_point_appearence_schedule": 4294967295,
+      "probability_day": 100,
+      "probability_night": 100,
+      "spawn_frequency": 0,
+      "countdown": 0,
+      "spawn_weight_of_1st_creature_slot": 0,
+      "spawn_weight_of_2nd_creature_slot": 0,
+      "spawn_weight_of_3rd_creature_slot": 0,
+      "spawn_weight_of_4th_creature_slot": 0,
+      "spawn_weight_of_5th_creature_slot": 0,
+      "spawn_weight_of_6th_creature_slot": 0,
+      "spawn_weight_of_7th_creature_slot": 0,
+      "spawn_weight_of_8th_creature_slot": 0,
+      "spawn_weight_of_9th_creature_slot": 0,
+      "spawn_weight_of_10th_creature_slot": 0
+    },
+    {
+      "name": "Spawn Point 3\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "x_coordinate": 3776,
+      "y_coordinate": 896,
+      "resref_of_creature_to_spawn_1st": "CARRIO\u0000\u0000",
+      "resref_of_creature_to_spawn_2nd": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_creature_to_spawn_3rd": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_creature_to_spawn_4th": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_creature_to_spawn_5th": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_creature_to_spawn_6th": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_creature_to_spawn_7th": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_creature_to_spawn_8th": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_creature_to_spawn_9th": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_creature_to_spawn_10th": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "count_of_spawn_creatures": 1,
+      "base_creature_number_to_spawn": 200,
+      "frequency": 6,
+      "spawn_method": 1,
+      "actor_removal_timer": 1000,
+      "movement_restriction_distance": 1000,
+      "movement_restriction_distance_move_to_object": 1000,
+      "maximum_creatures_to_spawn": 10,
+      "spawn_point_enabled": 1,
+      "spawn_point_appearence_schedule": 4294967295,
+      "probability_day": 100,
+      "probability_night": 100,
+      "spawn_frequency": 0,
+      "countdown": 0,
+      "spawn_weight_of_1st_creature_slot": 0,
+      "spawn_weight_of_2nd_creature_slot": 0,
+      "spawn_weight_of_3rd_creature_slot": 0,
+      "spawn_weight_of_4th_creature_slot": 0,
+      "spawn_weight_of_5th_creature_slot": 0,
+      "spawn_weight_of_6th_creature_slot": 0,
+      "spawn_weight_of_7th_creature_slot": 0,
+      "spawn_weight_of_8th_creature_slot": 0,
+      "spawn_weight_of_9th_creature_slot": 0,
+      "spawn_weight_of_10th_creature_slot": 0
+    }
+  ],
+  "entrances": [
+    {
+      "name": "ext0225h\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "x_coordinate": 283,
+      "y_coordinate": 863,
+      "orientation": 14
+    },
+    {
+      "name": "ext0225e\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "x_coordinate": 362,
+      "y_coordinate": 202,
+      "orientation": 12
+    },
+    {
+      "name": "extsew6\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "x_coordinate": 3609,
+      "y_coordinate": 2751,
+      "orientation": 0
+    },
+    {
+      "name": "extsew5\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "x_coordinate": 3350,
+      "y_coordinate": 1460,
+      "orientation": 4
+    },
+    {
+      "name": "Exitsewr7\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "x_coordinate": 2209,
+      "y_coordinate": 2412,
+      "orientation": 0
+    },
+    {
+      "name": "Exitsewr8\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "x_coordinate": 1773,
+      "y_coordinate": 2836,
+      "orientation": 0
+    },
+    {
+      "name": "Exitsewr9\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "x_coordinate": 1473,
+      "y_coordinate": 1645,
+      "orientation": 2
+    },
+    {
+      "name": "Exitsewr10\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "x_coordinate": 1165,
+      "y_coordinate": 1571,
+      "orientation": 14
+    },
+    {
+      "name": "Exitsewr11\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "x_coordinate": 3175,
+      "y_coordinate": 1410,
+      "orientation": 14
+    },
+    {
+      "name": "Exitsewr12\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "x_coordinate": 2773,
+      "y_coordinate": 1880,
+      "orientation": 0
+    },
+    {
+      "name": "extsew4\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "x_coordinate": 1831,
+      "y_coordinate": 531,
+      "orientation": 0
+    },
+    {
+      "name": "Exitsewr13\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "x_coordinate": 3761,
+      "y_coordinate": 903,
+      "orientation": 0
+    },
+    {
+      "name": "Exitsewr14\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "x_coordinate": 2644,
+      "y_coordinate": 2032,
+      "orientation": 10
+    },
+    {
+      "name": "Exit0112\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "x_coordinate": 343,
+      "y_coordinate": 1397,
+      "orientation": 14
+    }
+  ],
+  "containers": [
+    {
+      "name": "Container 1\u0000\t\u0005\u0003\u0000\u0015\u000b\u0006\u0000\u0015\u000b\u0006\u0000IF5\u0000yuW\u0000",
+      "x_coordinate": 827,
+      "y_coordinate": 1509,
+      "container_type": 10,
+      "lock_difficulty": 100,
+      "flags": 0,
+      "trap_detection_difficulty": 0,
+      "trap_removal_difficulty": 100,
+      "container_is_trapped": 0,
+      "trap_detected": 0,
+      "trap_launch_x_coordinate": 724,
+      "trap_launch_y_coordinate": 1364,
+      "left_bounding_box_of_container_polygon": 811,
+      "top_bounding_box_of_container_polygon": 1418,
+      "right_bounding_box_of_container_polygon": 860,
+      "bottom_bounding_box_of_container_polygon": 1468,
+      "index_to_first_item_in_this_container": 0,
+      "count_of_items_in_this_container": 4,
+      "trap_script": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "index_to_first_vertex_of_the_outline": 56,
+      "count_of_vertices_making_up_the_outline": 89,
+      "trigger_range": 0,
+      "owner_script_name": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "key_item": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "break_difficulty": 0,
+      "lockpick_string": 0
+    },
+    {
+      "name": "Container 2\u0000\u0000ÿ\u0000\u0000\u0000ÿ\u0000\u0000\u0000ÿ\u0000\u0000\u0000ÿ\u0000\u0000\u0000ÿ\u0000\u0000",
+      "x_coordinate": 693,
+      "y_coordinate": 1473,
+      "container_type": 10,
+      "lock_difficulty": 100,
+      "flags": 0,
+      "trap_detection_difficulty": 0,
+      "trap_removal_difficulty": 100,
+      "container_is_trapped": 0,
+      "trap_detected": 0,
+      "trap_launch_x_coordinate": 788,
+      "trap_launch_y_coordinate": 1460,
+      "left_bounding_box_of_container_polygon": 679,
+      "top_bounding_box_of_container_polygon": 1388,
+      "right_bounding_box_of_container_polygon": 716,
+      "bottom_bounding_box_of_container_polygon": 1441,
+      "index_to_first_item_in_this_container": 4,
+      "count_of_items_in_this_container": 3,
+      "trap_script": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "index_to_first_vertex_of_the_outline": 145,
+      "count_of_vertices_making_up_the_outline": 86,
+      "trigger_range": 0,
+      "owner_script_name": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "key_item": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "break_difficulty": 0,
+      "lockpick_string": 0
+    },
+    {
+      "name": "Container 3\u0000rmT\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "x_coordinate": 527,
+      "y_coordinate": 1441,
+      "container_type": 10,
+      "lock_difficulty": 100,
+      "flags": 0,
+      "trap_detection_difficulty": 0,
+      "trap_removal_difficulty": 100,
+      "container_is_trapped": 0,
+      "trap_detected": 0,
+      "trap_launch_x_coordinate": 532,
+      "trap_launch_y_coordinate": 1460,
+      "left_bounding_box_of_container_polygon": 516,
+      "top_bounding_box_of_container_polygon": 1361,
+      "right_bounding_box_of_container_polygon": 541,
+      "bottom_bounding_box_of_container_polygon": 1411,
+      "index_to_first_item_in_this_container": 7,
+      "count_of_items_in_this_container": 3,
+      "trap_script": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "index_to_first_vertex_of_the_outline": 231,
+      "count_of_vertices_making_up_the_outline": 69,
+      "trigger_range": 0,
+      "owner_script_name": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "key_item": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "break_difficulty": 0,
+      "lockpick_string": 0
+    },
+    {
+      "name": "Container 4\u0000ÔÊx\u0000ÊÃx\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000º·\u0000",
+      "x_coordinate": 398,
+      "y_coordinate": 1414,
+      "container_type": 10,
+      "lock_difficulty": 100,
+      "flags": 0,
+      "trap_detection_difficulty": 0,
+      "trap_removal_difficulty": 100,
+      "container_is_trapped": 0,
+      "trap_detected": 0,
+      "trap_launch_x_coordinate": 340,
+      "trap_launch_y_coordinate": 1460,
+      "left_bounding_box_of_container_polygon": 372,
+      "top_bounding_box_of_container_polygon": 1343,
+      "right_bounding_box_of_container_polygon": 416,
+      "bottom_bounding_box_of_container_polygon": 1395,
+      "index_to_first_item_in_this_container": 10,
+      "count_of_items_in_this_container": 4,
+      "trap_script": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "index_to_first_vertex_of_the_outline": 300,
+      "count_of_vertices_making_up_the_outline": 58,
+      "trigger_range": 0,
+      "owner_script_name": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "key_item": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "break_difficulty": 0,
+      "lockpick_string": 0
+    }
+  ],
+  "items": [
+    {
+      "item_resref": "RING19\u0000\u0000",
+      "item_expiration_time": 0,
+      "quantity_1": 0,
+      "quantity_2": 0,
+      "quantity_3": 0,
+      "flags": 0
+    },
+    {
+      "item_resref": "MISC07\u0000\u0000",
+      "item_expiration_time": 0,
+      "quantity_1": 135,
+      "quantity_2": 0,
+      "quantity_3": 0,
+      "flags": 0
+    },
+    {
+      "item_resref": "UBFEBODY",
+      "item_expiration_time": 0,
+      "quantity_1": 0,
+      "quantity_2": 0,
+      "quantity_3": 0,
+      "flags": 0
+    },
+    {
+      "item_resref": "UBSCARIN",
+      "item_expiration_time": 0,
+      "quantity_1": 0,
+      "quantity_2": 0,
+      "quantity_3": 0,
+      "flags": 0
+    },
+    {
+      "item_resref": "POTN34\u0000\u0000",
+      "item_expiration_time": 0,
+      "quantity_1": 0,
+      "quantity_2": 0,
+      "quantity_3": 0,
+      "flags": 0
+    },
+    {
+      "item_resref": "MISC07\u0000\u0000",
+      "item_expiration_time": 0,
+      "quantity_1": 51,
+      "quantity_2": 0,
+      "quantity_3": 0,
+      "flags": 0
+    },
+    {
+      "item_resref": "MISC79\u0000\u0000",
+      "item_expiration_time": 0,
+      "quantity_1": 0,
+      "quantity_2": 0,
+      "quantity_3": 0,
+      "flags": 0
+    },
+    {
+      "item_resref": "SW1H49\u0000\u0000",
+      "item_expiration_time": 0,
+      "quantity_1": 0,
+      "quantity_2": 0,
+      "quantity_3": 0,
+      "flags": 0
+    },
+    {
+      "item_resref": "MISC07\u0000\u0000",
+      "item_expiration_time": 0,
+      "quantity_1": 28,
+      "quantity_2": 0,
+      "quantity_3": 0,
+      "flags": 0
+    },
+    {
+      "item_resref": "MISC80\u0000\u0000",
+      "item_expiration_time": 0,
+      "quantity_1": 0,
+      "quantity_2": 0,
+      "quantity_3": 0,
+      "flags": 0
+    },
+    {
+      "item_resref": "MISC07\u0000\u0000",
+      "item_expiration_time": 0,
+      "quantity_1": 85,
+      "quantity_2": 0,
+      "quantity_3": 0,
+      "flags": 0
+    },
+    {
+      "item_resref": "POTN23\u0000\u0000",
+      "item_expiration_time": 0,
+      "quantity_1": 0,
+      "quantity_2": 0,
+      "quantity_3": 0,
+      "flags": 0
+    },
+    {
+      "item_resref": "MISC79\u0000\u0000",
+      "item_expiration_time": 0,
+      "quantity_1": 0,
+      "quantity_2": 0,
+      "quantity_3": 0,
+      "flags": 0
+    },
+    {
+      "item_resref": "MISC79\u0000\u0000",
+      "item_expiration_time": 0,
+      "quantity_1": 0,
+      "quantity_2": 0,
+      "quantity_3": 0,
+      "flags": 0
+    }
+  ],
+  "vertices": [
+    [
+      91,
+      108
+    ],
+    [
+      27,
+      263
+    ],
+    [
+      138,
+      291
+    ],
+    [
+      203,
+      126
+    ],
+    [
+      93,
+      710
+    ],
+    [
+      5,
+      805
+    ],
+    [
+      69,
+      879
+    ],
+    [
+      165,
+      748
+    ],
+    [
+      3505,
+      2603
+    ],
+    [
+      3505,
+      2680
+    ],
+    [
+      3581,
+      2718
+    ],
+    [
+      3581,
+      2627
+    ],
+    [
+      3377,
+      1442
+    ],
+    [
+      3442,
+      1443
+    ],
+    [
+      3446,
+      1521
+    ],
+    [
+      3378,
+      1523
+    ],
+    [
+      1828,
+      498
+    ],
+    [
+      1876,
+      510
+    ],
+    [
+      1880,
+      451
+    ],
+    [
+      1832,
+      440
+    ],
+    [
+      2175,
+      2302
+    ],
+    [
+      2171,
+      2379
+    ],
+    [
+      2249,
+      2351
+    ],
+    [
+      2218,
+      2288
+    ],
+    [
+      1751,
+      2818
+    ],
+    [
+      1803,
+      2820
+    ],
+    [
+      1800,
+      2754
+    ],
+    [
+      1754,
+      2754
+    ],
+    [
+      1521,
+      1650
+    ],
+    [
+      1579,
+      1685
+    ],
+    [
+      1599,
+      1623
+    ],
+    [
+      1559,
+      1600
+    ],
+    [
+      1066,
+      1557
+    ],
+    [
+      1135,
+      1557
+    ],
+    [
+      1135,
+      1522
+    ],
+    [
+      1066,
+      1522
+    ],
+    [
+      3123,
+      1325
+    ],
+    [
+      3129,
+      1383
+    ],
+    [
+      3190,
+      1372
+    ],
+    [
+      3177,
+      1313
+    ],
+    [
+      2759,
+      1852
+    ],
+    [
+      2803,
+      1856
+    ],
+    [
+      2785,
+      1795
+    ],
+    [
+      2757,
+      1796
+    ],
+    [
+      3733,
+      889
+    ],
+    [
+      3802,
+      890
+    ],
+    [
+      3797,
+      811
+    ],
+    [
+      3740,
+      810
+    ],
+    [
+      2572,
+      2030
+    ],
+    [
+      2619,
+      2021
+    ],
+    [
+      2619,
+      1978
+    ],
+    [
+      2573,
+      1975
+    ],
+    [
+      30,
+      1459
+    ],
+    [
+      144,
+      1500
+    ],
+    [
+      206,
+      1326
+    ],
+    [
+      100,
+      1292
+    ],
+    [
+      811,
+      1464
+    ],
+    [
+      811,
+      1463
+    ],
+    [
+      812,
+      1461
+    ],
+    [
+      814,
+      1459
+    ],
+    [
+      815,
+      1457
+    ],
+    [
+      815,
+      1457
+    ],
+    [
+      816,
+      1451
+    ],
+    [
+      817,
+      1448
+    ],
+    [
+      819,
+      1446
+    ],
+    [
+      820,
+      1446
+    ],
+    [
+      821,
+      1444
+    ],
+    [
+      821,
+      1443
+    ],
+    [
+      822,
+      1439
+    ],
+    [
+      823,
+      1438
+    ],
+    [
+      824,
+      1437
+    ],
+    [
+      825,
+      1436
+    ],
+    [
+      826,
+      1435
+    ],
+    [
+      826,
+      1433
+    ],
+    [
+      826,
+      1432
+    ],
+    [
+      824,
+      1431
+    ],
+    [
+      823,
+      1430
+    ],
+    [
+      821,
+      1425
+    ],
+    [
+      821,
+      1424
+    ],
+    [
+      818,
+      1425
+    ],
+    [
+      817,
+      1426
+    ],
+    [
+      817,
+      1426
+    ],
+    [
+      816,
+      1426
+    ],
+    [
+      816,
+      1426
+    ],
+    [
+      817,
+      1424
+    ],
+    [
+      821,
+      1423
+    ],
+    [
+      822,
+      1422
+    ],
+    [
+      822,
+      1421
+    ],
+    [
+      823,
+      1420
+    ],
+    [
+      827,
+      1418
+    ],
+    [
+      827,
+      1418
+    ],
+    [
+      832,
+      1418
+    ],
+    [
+      836,
+      1419
+    ],
+    [
+      837,
+      1421
+    ],
+    [
+      843,
+      1424
+    ],
+    [
+      843,
+      1423
+    ],
+    [
+      844,
+      1424
+    ],
+    [
+      845,
+      1424
+    ],
+    [
+      848,
+      1424
+    ],
+    [
+      849,
+      1424
+    ],
+    [
+      850,
+      1425
+    ],
+    [
+      851,
+      1426
+    ],
+    [
+      852,
+      1427
+    ],
+    [
+      854,
+      1428
+    ],
+    [
+      855,
+      1429
+    ],
+    [
+      859,
+      1429
+    ],
+    [
+      859,
+      1430
+    ],
+    [
+      859,
+      1431
+    ],
+    [
+      859,
+      1432
+    ],
+    [
+      860,
+      1433
+    ],
+    [
+      860,
+      1434
+    ],
+    [
+      860,
+      1435
+    ],
+    [
+      856,
+      1436
+    ],
+    [
+      856,
+      1436
+    ],
+    [
+      855,
+      1436
+    ],
+    [
+      853,
+      1437
+    ],
+    [
+      852,
+      1439
+    ],
+    [
+      851,
+      1440
+    ],
+    [
+      850,
+      1441
+    ],
+    [
+      848,
+      1442
+    ],
+    [
+      846,
+      1443
+    ],
+    [
+      845,
+      1444
+    ],
+    [
+      845,
+      1444
+    ],
+    [
+      844,
+      1444
+    ],
+    [
+      839,
+      1444
+    ],
+    [
+      838,
+      1444
+    ],
+    [
+      836,
+      1445
+    ],
+    [
+      836,
+      1446
+    ],
+    [
+      835,
+      1448
+    ],
+    [
+      832,
+      1450
+    ],
+    [
+      830,
+      1453
+    ],
+    [
+      828,
+      1454
+    ],
+    [
+      826,
+      1455
+    ],
+    [
+      825,
+      1456
+    ],
+    [
+      823,
+      1458
+    ],
+    [
+      821,
+      1460
+    ],
+    [
+      821,
+      1461
+    ],
+    [
+      820,
+      1462
+    ],
+    [
+      819,
+      1463
+    ],
+    [
+      819,
+      1464
+    ],
+    [
+      817,
+      1466
+    ],
+    [
+      817,
+      1466
+    ],
+    [
+      816,
+      1466
+    ],
+    [
+      814,
+      1468
+    ],
+    [
+      814,
+      1468
+    ],
+    [
+      688,
+      1441
+    ],
+    [
+      689,
+      1441
+    ],
+    [
+      689,
+      1441
+    ],
+    [
+      690,
+      1441
+    ],
+    [
+      691,
+      1441
+    ],
+    [
+      692,
+      1441
+    ],
+    [
+      693,
+      1441
+    ],
+    [
+      694,
+      1441
+    ],
+    [
+      695,
+      1441
+    ],
+    [
+      695,
+      1440
+    ],
+    [
+      695,
+      1439
+    ],
+    [
+      695,
+      1437
+    ],
+    [
+      695,
+      1435
+    ],
+    [
+      696,
+      1432
+    ],
+    [
+      696,
+      1428
+    ],
+    [
+      697,
+      1427
+    ],
+    [
+      697,
+      1425
+    ],
+    [
+      697,
+      1424
+    ],
+    [
+      697,
+      1422
+    ],
+    [
+      697,
+      1417
+    ],
+    [
+      697,
+      1416
+    ],
+    [
+      698,
+      1415
+    ],
+    [
+      699,
+      1414
+    ],
+    [
+      700,
+      1412
+    ],
+    [
+      701,
+      1411
+    ],
+    [
+      702,
+      1408
+    ],
+    [
+      703,
+      1408
+    ],
+    [
+      703,
+      1407
+    ],
+    [
+      704,
+      1406
+    ],
+    [
+      705,
+      1404
+    ],
+    [
+      708,
+      1403
+    ],
+    [
+      709,
+      1401
+    ],
+    [
+      716,
+      1393
+    ],
+    [
+      716,
+      1393
+    ],
+    [
+      715,
+      1393
+    ],
+    [
+      715,
+      1393
+    ],
+    [
+      713,
+      1391
+    ],
+    [
+      711,
+      1391
+    ],
+    [
+      708,
+      1392
+    ],
+    [
+      707,
+      1392
+    ],
+    [
+      702,
+      1392
+    ],
+    [
+      701,
+      1394
+    ],
+    [
+      701,
+      1394
+    ],
+    [
+      700,
+      1394
+    ],
+    [
+      698,
+      1391
+    ],
+    [
+      698,
+      1390
+    ],
+    [
+      697,
+      1389
+    ],
+    [
+      697,
+      1389
+    ],
+    [
+      696,
+      1389
+    ],
+    [
+      694,
+      1388
+    ],
+    [
+      693,
+      1388
+    ],
+    [
+      690,
+      1389
+    ],
+    [
+      689,
+      1389
+    ],
+    [
+      687,
+      1390
+    ],
+    [
+      687,
+      1390
+    ],
+    [
+      685,
+      1392
+    ],
+    [
+      684,
+      1395
+    ],
+    [
+      683,
+      1396
+    ],
+    [
+      682,
+      1397
+    ],
+    [
+      682,
+      1398
+    ],
+    [
+      680,
+      1400
+    ],
+    [
+      679,
+      1401
+    ],
+    [
+      679,
+      1402
+    ],
+    [
+      679,
+      1404
+    ],
+    [
+      682,
+      1405
+    ],
+    [
+      683,
+      1406
+    ],
+    [
+      683,
+      1408
+    ],
+    [
+      683,
+      1408
+    ],
+    [
+      684,
+      1410
+    ],
+    [
+      684,
+      1412
+    ],
+    [
+      685,
+      1413
+    ],
+    [
+      687,
+      1414
+    ],
+    [
+      687,
+      1417
+    ],
+    [
+      687,
+      1421
+    ],
+    [
+      687,
+      1423
+    ],
+    [
+      687,
+      1426
+    ],
+    [
+      685,
+      1428
+    ],
+    [
+      685,
+      1429
+    ],
+    [
+      685,
+      1430
+    ],
+    [
+      687,
+      1432
+    ],
+    [
+      688,
+      1433
+    ],
+    [
+      688,
+      1434
+    ],
+    [
+      688,
+      1436
+    ],
+    [
+      688,
+      1436
+    ],
+    [
+      688,
+      1438
+    ],
+    [
+      688,
+      1440
+    ],
+    [
+      530,
+      1411
+    ],
+    [
+      528,
+      1411
+    ],
+    [
+      527,
+      1411
+    ],
+    [
+      525,
+      1411
+    ],
+    [
+      523,
+      1410
+    ],
+    [
+      523,
+      1410
+    ],
+    [
+      523,
+      1409
+    ],
+    [
+      523,
+      1408
+    ],
+    [
+      523,
+      1406
+    ],
+    [
+      523,
+      1404
+    ],
+    [
+      523,
+      1400
+    ],
+    [
+      523,
+      1396
+    ],
+    [
+      523,
+      1394
+    ],
+    [
+      522,
+      1393
+    ],
+    [
+      521,
+      1391
+    ],
+    [
+      521,
+      1389
+    ],
+    [
+      521,
+      1387
+    ],
+    [
+      521,
+      1385
+    ],
+    [
+      520,
+      1383
+    ],
+    [
+      520,
+      1381
+    ],
+    [
+      520,
+      1379
+    ],
+    [
+      519,
+      1378
+    ],
+    [
+      517,
+      1379
+    ],
+    [
+      517,
+      1379
+    ],
+    [
+      516,
+      1379
+    ],
+    [
+      516,
+      1377
+    ],
+    [
+      516,
+      1373
+    ],
+    [
+      518,
+      1371
+    ],
+    [
+      519,
+      1370
+    ],
+    [
+      520,
+      1368
+    ],
+    [
+      521,
+      1366
+    ],
+    [
+      521,
+      1366
+    ],
+    [
+      522,
+      1362
+    ],
+    [
+      523,
+      1362
+    ],
+    [
+      524,
+      1361
+    ],
+    [
+      525,
+      1361
+    ],
+    [
+      529,
+      1362
+    ],
+    [
+      530,
+      1362
+    ],
+    [
+      530,
+      1362
+    ],
+    [
+      531,
+      1364
+    ],
+    [
+      531,
+      1366
+    ],
+    [
+      531,
+      1368
+    ],
+    [
+      533,
+      1368
+    ],
+    [
+      534,
+      1368
+    ],
+    [
+      536,
+      1370
+    ],
+    [
+      537,
+      1371
+    ],
+    [
+      541,
+      1372
+    ],
+    [
+      541,
+      1374
+    ],
+    [
+      540,
+      1375
+    ],
+    [
+      538,
+      1376
+    ],
+    [
+      537,
+      1376
+    ],
+    [
+      537,
+      1376
+    ],
+    [
+      536,
+      1377
+    ],
+    [
+      536,
+      1381
+    ],
+    [
+      535,
+      1384
+    ],
+    [
+      535,
+      1385
+    ],
+    [
+      534,
+      1388
+    ],
+    [
+      534,
+      1389
+    ],
+    [
+      533,
+      1391
+    ],
+    [
+      532,
+      1393
+    ],
+    [
+      532,
+      1394
+    ],
+    [
+      531,
+      1396
+    ],
+    [
+      530,
+      1401
+    ],
+    [
+      529,
+      1403
+    ],
+    [
+      529,
+      1403
+    ],
+    [
+      529,
+      1406
+    ],
+    [
+      529,
+      1407
+    ],
+    [
+      529,
+      1408
+    ],
+    [
+      529,
+      1409
+    ],
+    [
+      401,
+      1343
+    ],
+    [
+      399,
+      1343
+    ],
+    [
+      399,
+      1343
+    ],
+    [
+      391,
+      1344
+    ],
+    [
+      389,
+      1345
+    ],
+    [
+      389,
+      1346
+    ],
+    [
+      389,
+      1348
+    ],
+    [
+      388,
+      1350
+    ],
+    [
+      387,
+      1352
+    ],
+    [
+      386,
+      1354
+    ],
+    [
+      384,
+      1356
+    ],
+    [
+      383,
+      1357
+    ],
+    [
+      382,
+      1360
+    ],
+    [
+      382,
+      1363
+    ],
+    [
+      375,
+      1366
+    ],
+    [
+      373,
+      1366
+    ],
+    [
+      372,
+      1367
+    ],
+    [
+      373,
+      1370
+    ],
+    [
+      374,
+      1372
+    ],
+    [
+      374,
+      1374
+    ],
+    [
+      373,
+      1376
+    ],
+    [
+      372,
+      1378
+    ],
+    [
+      373,
+      1379
+    ],
+    [
+      374,
+      1381
+    ],
+    [
+      374,
+      1383
+    ],
+    [
+      376,
+      1385
+    ],
+    [
+      381,
+      1388
+    ],
+    [
+      383,
+      1390
+    ],
+    [
+      384,
+      1391
+    ],
+    [
+      397,
+      1394
+    ],
+    [
+      397,
+      1394
+    ],
+    [
+      407,
+      1395
+    ],
+    [
+      408,
+      1394
+    ],
+    [
+      408,
+      1391
+    ],
+    [
+      408,
+      1389
+    ],
+    [
+      410,
+      1387
+    ],
+    [
+      411,
+      1387
+    ],
+    [
+      411,
+      1387
+    ],
+    [
+      412,
+      1385
+    ],
+    [
+      412,
+      1385
+    ],
+    [
+      412,
+      1384
+    ],
+    [
+      412,
+      1383
+    ],
+    [
+      413,
+      1379
+    ],
+    [
+      413,
+      1378
+    ],
+    [
+      415,
+      1375
+    ],
+    [
+      416,
+      1372
+    ],
+    [
+      416,
+      1370
+    ],
+    [
+      416,
+      1365
+    ],
+    [
+      416,
+      1362
+    ],
+    [
+      416,
+      1360
+    ],
+    [
+      416,
+      1359
+    ],
+    [
+      415,
+      1357
+    ],
+    [
+      412,
+      1356
+    ],
+    [
+      410,
+      1354
+    ],
+    [
+      410,
+      1352
+    ],
+    [
+      410,
+      1351
+    ],
+    [
+      409,
+      1349
+    ],
+    [
+      407,
+      1348
+    ]
+  ],
+  "ambients": [
+    {
+      "name": "Flies\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "x_coordinate": 1768,
+      "y_coordinate": 503,
+      "radius": 400,
+      "height": 0,
+      "pitch_variance": 0,
+      "volume_variance": 0,
+      "volume_percentage": 80,
+      "resref_of_sound_1": "AMB_E29A",
+      "resref_of_sound_2": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_3": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_4": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_5": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_6": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_7": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_8": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_9": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_10": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "count_of_sounds": 1,
+      "base_time_interval": 0,
+      "base_time_deviation": 0,
+      "ambient_appearence_schedule": 4294967295,
+      "flags": 3
+    },
+    {
+      "name": "Flies\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "x_coordinate": 3806,
+      "y_coordinate": 1095,
+      "radius": 400,
+      "height": 0,
+      "pitch_variance": 0,
+      "volume_variance": 0,
+      "volume_percentage": 100,
+      "resref_of_sound_1": "AMB_E29A",
+      "resref_of_sound_2": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_3": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_4": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_5": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_6": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_7": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_8": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_9": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_10": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "count_of_sounds": 1,
+      "base_time_interval": 0,
+      "base_time_deviation": 0,
+      "ambient_appearence_schedule": 4294967295,
+      "flags": 3
+    },
+    {
+      "name": "Flies\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "x_coordinate": 1588,
+      "y_coordinate": 1022,
+      "radius": 400,
+      "height": 0,
+      "pitch_variance": 0,
+      "volume_variance": 0,
+      "volume_percentage": 80,
+      "resref_of_sound_1": "AMB_E29A",
+      "resref_of_sound_2": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_3": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_4": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_5": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_6": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_7": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_8": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_9": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_10": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "count_of_sounds": 1,
+      "base_time_interval": 0,
+      "base_time_deviation": 0,
+      "ambient_appearence_schedule": 4294967295,
+      "flags": 3
+    },
+    {
+      "name": "Flies\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "x_coordinate": 1180,
+      "y_coordinate": 1594,
+      "radius": 400,
+      "height": 0,
+      "pitch_variance": 0,
+      "volume_variance": 0,
+      "volume_percentage": 100,
+      "resref_of_sound_1": "AMB_E29A",
+      "resref_of_sound_2": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_3": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_4": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_5": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_6": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_7": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_8": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_9": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_10": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "count_of_sounds": 1,
+      "base_time_interval": 0,
+      "base_time_deviation": 0,
+      "ambient_appearence_schedule": 4294967295,
+      "flags": 3
+    },
+    {
+      "name": "Flies\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "x_coordinate": 3433,
+      "y_coordinate": 1838,
+      "radius": 400,
+      "height": 0,
+      "pitch_variance": 0,
+      "volume_variance": 0,
+      "volume_percentage": 80,
+      "resref_of_sound_1": "AMB_E29A",
+      "resref_of_sound_2": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_3": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_4": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_5": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_6": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_7": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_8": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_9": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_10": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "count_of_sounds": 1,
+      "base_time_interval": 0,
+      "base_time_deviation": 0,
+      "ambient_appearence_schedule": 4294967295,
+      "flags": 3
+    },
+    {
+      "name": "Flies\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "x_coordinate": 3247,
+      "y_coordinate": 1435,
+      "radius": 400,
+      "height": 0,
+      "pitch_variance": 0,
+      "volume_variance": 0,
+      "volume_percentage": 80,
+      "resref_of_sound_1": "AMB_E29A",
+      "resref_of_sound_2": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_3": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_4": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_5": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_6": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_7": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_8": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_9": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_10": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "count_of_sounds": 1,
+      "base_time_interval": 0,
+      "base_time_deviation": 0,
+      "ambient_appearence_schedule": 4294967295,
+      "flags": 3
+    },
+    {
+      "name": "Flies\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "x_coordinate": 4175,
+      "y_coordinate": 1469,
+      "radius": 400,
+      "height": 0,
+      "pitch_variance": 0,
+      "volume_variance": 0,
+      "volume_percentage": 80,
+      "resref_of_sound_1": "AMB_E29A",
+      "resref_of_sound_2": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_3": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_4": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_5": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_6": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_7": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_8": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_9": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_10": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "count_of_sounds": 1,
+      "base_time_interval": 0,
+      "base_time_deviation": 0,
+      "ambient_appearence_schedule": 4294967295,
+      "flags": 3
+    },
+    {
+      "name": "Flies\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "x_coordinate": 3580,
+      "y_coordinate": 2690,
+      "radius": 500,
+      "height": 0,
+      "pitch_variance": 0,
+      "volume_variance": 0,
+      "volume_percentage": 100,
+      "resref_of_sound_1": "AMB_E29A",
+      "resref_of_sound_2": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_3": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_4": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_5": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_6": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_7": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_8": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_9": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_10": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "count_of_sounds": 1,
+      "base_time_interval": 0,
+      "base_time_deviation": 0,
+      "ambient_appearence_schedule": 4294967295,
+      "flags": 3
+    },
+    {
+      "name": "Flies\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "x_coordinate": 2340,
+      "y_coordinate": 2358,
+      "radius": 400,
+      "height": 0,
+      "pitch_variance": 0,
+      "volume_variance": 0,
+      "volume_percentage": 80,
+      "resref_of_sound_1": "AMB_E29A",
+      "resref_of_sound_2": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_3": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_4": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_5": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_6": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_7": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_8": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_9": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_10": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "count_of_sounds": 1,
+      "base_time_interval": 0,
+      "base_time_deviation": 0,
+      "ambient_appearence_schedule": 4294967295,
+      "flags": 3
+    },
+    {
+      "name": "Flies\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "x_coordinate": 1616,
+      "y_coordinate": 3082,
+      "radius": 400,
+      "height": 0,
+      "pitch_variance": 0,
+      "volume_variance": 0,
+      "volume_percentage": 80,
+      "resref_of_sound_1": "AMB_E29A",
+      "resref_of_sound_2": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_3": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_4": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_5": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_6": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_7": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_8": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_9": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_10": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "count_of_sounds": 1,
+      "base_time_interval": 0,
+      "base_time_deviation": 0,
+      "ambient_appearence_schedule": 4294967295,
+      "flags": 3
+    },
+    {
+      "name": "Drips1\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "x_coordinate": 1188,
+      "y_coordinate": 1504,
+      "radius": 800,
+      "height": 0,
+      "pitch_variance": 0,
+      "volume_variance": 0,
+      "volume_percentage": 100,
+      "resref_of_sound_1": "AMB_E15A",
+      "resref_of_sound_2": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_3": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_4": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_5": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_6": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_7": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_8": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_9": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_10": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "count_of_sounds": 1,
+      "base_time_interval": 2,
+      "base_time_deviation": 1,
+      "ambient_appearence_schedule": 4294967295,
+      "flags": 1
+    },
+    {
+      "name": "Drips2\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "x_coordinate": 2968,
+      "y_coordinate": 1766,
+      "radius": 800,
+      "height": 0,
+      "pitch_variance": 0,
+      "volume_variance": 0,
+      "volume_percentage": 100,
+      "resref_of_sound_1": "AMB_E15B",
+      "resref_of_sound_2": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_3": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_4": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_5": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_6": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_7": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_8": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_9": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_10": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "count_of_sounds": 1,
+      "base_time_interval": 2,
+      "base_time_deviation": 1,
+      "ambient_appearence_schedule": 4294967295,
+      "flags": 1
+    },
+    {
+      "name": "Drips3\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "x_coordinate": 3613,
+      "y_coordinate": 994,
+      "radius": 500,
+      "height": 0,
+      "pitch_variance": 0,
+      "volume_variance": 0,
+      "volume_percentage": 100,
+      "resref_of_sound_1": "AMB_E15A",
+      "resref_of_sound_2": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_3": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_4": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_5": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_6": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_7": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_8": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_9": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_10": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "count_of_sounds": 1,
+      "base_time_interval": 3,
+      "base_time_deviation": 1,
+      "ambient_appearence_schedule": 4294967295,
+      "flags": 1
+    },
+    {
+      "name": "Rats\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "x_coordinate": 1580,
+      "y_coordinate": 958,
+      "radius": 500,
+      "height": 0,
+      "pitch_variance": 0,
+      "volume_variance": 0,
+      "volume_percentage": 100,
+      "resref_of_sound_1": "AMB_E45A",
+      "resref_of_sound_2": "AMB_E45B",
+      "resref_of_sound_3": "AMB_E45C",
+      "resref_of_sound_4": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_5": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_6": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_7": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_8": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_9": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_10": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "count_of_sounds": 3,
+      "base_time_interval": 10,
+      "base_time_deviation": 4,
+      "ambient_appearence_schedule": 4294967295,
+      "flags": 13
+    },
+    {
+      "name": "Rats1\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "x_coordinate": 1088,
+      "y_coordinate": 1600,
+      "radius": 1204,
+      "height": 0,
+      "pitch_variance": 0,
+      "volume_variance": 0,
+      "volume_percentage": 100,
+      "resref_of_sound_1": "AMB_E45C",
+      "resref_of_sound_2": "AMB_E45A",
+      "resref_of_sound_3": "AMB_E45B",
+      "resref_of_sound_4": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_5": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_6": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_7": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_8": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_9": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_10": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "count_of_sounds": 3,
+      "base_time_interval": 8,
+      "base_time_deviation": 2,
+      "ambient_appearence_schedule": 4294967295,
+      "flags": 9
+    },
+    {
+      "name": "Rats2\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "x_coordinate": 3152,
+      "y_coordinate": 1582,
+      "radius": 1024,
+      "height": 0,
+      "pitch_variance": 0,
+      "volume_variance": 0,
+      "volume_percentage": 100,
+      "resref_of_sound_1": "AMB_E45B",
+      "resref_of_sound_2": "AMB_E45C",
+      "resref_of_sound_3": "AMB_E45A",
+      "resref_of_sound_4": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_5": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_6": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_7": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_8": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_9": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "resref_of_sound_10": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "count_of_sounds": 3,
+      "base_time_interval": 10,
+      "base_time_deviation": 3,
+      "ambient_appearence_schedule": 4294967295,
+      "flags": 9
+    }
+  ],
+  "variables": [],
+  "explored_bitmasks": [],
+  "doors": [],
+  "animations": [
+    {
+      "name": "FLIESL\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "x_coordinate": 1764,
+      "y_coordinate": 503,
+      "animation_appearence_schedule": 4294967295,
+      "animation_resref": "FLIESL\u0000\u0000",
+      "bam_sequence_number": 0,
+      "bam_frame_number": 0,
+      "flags": 4101,
+      "height": 0,
+      "transparency": 0,
+      "starting_frame": 255,
+      "chance_of_looping": 0,
+      "skip_cycles": 0,
+      "palette": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "animation_width": 33884,
+      "animation_height": 16703
+    },
+    {
+      "name": "FLIESL\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "x_coordinate": 3897,
+      "y_coordinate": 1186,
+      "animation_appearence_schedule": 4294967295,
+      "animation_resref": "FLIESL\u0000\u0000",
+      "bam_sequence_number": 0,
+      "bam_frame_number": 0,
+      "flags": 4101,
+      "height": 0,
+      "transparency": 0,
+      "starting_frame": 255,
+      "chance_of_looping": 0,
+      "skip_cycles": 0,
+      "palette": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "animation_width": 33884,
+      "animation_height": 16703
+    },
+    {
+      "name": "FLIESL\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "x_coordinate": 3747,
+      "y_coordinate": 1012,
+      "animation_appearence_schedule": 4294967295,
+      "animation_resref": "FLIESL\u0000\u0000",
+      "bam_sequence_number": 0,
+      "bam_frame_number": 0,
+      "flags": 4101,
+      "height": 0,
+      "transparency": 0,
+      "starting_frame": 255,
+      "chance_of_looping": 0,
+      "skip_cycles": 0,
+      "palette": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "animation_width": 33884,
+      "animation_height": 16703
+    },
+    {
+      "name": "FLIESL\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "x_coordinate": 1591,
+      "y_coordinate": 1022,
+      "animation_appearence_schedule": 4294967295,
+      "animation_resref": "FLIESL\u0000\u0000",
+      "bam_sequence_number": 0,
+      "bam_frame_number": 0,
+      "flags": 4101,
+      "height": 0,
+      "transparency": 0,
+      "starting_frame": 255,
+      "chance_of_looping": 0,
+      "skip_cycles": 0,
+      "palette": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "animation_width": 33884,
+      "animation_height": 16703
+    },
+    {
+      "name": "FLIESL\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "x_coordinate": 1333,
+      "y_coordinate": 1594,
+      "animation_appearence_schedule": 4294967295,
+      "animation_resref": "FLIESL\u0000\u0000",
+      "bam_sequence_number": 0,
+      "bam_frame_number": 0,
+      "flags": 4101,
+      "height": 0,
+      "transparency": 0,
+      "starting_frame": 255,
+      "chance_of_looping": 0,
+      "skip_cycles": 0,
+      "palette": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "animation_width": 33884,
+      "animation_height": 16703
+    },
+    {
+      "name": "FLIESL\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "x_coordinate": 1032,
+      "y_coordinate": 1602,
+      "animation_appearence_schedule": 4294967295,
+      "animation_resref": "FLIESL\u0000\u0000",
+      "bam_sequence_number": 0,
+      "bam_frame_number": 0,
+      "flags": 4101,
+      "height": 0,
+      "transparency": 0,
+      "starting_frame": 255,
+      "chance_of_looping": 0,
+      "skip_cycles": 0,
+      "palette": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "animation_width": 33884,
+      "animation_height": 16703
+    },
+    {
+      "name": "FLIESL\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "x_coordinate": 3432,
+      "y_coordinate": 1840,
+      "animation_appearence_schedule": 4294967295,
+      "animation_resref": "FLIESL\u0000\u0000",
+      "bam_sequence_number": 0,
+      "bam_frame_number": 0,
+      "flags": 4101,
+      "height": 0,
+      "transparency": 0,
+      "starting_frame": 255,
+      "chance_of_looping": 0,
+      "skip_cycles": 0,
+      "palette": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "animation_width": 33884,
+      "animation_height": 16703
+    },
+    {
+      "name": "FLIESL\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "x_coordinate": 3252,
+      "y_coordinate": 1461,
+      "animation_appearence_schedule": 4294967295,
+      "animation_resref": "FLIESL\u0000\u0000",
+      "bam_sequence_number": 0,
+      "bam_frame_number": 0,
+      "flags": 4101,
+      "height": 0,
+      "transparency": 0,
+      "starting_frame": 255,
+      "chance_of_looping": 0,
+      "skip_cycles": 0,
+      "palette": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "animation_width": 33884,
+      "animation_height": 16703
+    },
+    {
+      "name": "FLIESL\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "x_coordinate": 4175,
+      "y_coordinate": 1470,
+      "animation_appearence_schedule": 4294967295,
+      "animation_resref": "FLIESL\u0000\u0000",
+      "bam_sequence_number": 0,
+      "bam_frame_number": 0,
+      "flags": 4101,
+      "height": 0,
+      "transparency": 0,
+      "starting_frame": 255,
+      "chance_of_looping": 0,
+      "skip_cycles": 0,
+      "palette": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "animation_width": 33884,
+      "animation_height": 16703
+    },
+    {
+      "name": "FLIESL\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "x_coordinate": 3633,
+      "y_coordinate": 2509,
+      "animation_appearence_schedule": 4294967295,
+      "animation_resref": "FLIESL\u0000\u0000",
+      "bam_sequence_number": 0,
+      "bam_frame_number": 0,
+      "flags": 4101,
+      "height": 0,
+      "transparency": 0,
+      "starting_frame": 255,
+      "chance_of_looping": 0,
+      "skip_cycles": 0,
+      "palette": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "animation_width": 33884,
+      "animation_height": 16703
+    },
+    {
+      "name": "FLIESL\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "x_coordinate": 2346,
+      "y_coordinate": 2359,
+      "animation_appearence_schedule": 4294967295,
+      "animation_resref": "FLIESL\u0000\u0000",
+      "bam_sequence_number": 0,
+      "bam_frame_number": 0,
+      "flags": 4101,
+      "height": 0,
+      "transparency": 0,
+      "starting_frame": 255,
+      "chance_of_looping": 0,
+      "skip_cycles": 0,
+      "palette": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "animation_width": 33884,
+      "animation_height": 16703
+    },
+    {
+      "name": "FLIESL\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "x_coordinate": 1618,
+      "y_coordinate": 3087,
+      "animation_appearence_schedule": 4294967295,
+      "animation_resref": "FLIESL\u0000\u0000",
+      "bam_sequence_number": 0,
+      "bam_frame_number": 0,
+      "flags": 4101,
+      "height": 0,
+      "transparency": 0,
+      "starting_frame": 255,
+      "chance_of_looping": 0,
+      "skip_cycles": 0,
+      "palette": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "animation_width": 33884,
+      "animation_height": 16703
+    },
+    {
+      "name": "FLIESL\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "x_coordinate": 3408,
+      "y_coordinate": 2668,
+      "animation_appearence_schedule": 4294967295,
+      "animation_resref": "FLIESL\u0000\u0000",
+      "bam_sequence_number": 0,
+      "bam_frame_number": 0,
+      "flags": 4101,
+      "height": 0,
+      "transparency": 0,
+      "starting_frame": 255,
+      "chance_of_looping": 0,
+      "skip_cycles": 0,
+      "palette": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "animation_width": 33884,
+      "animation_height": 16703
+    },
+    {
+      "name": "FLIESL\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "x_coordinate": 3535,
+      "y_coordinate": 2828,
+      "animation_appearence_schedule": 4294967295,
+      "animation_resref": "FLIESL\u0000\u0000",
+      "bam_sequence_number": 0,
+      "bam_frame_number": 0,
+      "flags": 4101,
+      "height": 0,
+      "transparency": 0,
+      "starting_frame": 255,
+      "chance_of_looping": 0,
+      "skip_cycles": 0,
+      "palette": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "animation_width": 33884,
+      "animation_height": 16703
+    }
+  ],
+  "automap_notes": [],
+  "tiled_objects": [],
+  "projectile_traps": [],
+  "day_song_reference_number": 16,
+  "night_song_reference_number": 16,
+  "win_song_reference_number": 4294967295,
+  "battle_song_reference_number": 16,
+  "lose_song_reference_number": 4294967295,
+  "alt_music_1": 4294967295,
+  "alt_music_2": 4294967295,
+  "alt_music_3": 4294967295,
+  "alt_music_4": 4294967295,
+  "alt_music_5": 4294967295,
+  "main_day_ambient_1": "AMB_S16\u0000",
+  "main_day_ambient_2": "AMB_S16A",
+  "main_day_ambient_volume_percent": 100,
+  "main_night_ambient_1": "AMB_S16\u0000",
+  "main_night_ambient_2": "AMB_S16A",
+  "main_night_ambient_volume_percent": 100,
+  "reverb_or_unused": 0,
+  "name": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+  "interruption_explanation_text": "9(\u0000\u0000'\u0000\u0000'\u0000\u0000'\u0000\u0000'\u0000\u0000'\u0000\u0000'\u0000\u0000'\u0000\u0000'\u0000\u0000'\u0000\u0000",
+  "resref_of_creature_to_spawn": [
+    "CARRIO\u0000\u0000",
+    "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+    "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+    "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+    "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+    "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+    "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+    "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+    "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+    "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000"
+  ],
+  "count_of_creatures_in_spawn_table": 1,
+  "difficulty": 1,
+  "removal_time": 1000,
+  "movement_restriction_distance": 1000,
+  "movement_restriction_distance_move_to_object": 1000,
+  "maximum_number_of_creatures_to_spawn": 10,
+  "interruption_point_enabled": 1,
+  "probability_day_per_hour": 7,
+  "probability_night_per_hour": 7
+}

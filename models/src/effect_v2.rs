@@ -11,8 +11,7 @@ use crate::model::Model;
 pub struct EffectV2 {
     #[serde(flatten)]
     pub header: Header,
-    #[serde(flatten)]
-    pub body: EffectV2Body,
+    pub effect: EffectV2Body,
 }
 
 impl Model for EffectV2 {
@@ -102,81 +101,30 @@ pub struct EffectV2BodyWithOutHeader {
 
 #[cfg(test)]
 mod tests {
-
     use super::*;
-    use binrw::io::{BufReader, Read};
+    use binrw::io::Read;
     use pretty_assertions::assert_eq;
-    use std::fs::File;
+    use serde_json::Value;
+    use std::{error::Error, fs::File};
+
+    const FIXTURES: [(&str, &str); 1] = [("fixtures/#trollis.eff", "fixtures/#trollis.eff.json")];
+
+    fn read_file(path: &str) -> Result<Vec<u8>, Box<dyn Error>> {
+        let mut file = File::open(path)?;
+        let mut buffer = Vec::new();
+        file.read_to_end(&mut buffer)?;
+        Ok(buffer)
+    }
 
     #[test]
-    fn valid_simple_creature_file_header_parsed() {
-        let file = File::open("fixtures/#trollis.eff").unwrap();
+    fn parse() -> Result<(), Box<dyn Error>> {
+        for (file_path, json_file_path) in FIXTURES {
+            let effect: EffectV2 = EffectV2::new(&read_file(file_path)?);
+            let result: Value = serde_json::to_value(effect)?;
+            let expected: Value = serde_json::from_slice(&read_file(json_file_path)?)?;
 
-        let mut reader = BufReader::new(file);
-        let mut buffer = Vec::new();
-
-        reader
-            .read_to_end(&mut buffer)
-            .expect("Could not read to buffer");
-        assert_eq!(
-            EffectV2::new(&buffer),
-            EffectV2 {
-                header: Header {
-                    signature: "EFF ".into(),
-                    version: "V2.0".into(),
-                },
-                body: EffectV2Body {
-                    header: Header {
-                        signature: "EFF ".into(),
-                        version: "V2.0".into(),
-                    },
-                    body: EffectV2BodyWithOutHeader {
-                        opcode_number: 98,
-                        target_type: 2,
-                        power: 0,
-                        parameter_1: 6,
-                        parameter_2: 4,
-                        timing_mode: 0,
-                        timing: 0,
-                        duration: 120,
-                        probability_1: 100,
-                        probability_2: 0,
-                        resource_1: "\0\0\0\0\0\0\0\0".into(),
-                        dice_thrown: 0,
-                        dice_sides: 0,
-                        saving_throw_type: 0,
-                        saving_throw_bonus: 0,
-                        special: 0,
-                        primary_spell_school: 0,
-                        _unknown_1: 0,
-                        parent_resource_lowest_affected_level: 0,
-                        parent_resource_highest_affected_level: 0,
-                        dispel_resistance: 0,
-                        parameter_3: 5,
-                        parameter_4: 0,
-                        parameter_5: 0,
-                        time_applied_ticks: 0,
-                        resource_2: "\0\0\0\0\0\0\0\0".into(),
-                        resource_3: "\0\0\0\0\0\0\0\0".into(),
-                        caster_x_coordinate: 4294967295,
-                        caster_y_coordinate: 4294967295,
-                        target_x_coordinate: 4294967295,
-                        target_y_coordinate: 4294967295,
-                        parent_resource_type: 0,
-                        parent_resource: "\0\0\0\0\0\0\0\0".into(),
-                        parent_resource_flags: vec![0; 4],
-                        projectile: 0,
-                        parent_resource_slot: 4294967295,
-                        variable_name:
-                            "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
-                                .into(),
-                        caster_level: 0,
-                        first_apply: 0,
-                        secondary_type: 0,
-                        _unknown_2: vec![0; 15],
-                    }
-                },
-            }
-        )
+            assert_eq!(result, expected);
+        }
+        Ok(())
     }
 }

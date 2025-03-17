@@ -1,0 +1,1093 @@
+{
+  "signature": "CRE ",
+  "version": "V1.0",
+  "long_creature_name": 69026,
+  "short_creature_name": 69027,
+  "flags": 0,
+  "exp_for_killing": 9000,
+  "exp": 0,
+  "gold": 0,
+  "state_flags": 0,
+  "current_hp": 87,
+  "base_hp": 87,
+  "animation_id": 25104,
+  "metal_color": 57,
+  "minor_color": 58,
+  "major_color": 62,
+  "skin_color": 13,
+  "leather_color": 94,
+  "armor_color": 97,
+  "hair_color": 111,
+  "effstructure": 1,
+  "small_portrait": "MEL_GDS\u0000",
+  "large_portrait": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+  "reputation": 0,
+  "hide_in_shadows": 0,
+  "nac_1": 5,
+  "nac_2": 5,
+  "nac_mod_crushing": 0,
+  "nac_mod_missile": 0,
+  "nac_mod_piercing": 0,
+  "nac_mod_slashing": 0,
+  "thac0": 8,
+  "attacks": 1,
+  "save_death": 2,
+  "save_wands": 3,
+  "save_poly": 5,
+  "save_breath": 7,
+  "save_spells": 4,
+  "resist_fire": 0,
+  "resist_cold": 0,
+  "resist_electricity": 0,
+  "resist_acid": 0,
+  "resist_magic": 0,
+  "resist_magicfire": 0,
+  "resist_magiccold": 0,
+  "resist_slashing": 0,
+  "resist_crushing": 0,
+  "resist_piercing": 0,
+  "resist_missile": 0,
+  "detect_illusions": 0,
+  "set_traps": 0,
+  "lore": 0,
+  "open_locks": 0,
+  "move_silently": 0,
+  "find_traps": 0,
+  "pick_pockets": 0,
+  "fatigue": 0,
+  "intoxication": 0,
+  "luck": 0,
+  "proficiency_large_swords": 1,
+  "proficiency_small_swords": 1,
+  "proficiency_bows": 1,
+  "proficiency_spears": 1,
+  "proficiency_blunt": 1,
+  "proficiency_spiked": 1,
+  "proficiency_axes": 1,
+  "proficiency_missiles": 1,
+  "unused_proficiencies": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "nightmare_mode": 0,
+  "translucency": 0,
+  "reputation_loss_if_killed": 0,
+  "reputation_loss_if_joins_party": 0,
+  "reputation_loss_if_leaves_party": 0,
+  "turn_undead_level": 0,
+  "tracking_skill": 0,
+  "tracking": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+  "strrefs": [
+    73165,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    73170,
+    4294967295,
+    4294967295,
+    4294967295,
+    73166,
+    73167,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    73168,
+    73169,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    73165,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    15182,
+    15183,
+    15184,
+    15185,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295,
+    4294967295
+  ],
+  "level_first_class": 30,
+  "level_second_class": 30,
+  "level_third_class": 1,
+  "sex": 2,
+  "strength": 13,
+  "strength_bonus": 0,
+  "intelligence": 18,
+  "wisdom": 17,
+  "dexterity": 16,
+  "constitution": 12,
+  "charisma": 15,
+  "morale": 10,
+  "morale_break": 5,
+  "racial_enemy": 255,
+  "morale_recovery_time": 60,
+  "kit": 1073741824,
+  "override_script": "None\u0000\u0000\u0000\u0000",
+  "class_script": "None\u0000\u0000\u0000\u0000",
+  "race_script": "None\u0000\u0000\u0000\u0000",
+  "general_script": "None\u0000\u0000\u0000\u0000",
+  "creature_script_default": "None\u0000\u0000\u0000\u0000",
+  "enemy_ally": 128,
+  "general": 1,
+  "race": 1,
+  "class": 14,
+  "specific": 0,
+  "gender": 2,
+  "object_references": [
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "alignment": 17,
+  "global_actor_enumeration": 65535,
+  "local_actor_enumeration": 65535,
+  "death_variable": "cutmelis\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+  "offset_to_known_spells": 724,
+  "count_of_known_spells": 92,
+  "offset_to_spell_memorization_info": 1828,
+  "count_of_spell_memorization_info": 17,
+  "offset_to_memorized_spell_table": 2100,
+  "count_of_memorized_spell_table": 34,
+  "offset_to_item_slots": 2628,
+  "offset_to_items": 2508,
+  "count_of_items": 6,
+  "offset_to_effects": 2508,
+  "count_of_effects": 0,
+  "dialog_ref": "None\u0000\u0000\u0000\u0000",
+  "known_spells": [
+    {
+      "spell_name": "SPPR101\u0000",
+      "spell_level": 0,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR102\u0000",
+      "spell_level": 0,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR103\u0000",
+      "spell_level": 0,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR104\u0000",
+      "spell_level": 0,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR106\u0000",
+      "spell_level": 0,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR107\u0000",
+      "spell_level": 0,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR108\u0000",
+      "spell_level": 0,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR109\u0000",
+      "spell_level": 0,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR110\u0000",
+      "spell_level": 0,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR111\u0000",
+      "spell_level": 0,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR113\u0000",
+      "spell_level": 0,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR201\u0000",
+      "spell_level": 1,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR202\u0000",
+      "spell_level": 1,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR203\u0000",
+      "spell_level": 1,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR205\u0000",
+      "spell_level": 1,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR208\u0000",
+      "spell_level": 1,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR209\u0000",
+      "spell_level": 1,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR210\u0000",
+      "spell_level": 1,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR211\u0000",
+      "spell_level": 1,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR212\u0000",
+      "spell_level": 1,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR213\u0000",
+      "spell_level": 1,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR214\u0000",
+      "spell_level": 1,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR301\u0000",
+      "spell_level": 2,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR303\u0000",
+      "spell_level": 2,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR304\u0000",
+      "spell_level": 2,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR306\u0000",
+      "spell_level": 2,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR307\u0000",
+      "spell_level": 2,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR308\u0000",
+      "spell_level": 2,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR309\u0000",
+      "spell_level": 2,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR310\u0000",
+      "spell_level": 2,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR311\u0000",
+      "spell_level": 2,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR312\u0000",
+      "spell_level": 2,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR313\u0000",
+      "spell_level": 2,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR315\u0000",
+      "spell_level": 2,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR317\u0000",
+      "spell_level": 2,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR318\u0000",
+      "spell_level": 2,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR401\u0000",
+      "spell_level": 3,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR402\u0000",
+      "spell_level": 3,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR403\u0000",
+      "spell_level": 3,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR404\u0000",
+      "spell_level": 3,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR405\u0000",
+      "spell_level": 3,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR406\u0000",
+      "spell_level": 3,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR407\u0000",
+      "spell_level": 3,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR408\u0000",
+      "spell_level": 3,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR409\u0000",
+      "spell_level": 3,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR411\u0000",
+      "spell_level": 3,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR412\u0000",
+      "spell_level": 3,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR413\u0000",
+      "spell_level": 3,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR414\u0000",
+      "spell_level": 3,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR415\u0000",
+      "spell_level": 3,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR416\u0000",
+      "spell_level": 3,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR417\u0000",
+      "spell_level": 3,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR501\u0000",
+      "spell_level": 4,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR502\u0000",
+      "spell_level": 4,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR503\u0000",
+      "spell_level": 4,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR504\u0000",
+      "spell_level": 4,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR505\u0000",
+      "spell_level": 4,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR507\u0000",
+      "spell_level": 4,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR508\u0000",
+      "spell_level": 4,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR509\u0000",
+      "spell_level": 4,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR510\u0000",
+      "spell_level": 4,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR511\u0000",
+      "spell_level": 4,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR512\u0000",
+      "spell_level": 4,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR513\u0000",
+      "spell_level": 4,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR514\u0000",
+      "spell_level": 4,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPPR515\u0000",
+      "spell_level": 4,
+      "spell_type": 0
+    },
+    {
+      "spell_name": "SPWI617\u0000",
+      "spell_level": 5,
+      "spell_type": 1
+    },
+    {
+      "spell_name": "SPWI613\u0000",
+      "spell_level": 5,
+      "spell_type": 1
+    },
+    {
+      "spell_name": "SPWI506\u0000",
+      "spell_level": 4,
+      "spell_type": 1
+    },
+    {
+      "spell_name": "SPWI507\u0000",
+      "spell_level": 4,
+      "spell_type": 1
+    },
+    {
+      "spell_name": "SPWI522\u0000",
+      "spell_level": 4,
+      "spell_type": 1
+    },
+    {
+      "spell_name": "SPWI505\u0000",
+      "spell_level": 4,
+      "spell_type": 1
+    },
+    {
+      "spell_name": "SPWI510\u0000",
+      "spell_level": 4,
+      "spell_type": 1
+    },
+    {
+      "spell_name": "SPWI403\u0000",
+      "spell_level": 3,
+      "spell_type": 1
+    },
+    {
+      "spell_name": "SPWI405\u0000",
+      "spell_level": 3,
+      "spell_type": 1
+    },
+    {
+      "spell_name": "SPWI406\u0000",
+      "spell_level": 3,
+      "spell_type": 1
+    },
+    {
+      "spell_name": "SPWI408\u0000",
+      "spell_level": 3,
+      "spell_type": 1
+    },
+    {
+      "spell_name": "SPWI302\u0000",
+      "spell_level": 2,
+      "spell_type": 1
+    },
+    {
+      "spell_name": "SPWI308\u0000",
+      "spell_level": 2,
+      "spell_type": 1
+    },
+    {
+      "spell_name": "SPWI318\u0000",
+      "spell_level": 2,
+      "spell_type": 1
+    },
+    {
+      "spell_name": "SPWI311\u0000",
+      "spell_level": 2,
+      "spell_type": 1
+    },
+    {
+      "spell_name": "SPWI312\u0000",
+      "spell_level": 2,
+      "spell_type": 1
+    },
+    {
+      "spell_name": "SPWI201\u0000",
+      "spell_level": 1,
+      "spell_type": 1
+    },
+    {
+      "spell_name": "SPWI203\u0000",
+      "spell_level": 1,
+      "spell_type": 1
+    },
+    {
+      "spell_name": "SPWI211\u0000",
+      "spell_level": 1,
+      "spell_type": 1
+    },
+    {
+      "spell_name": "SPWI220\u0000",
+      "spell_level": 1,
+      "spell_type": 1
+    },
+    {
+      "spell_name": "SPWI213\u0000",
+      "spell_level": 1,
+      "spell_type": 1
+    },
+    {
+      "spell_name": "SPWI104\u0000",
+      "spell_level": 0,
+      "spell_type": 1
+    },
+    {
+      "spell_name": "SPWI105\u0000",
+      "spell_level": 0,
+      "spell_type": 1
+    },
+    {
+      "spell_name": "SPWI110\u0000",
+      "spell_level": 0,
+      "spell_type": 1
+    },
+    {
+      "spell_name": "SPWI112\u0000",
+      "spell_level": 0,
+      "spell_type": 1
+    },
+    {
+      "spell_name": "SPWI113\u0000",
+      "spell_level": 0,
+      "spell_type": 1
+    }
+  ],
+  "memorized_spell_info": [
+    {
+      "spell_level": 0,
+      "number_of_spells_memorizable": 4,
+      "number_of_spells_memorizable_after_effects": 4,
+      "spell_type": 0,
+      "index_to_spell_table": 0,
+      "count_of_memorizable_spell_tables": 4
+    },
+    {
+      "spell_level": 1,
+      "number_of_spells_memorizable": 4,
+      "number_of_spells_memorizable_after_effects": 4,
+      "spell_type": 0,
+      "index_to_spell_table": 4,
+      "count_of_memorizable_spell_tables": 4
+    },
+    {
+      "spell_level": 2,
+      "number_of_spells_memorizable": 3,
+      "number_of_spells_memorizable_after_effects": 3,
+      "spell_type": 0,
+      "index_to_spell_table": 8,
+      "count_of_memorizable_spell_tables": 3
+    },
+    {
+      "spell_level": 3,
+      "number_of_spells_memorizable": 3,
+      "number_of_spells_memorizable_after_effects": 3,
+      "spell_type": 0,
+      "index_to_spell_table": 11,
+      "count_of_memorizable_spell_tables": 3
+    },
+    {
+      "spell_level": 4,
+      "number_of_spells_memorizable": 2,
+      "number_of_spells_memorizable_after_effects": 2,
+      "spell_type": 0,
+      "index_to_spell_table": 14,
+      "count_of_memorizable_spell_tables": 2
+    },
+    {
+      "spell_level": 5,
+      "number_of_spells_memorizable": 0,
+      "number_of_spells_memorizable_after_effects": 0,
+      "spell_type": 0,
+      "index_to_spell_table": 16,
+      "count_of_memorizable_spell_tables": 0
+    },
+    {
+      "spell_level": 6,
+      "number_of_spells_memorizable": 0,
+      "number_of_spells_memorizable_after_effects": 0,
+      "spell_type": 0,
+      "index_to_spell_table": 16,
+      "count_of_memorizable_spell_tables": 0
+    },
+    {
+      "spell_level": 0,
+      "number_of_spells_memorizable": 4,
+      "number_of_spells_memorizable_after_effects": 4,
+      "spell_type": 1,
+      "index_to_spell_table": 16,
+      "count_of_memorizable_spell_tables": 4
+    },
+    {
+      "spell_level": 1,
+      "number_of_spells_memorizable": 4,
+      "number_of_spells_memorizable_after_effects": 4,
+      "spell_type": 1,
+      "index_to_spell_table": 20,
+      "count_of_memorizable_spell_tables": 4
+    },
+    {
+      "spell_level": 2,
+      "number_of_spells_memorizable": 4,
+      "number_of_spells_memorizable_after_effects": 4,
+      "spell_type": 1,
+      "index_to_spell_table": 24,
+      "count_of_memorizable_spell_tables": 4
+    },
+    {
+      "spell_level": 3,
+      "number_of_spells_memorizable": 3,
+      "number_of_spells_memorizable_after_effects": 3,
+      "spell_type": 1,
+      "index_to_spell_table": 28,
+      "count_of_memorizable_spell_tables": 3
+    },
+    {
+      "spell_level": 4,
+      "number_of_spells_memorizable": 3,
+      "number_of_spells_memorizable_after_effects": 3,
+      "spell_type": 1,
+      "index_to_spell_table": 31,
+      "count_of_memorizable_spell_tables": 3
+    },
+    {
+      "spell_level": 5,
+      "number_of_spells_memorizable": 0,
+      "number_of_spells_memorizable_after_effects": 0,
+      "spell_type": 1,
+      "index_to_spell_table": 34,
+      "count_of_memorizable_spell_tables": 0
+    },
+    {
+      "spell_level": 6,
+      "number_of_spells_memorizable": 0,
+      "number_of_spells_memorizable_after_effects": 0,
+      "spell_type": 1,
+      "index_to_spell_table": 34,
+      "count_of_memorizable_spell_tables": 0
+    },
+    {
+      "spell_level": 7,
+      "number_of_spells_memorizable": 0,
+      "number_of_spells_memorizable_after_effects": 0,
+      "spell_type": 1,
+      "index_to_spell_table": 34,
+      "count_of_memorizable_spell_tables": 0
+    },
+    {
+      "spell_level": 8,
+      "number_of_spells_memorizable": 0,
+      "number_of_spells_memorizable_after_effects": 0,
+      "spell_type": 1,
+      "index_to_spell_table": 34,
+      "count_of_memorizable_spell_tables": 0
+    },
+    {
+      "spell_level": 0,
+      "number_of_spells_memorizable": 0,
+      "number_of_spells_memorizable_after_effects": 0,
+      "spell_type": 2,
+      "index_to_spell_table": 34,
+      "count_of_memorizable_spell_tables": 0
+    }
+  ],
+  "memorized_spells": [
+    {
+      "spell_name": "SPPR103\u0000",
+      "memorised": 1
+    },
+    {
+      "spell_name": "SPPR103\u0000",
+      "memorised": 1
+    },
+    {
+      "spell_name": "SPPR109\u0000",
+      "memorised": 1
+    },
+    {
+      "spell_name": "SPPR101\u0000",
+      "memorised": 1
+    },
+    {
+      "spell_name": "SPPR203\u0000",
+      "memorised": 1
+    },
+    {
+      "spell_name": "SPPR208\u0000",
+      "memorised": 1
+    },
+    {
+      "spell_name": "SPPR211\u0000",
+      "memorised": 1
+    },
+    {
+      "spell_name": "SPPR212\u0000",
+      "memorised": 1
+    },
+    {
+      "spell_name": "SPPR312\u0000",
+      "memorised": 1
+    },
+    {
+      "spell_name": "SPPR313\u0000",
+      "memorised": 1
+    },
+    {
+      "spell_name": "SPPR315\u0000",
+      "memorised": 1
+    },
+    {
+      "spell_name": "SPPR401\u0000",
+      "memorised": 1
+    },
+    {
+      "spell_name": "SPPR413\u0000",
+      "memorised": 1
+    },
+    {
+      "spell_name": "SPPR411\u0000",
+      "memorised": 1
+    },
+    {
+      "spell_name": "SPPR502\u0000",
+      "memorised": 1
+    },
+    {
+      "spell_name": "SPPR503\u0000",
+      "memorised": 1
+    },
+    {
+      "spell_name": "SPWI113\u0000",
+      "memorised": 1
+    },
+    {
+      "spell_name": "SPWI112\u0000",
+      "memorised": 1
+    },
+    {
+      "spell_name": "SPWI110\u0000",
+      "memorised": 1
+    },
+    {
+      "spell_name": "SPWI105\u0000",
+      "memorised": 1
+    },
+    {
+      "spell_name": "SPWI213\u0000",
+      "memorised": 1
+    },
+    {
+      "spell_name": "SPWI220\u0000",
+      "memorised": 1
+    },
+    {
+      "spell_name": "SPWI211\u0000",
+      "memorised": 1
+    },
+    {
+      "spell_name": "SPWI203\u0000",
+      "memorised": 1
+    },
+    {
+      "spell_name": "SPWI312\u0000",
+      "memorised": 1
+    },
+    {
+      "spell_name": "SPWI311\u0000",
+      "memorised": 1
+    },
+    {
+      "spell_name": "SPWI318\u0000",
+      "memorised": 1
+    },
+    {
+      "spell_name": "SPWI308\u0000",
+      "memorised": 1
+    },
+    {
+      "spell_name": "SPWI408\u0000",
+      "memorised": 1
+    },
+    {
+      "spell_name": "SPWI405\u0000",
+      "memorised": 1
+    },
+    {
+      "spell_name": "SPWI406\u0000",
+      "memorised": 1
+    },
+    {
+      "spell_name": "SPWI510\u0000",
+      "memorised": 1
+    },
+    {
+      "spell_name": "SPWI505\u0000",
+      "memorised": 1
+    },
+    {
+      "spell_name": "SPWI522\u0000",
+      "memorised": 1
+    }
+  ],
+  "effects_v1": [],
+  "effects_v2": [],
+  "item_table": [
+    {
+      "resource_name": "CLCK17\u0000\u0000",
+      "item_expiration_time_hour": 0,
+      "item_expiration_time": 0,
+      "quantity_1": 0,
+      "quantity_2": 0,
+      "quantity_3": 0,
+      "identified": 0,
+      "unstealable": 0,
+      "stolen": 0,
+      "undroppable": 0
+    },
+    {
+      "resource_name": "RING07\u0000\u0000",
+      "item_expiration_time_hour": 0,
+      "item_expiration_time": 0,
+      "quantity_1": 0,
+      "quantity_2": 0,
+      "quantity_3": 0,
+      "identified": 0,
+      "unstealable": 0,
+      "stolen": 0,
+      "undroppable": 0
+    },
+    {
+      "resource_name": "HELMNOAN",
+      "item_expiration_time_hour": 0,
+      "item_expiration_time": 0,
+      "quantity_1": 0,
+      "quantity_2": 0,
+      "quantity_3": 0,
+      "identified": 0,
+      "unstealable": 0,
+      "stolen": 0,
+      "undroppable": 0
+    },
+    {
+      "resource_name": "IMOENHP1",
+      "item_expiration_time_hour": 0,
+      "item_expiration_time": 0,
+      "quantity_1": 0,
+      "quantity_2": 0,
+      "quantity_3": 0,
+      "identified": 0,
+      "unstealable": 0,
+      "stolen": 0,
+      "undroppable": 0
+    },
+    {
+      "resource_name": "DW#RND08",
+      "item_expiration_time_hour": 0,
+      "item_expiration_time": 0,
+      "quantity_1": 0,
+      "quantity_2": 0,
+      "quantity_3": 0,
+      "identified": 0,
+      "unstealable": 0,
+      "stolen": 0,
+      "undroppable": 0
+    },
+    {
+      "resource_name": "DW#RND16",
+      "item_expiration_time_hour": 0,
+      "item_expiration_time": 0,
+      "quantity_1": 0,
+      "quantity_2": 0,
+      "quantity_3": 0,
+      "identified": 0,
+      "unstealable": 0,
+      "stolen": 0,
+      "undroppable": 0
+    }
+  ],
+  "item_slots": {
+    "helmet": 2,
+    "armor": 65535,
+    "shield": 65535,
+    "gloves": 65535,
+    "left_ring": 1,
+    "right_ring": 3,
+    "amulet": 65535,
+    "belt": 65535,
+    "boots": 65535,
+    "weapon_1": 65535,
+    "weapon_2": 65535,
+    "weapon_3": 65535,
+    "weapon_4": 65535,
+    "quiver_1": 65535,
+    "quiver_2": 65535,
+    "quiver_3": 65535,
+    "quiver_4": 65535,
+    "cloak": 65535,
+    "quick_item_1": 65535,
+    "quick_item_2": 65535,
+    "quick_item_3": 65535,
+    "inventory_item_1": 4,
+    "inventory_item_2": 5,
+    "inventory_item_3": 65535,
+    "inventory_item_4": 65535,
+    "inventory_item_5": 65535,
+    "inventory_item_6": 65535,
+    "inventory_item_7": 65535,
+    "inventory_item_8": 65535,
+    "inventory_item_9": 65535,
+    "inventory_item_10": 65535,
+    "inventory_item_11": 65535,
+    "inventory_item_12": 65535,
+    "inventory_item_13": 65535,
+    "inventory_item_14": 65535,
+    "inventory_item_15": 65535,
+    "inventory_item_16": 65535,
+    "magic_weapon": 65535,
+    "weapon_slot_selected": 0,
+    "weapon_ability_selected": 0
+  }
+}
