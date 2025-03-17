@@ -1,3 +1,4 @@
+use std::error::Error;
 use std::rc::Rc;
 
 use bam::Bam;
@@ -7,8 +8,8 @@ use tileset::Tileset;
 
 use crate::{
     area::Area, bio::Biography, character::ExpandedCharacter, creature::Creature,
-    dialogue::Dialogue, effect_v2::EffectV2, game::Game, ids::Ids, item::Item, spell::Spell,
-    store::Store, twoda::TwoDA, world_map::WorldMap,
+    dialogue::Dialogue, effect_v2::EffectV2, game::Game, ids::Ids, item::Item, save::Save,
+    spell::Spell, store::Store, twoda::TwoDA, world_map::WorldMap,
 };
 
 pub mod area;
@@ -94,71 +95,73 @@ pub fn from_buffer(buffer: &[u8], resource_type: ResourceType) -> Option<Rc<dyn 
         // Skipping sounds/ out of dialog text
         ResourceType::FileTypeSrc => None,
         ResourceType::NotFound => None,
+        // Our invented file types:
+        ResourceType::FileTypeSave => Some(Rc::new(Save::new(buffer))),
         _ => None,
     }
 }
 
-pub fn from_json(buffer: &[u8], resource_type: ResourceType) -> Vec<u8> {
+pub fn from_json(buffer: &[u8], resource_type: ResourceType) -> Result<Vec<u8>, Box<dyn Error>> {
     let model: Rc<dyn Model> = match resource_type {
         // I am skipping image files
-        ResourceType::FileTypeBmp => todo!(),
-        ResourceType::FileTypeMve => todo!(),
+        ResourceType::FileTypeBmp => return Err("Not implimented yet".into()),
+        ResourceType::FileTypeMve => return Err("Not implimented yet".into()),
         // I am skipping music files
-        ResourceType::FileTypeWav => todo!(),
+        ResourceType::FileTypeWav => return Err("Not implimented yet".into()),
         // Skipping play back sounds
-        ResourceType::FileTypeWfx => todo!(),
+        ResourceType::FileTypeWfx => return Err("Not implimented yet".into()),
         // Skipping
-        ResourceType::FileTypePlt => todo!(),
-        ResourceType::FileTypeBam => Rc::new(serde_json::from_slice::<Bam>(buffer).unwrap()),
+        ResourceType::FileTypePlt => return Err("Not implimented yet".into()),
+        ResourceType::FileTypeBam => Rc::new(serde_json::from_slice::<Bam>(buffer)?),
         // I am skipping texture files
-        ResourceType::FileTypeWed => todo!(),
+        ResourceType::FileTypeWed => return Err("Not implimented yet".into()),
         // I am skipping GUI defs
-        ResourceType::FileTypeChu => todo!(),
-        ResourceType::FileTypeTi => todo!(),
+        ResourceType::FileTypeChu => return Err("Not implimented yet".into()),
+        ResourceType::FileTypeTi => return Err("Not implimented yet".into()),
         // I am skipping compress graphic files
-        ResourceType::FileTypeMos => todo!(),
-        ResourceType::FileTypeItm => Rc::new(serde_json::from_slice::<Item>(buffer).unwrap()),
-        ResourceType::FileTypeSpl => Rc::new(serde_json::from_slice::<Spell>(buffer).unwrap()),
+        ResourceType::FileTypeMos => return Err("Not implimented yet".into()),
+        ResourceType::FileTypeItm => Rc::new(serde_json::from_slice::<Item>(buffer)?),
+        ResourceType::FileTypeSpl => Rc::new(serde_json::from_slice::<Spell>(buffer)?),
         // I am ignoring scripting files
-        ResourceType::FileTypeBcs => todo!(),
-        ResourceType::FileTypeIds => Rc::new(serde_json::from_slice::<Ids>(buffer).unwrap()),
-        ResourceType::FileTypeCre => Rc::new(serde_json::from_slice::<Creature>(buffer).unwrap()),
-        ResourceType::FileTypeAre => Rc::new(serde_json::from_slice::<Area>(buffer).unwrap()),
-        ResourceType::FileTypeDlg => Rc::new(serde_json::from_slice::<Dialogue>(buffer).unwrap()),
-        ResourceType::FileType2da => Rc::new(serde_json::from_slice::<TwoDA>(buffer).unwrap()),
+        ResourceType::FileTypeBcs => return Err("Not implimented yet".into()),
+        ResourceType::FileTypeIds => Rc::new(serde_json::from_slice::<Ids>(buffer)?),
+        ResourceType::FileTypeCre => Rc::new(serde_json::from_slice::<Creature>(buffer)?),
+        ResourceType::FileTypeAre => Rc::new(serde_json::from_slice::<Area>(buffer)?),
+        ResourceType::FileTypeDlg => Rc::new(serde_json::from_slice::<Dialogue>(buffer)?),
+        ResourceType::FileType2da => Rc::new(serde_json::from_slice::<TwoDA>(buffer)?),
         // Game is a slow resource
-        ResourceType::FileTypeGam => Rc::new(serde_json::from_slice::<Game>(buffer).unwrap()),
-        ResourceType::FileTypeSto => Rc::new(serde_json::from_slice::<Store>(buffer).unwrap()),
-        ResourceType::FileTypeWmap => Rc::new(serde_json::from_slice::<WorldMap>(buffer).unwrap()),
-        ResourceType::FileTypeEff => Rc::new(serde_json::from_slice::<EffectV2>(buffer).unwrap()),
-        ResourceType::FileTypeBs => todo!(),
-        ResourceType::FileTypeChr => {
-            Rc::new(serde_json::from_slice::<ExpandedCharacter>(buffer).unwrap())
-        }
+        ResourceType::FileTypeGam => Rc::new(serde_json::from_slice::<Game>(buffer)?),
+        ResourceType::FileTypeSto => Rc::new(serde_json::from_slice::<Store>(buffer)?),
+        ResourceType::FileTypeWmap => Rc::new(serde_json::from_slice::<WorldMap>(buffer)?),
+        ResourceType::FileTypeEff => Rc::new(serde_json::from_slice::<EffectV2>(buffer)?),
+        ResourceType::FileTypeBs => return Err("Not implimented yet".into()),
+        ResourceType::FileTypeChr => Rc::new(serde_json::from_slice::<ExpandedCharacter>(buffer)?),
         // I am skipping spell casting graphics
-        ResourceType::FileTypeVvc => todo!(),
+        ResourceType::FileTypeVvc => return Err("Not implimented yet".into()),
         // Skip visual effects
-        ResourceType::FileTypeVef => todo!(),
+        ResourceType::FileTypeVef => return Err("Not implimented yet".into()),
         // I am skipping projectiles
-        ResourceType::FileTypePro => todo!(),
-        ResourceType::FileTypeBio => Rc::new(serde_json::from_slice::<Biography>(buffer).unwrap()),
-        ResourceType::FileTypeWbm => todo!(),
-        ResourceType::FileTypeFnt => todo!(),
-        ResourceType::FileTypeGui => todo!(),
-        ResourceType::FileTypeSql => todo!(),
+        ResourceType::FileTypePro => return Err("Not implimented yet".into()),
+        ResourceType::FileTypeBio => Rc::new(serde_json::from_slice::<Biography>(buffer)?),
+        ResourceType::FileTypeWbm => return Err("Not implimented yet".into()),
+        ResourceType::FileTypeFnt => return Err("Not implimented yet".into()),
+        ResourceType::FileTypeGui => return Err("Not implimented yet".into()),
+        ResourceType::FileTypeSql => return Err("Not implimented yet".into()),
         // Skipping graphic data
-        ResourceType::FileTypePvrz => todo!(),
-        ResourceType::FileTypeGlsl => todo!(),
-        ResourceType::FileTypeTlk => todo!(),
-        ResourceType::FileTypeMenu => todo!(),
-        ResourceType::FileTypeTtf => todo!(),
-        ResourceType::FileTypePng => todo!(),
-        ResourceType::FileTypeBah => todo!(),
-        ResourceType::FileTypeIni => todo!(),
+        ResourceType::FileTypePvrz => return Err("Not implimented yet".into()),
+        ResourceType::FileTypeGlsl => return Err("Not implimented yet".into()),
+        ResourceType::FileTypeTlk => return Err("Not implimented yet".into()),
+        ResourceType::FileTypeMenu => return Err("Not implimented yet".into()),
+        ResourceType::FileTypeTtf => return Err("Not implimented yet".into()),
+        ResourceType::FileTypePng => return Err("Not implimented yet".into()),
+        ResourceType::FileTypeBah => return Err("Not implimented yet".into()),
+        ResourceType::FileTypeIni => return Err("Not implimented yet".into()),
         // Skipping sounds/ out of dialog text
-        ResourceType::FileTypeSrc => todo!(),
-        ResourceType::NotFound => todo!(),
-        _ => todo!(),
+        ResourceType::FileTypeSrc => return Err("Not implimented yet".into()),
+        ResourceType::NotFound => return Err("Not implimented yet".into()),
+        // Our invented file types:
+        ResourceType::FileTypeSave => Rc::new(serde_json::from_slice::<Save>(buffer)?),
+        _ => return Err("Not implimented yet".into()),
     };
-    model.to_bytes()
+    Ok(model.to_bytes())
 }

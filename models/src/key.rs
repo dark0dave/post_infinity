@@ -1,12 +1,15 @@
-use std::fmt::Debug;
+use std::{fmt::Debug, path::Path};
 
-use binrw::{
-    io::{Read, Seek},
-    BinRead, BinReaderExt, BinWrite,
-};
+use std::error::Error;
+
+use binrw::{io::Cursor, BinRead, BinReaderExt, BinWrite};
 use serde::{Deserialize, Serialize};
 
-use crate::common::{header::Header, Resref};
+use crate::{
+    biff::Biff,
+    common::{header::Header, Resref},
+    model::Model,
+};
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/key_v1.htm
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
@@ -20,6 +23,9 @@ pub struct Key {
     pub bif_file_names: Vec<String>,
     #[br(count=header.count_of_resource_entries)]
     pub resource_entries: Vec<ResourceEntry>,
+    #[bw(ignore)]
+    #[br(ignore)]
+    pub biffs: Vec<Biff>,
 }
 
 fn read_key_strings(s: &[u8], entries: &Vec<BiffEntry>) -> Vec<String> {
@@ -34,14 +40,40 @@ fn read_key_strings(s: &[u8], entries: &Vec<BiffEntry>) -> Vec<String> {
     out
 }
 
-impl Key {
-    pub fn new<R: Read + Seek>(reader: &mut R) -> Self {
+impl Model for Key {
+    fn new(buffer: &[u8]) -> Self {
+        let mut reader = Cursor::new(buffer);
         match reader.read_le() {
             Ok(res) => res,
             Err(err) => {
-                panic!("Errored with {:?}", err);
+                panic!("Errored with {:?}, dumping buffer: {:?}", err, buffer);
             }
         }
+    }
+
+    fn to_bytes(&self) -> Vec<u8> {
+        let mut writer = Cursor::new(Vec::new());
+        self.write_le(&mut writer).unwrap();
+        writer.into_inner()
+    }
+}
+
+impl Key {
+    pub fn recurse(&mut self, path: &Path) -> Result<(), Box<dyn Error>> {
+        let parent = path
+            .parent()
+            .ok_or_else(|| format!("No parent found for {:?}", path))?;
+        log::trace!("Parent path is: {:?}", parent);
+        let mut out = vec![];
+        for bif_file_name in self.bif_file_names.iter() {
+            let file_path = &parent
+                .join(bif_file_name.to_string().replace('\0', ""))
+                .canonicalize()?;
+            log::debug!("Path to biff: {:?}", file_path);
+            out.push(Biff::try_from(file_path)?);
+        }
+        self.biffs = out;
+        Ok(())
     }
 }
 
@@ -75,33 +107,30 @@ pub struct ResourceEntry {
 
 #[cfg(test)]
 mod tests {
-
+    use super::*;
+    use binrw::io::Read;
+    use pretty_assertions::assert_eq;
+    use serde_json::Value;
     use std::fs::File;
 
-    use super::*;
-    use binrw::io::BufReader;
-    use pretty_assertions::assert_eq;
+    const FIXTURES: [(&str, &str); 1] = [("fixtures/chitin.key", "fixtures/chitin.key.json")];
+
+    fn read_file(path: &str) -> Result<Vec<u8>, Box<dyn Error>> {
+        let mut file = File::open(path)?;
+        let mut buffer = Vec::new();
+        file.read_to_end(&mut buffer)?;
+        Ok(buffer)
+    }
 
     #[test]
-    fn valid_key_file_parsed() {
-        let file = File::open("fixtures/chitin.key").unwrap();
-        let mut reader = BufReader::new(file);
-        let key = Key::new(&mut reader);
-        assert_eq!(
-            key.bif_entries.len(),
-            key.header.count_of_bif_entries as usize
-        );
-        assert_eq!(
-            key.bif_file_names.first(),
-            Some(&"data/Default.bif\0".into())
-        );
-        assert_eq!(
-            key.bif_file_names.last(),
-            Some(&"data/BDTP_DLC.BIF\0".into())
-        );
-        assert_eq!(
-            key.resource_entries.len(),
-            key.header.count_of_resource_entries as usize
-        );
+    fn parse() -> Result<(), Box<dyn Error>> {
+        for (file_path, json_file_path) in FIXTURES {
+            let key: Key = Key::new(&read_file(file_path)?);
+            let result: Value = serde_json::to_value(key)?;
+            let expected: Value = serde_json::from_slice(&read_file(json_file_path)?)?;
+
+            assert_eq!(result, expected);
+        }
+        Ok(())
     }
 }

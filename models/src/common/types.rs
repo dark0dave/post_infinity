@@ -1,4 +1,4 @@
-#![allow(dead_code, unused_variables)]
+// #![allow(dead_code, unused_variables)]
 
 use std::{error::Error, path::Path};
 
@@ -54,58 +54,10 @@ pub enum ResourceType {
     FileTypeBah = 0x044c,
     FileTypeIni = 0x0802,
     FileTypeSrc = 0x0803,
-}
-
-impl std::fmt::Display for ResourceType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let ext = match self {
-            ResourceType::FileTypeBmp => "bmp",
-            ResourceType::FileTypeMve => "mve",
-            ResourceType::FileTypeWav => "wav",
-            ResourceType::FileTypeWfx => "wfx",
-            ResourceType::FileTypePlt => "plt",
-            ResourceType::FileTypeBam => "bam",
-            ResourceType::FileTypeWed => "wed",
-            ResourceType::FileTypeChu => "chu",
-            ResourceType::FileTypeTi => "ti",
-            ResourceType::FileTypeMos => "mos",
-            ResourceType::FileTypeItm => "itm",
-            ResourceType::FileTypeSpl => "spl",
-            ResourceType::FileTypeBcs => "bcs",
-            ResourceType::FileTypeIds => "ids",
-            ResourceType::FileTypeCre => "cre",
-            ResourceType::FileTypeAre => "are",
-            ResourceType::FileTypeDlg => "dlg",
-            ResourceType::FileType2da => "2da",
-            ResourceType::FileTypeGam => "gam",
-            ResourceType::FileTypeSto => "sto",
-            ResourceType::FileTypeWmap => "wmap",
-            ResourceType::FileTypeEff => "eff",
-            ResourceType::FileTypeBs => "ebs",
-            ResourceType::FileTypeChr => "chr",
-            ResourceType::FileTypeVvc => "vvc",
-            ResourceType::FileTypeVef => "vef",
-            ResourceType::FileTypePro => "pro",
-            ResourceType::FileTypeBio => "bio",
-            ResourceType::FileTypeWbm => "wbm",
-            ResourceType::FileTypeFnt => "fnt",
-            ResourceType::FileTypeGui => "gui",
-            ResourceType::FileTypeSql => "sql",
-            ResourceType::FileTypePvrz => "pvrz",
-            ResourceType::FileTypeGlsl => "glsl",
-            ResourceType::FileTypeTlk => "tlk",
-            ResourceType::FileTypeMenu => "enu",
-            ResourceType::FileTypeMenu2 => "nu2",
-            ResourceType::FileTypeTtf => "ttf",
-            ResourceType::FileTypePng => "png",
-            ResourceType::FileTypeBah => "bah",
-            ResourceType::FileTypeIni => "ini",
-            ResourceType::FileTypeSrc => "src",
-            _ => "",
-        }
-        .to_string();
-        write!(f, "{}", ext)
-    }
+    // Here our invented FileTypes:
+    FileTypeKey = 0x1000,
+    FileTypeBiff = 0x1001,
+    FileTypeSave = 0x1002,
 }
 
 impl TryFrom<&Path> for ResourceType {
@@ -162,6 +114,10 @@ impl From<&str> for ResourceType {
             "bah" => ResourceType::FileTypeBah,
             "ini" => ResourceType::FileTypeIni,
             "src" => ResourceType::FileTypeSrc,
+            // Here our invented FileTypes:
+            "key" => ResourceType::FileTypeKey,
+            "bif" => ResourceType::FileTypeBiff,
+            "sav" => ResourceType::FileTypeSave,
             _ => ResourceType::NotFound,
         }
     }

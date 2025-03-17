@@ -106,7 +106,7 @@ fn parse_compressed_data(buff: &[u8]) -> Vec<u8> {
     let mut d = ZlibDecoder::new(buff);
     let mut buffer = vec![];
     if let Err(err) = d.read_to_end(&mut buffer) {
-        println!("{}", err);
+        log::error!("{}", err);
     }
     buffer
 }

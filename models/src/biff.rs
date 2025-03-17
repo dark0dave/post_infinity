@@ -1,8 +1,8 @@
 use core::str;
-use std::rc::Rc;
+use std::{error::Error, fs::File, path::PathBuf, rc::Rc};
 
 use binrw::{
-    io::{Read, Seek, SeekFrom},
+    io::{BufReader, Cursor, Read, Seek, SeekFrom},
     BinRead, BinReaderExt, BinResult, BinWrite,
 };
 use serde::{Deserialize, Serialize};
@@ -12,7 +12,7 @@ use crate::tileset::Tileset;
 use crate::{common::types::ResourceType, from_buffer, model::Model};
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/bif_v1.htm
-#[derive(Debug, BinRead, BinWrite, Serialize)]
+#[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct Biff {
     #[serde(flatten)]
     pub header: BiffHeader,
@@ -21,48 +21,69 @@ pub struct Biff {
     #[br(count=header.count_of_tileset_entries)]
     pub tileset_entries: Vec<TilesetEntry>,
     #[serde(skip)]
-    #[br(seek_before=SeekFrom::Start(0), parse_with = |reader, _, _: ()| parse_contained_files(reader, &fileset_entries, &tileset_entries))]
+    #[br(seek_before=SeekFrom::Start(0), parse_with = |reader, _, _: ()| Biff::parse_contained_files(reader, &fileset_entries, &tileset_entries))]
     #[bw(map = |x| x.iter().flat_map(|x| x.to_bytes()).collect::<Vec<u8>>())]
     pub contained_files: Vec<Rc<dyn Model>>,
 }
 
-fn parse_contained_files<R: Read + Seek>(
-    reader: &mut R,
-    fileset_entries: &Vec<FilesetEntry>,
-    tileset_entries: &Vec<TilesetEntry>,
-) -> BinResult<Vec<Rc<dyn Model>>> {
-    let mut buffer = vec![];
-    reader.read_to_end(&mut buffer).unwrap();
-
-    let mut out: Vec<Rc<dyn Model>> =
-        Vec::with_capacity(fileset_entries.len() + tileset_entries.len());
-    for fileset_entry in fileset_entries {
-        let start: usize = fileset_entry.offset as usize;
-        let end: usize = start + fileset_entry.size as usize;
-        let buff = buffer.get(start..end).unwrap_or_default();
-        if let Some(data) = from_buffer(buff, fileset_entry.resource_type) {
-            out.push(data);
-        }
-    }
-    for tileset_entry in tileset_entries {
-        let start: usize = tileset_entry.offset as usize;
-        let end: usize = start + (tileset_entry.tile_count * tileset_entry.tile_size) as usize;
-        let buff = buffer.get(start..end).unwrap_or_default();
-        out.push(Rc::new(Tileset {
-            data: buff.to_vec(),
-        }));
-    }
-    Ok(out)
-}
-
-impl Biff {
-    pub fn new<R: Read + Seek>(reader: &mut R) -> Self {
+impl Model for Biff {
+    fn new(buffer: &[u8]) -> Self {
+        let mut reader = Cursor::new(buffer);
         match reader.read_le() {
             Ok(res) => res,
             Err(err) => {
-                panic!("Errored with {:?}", err);
+                panic!("Errored with {:?}, dumping buffer: {:?}", err, buffer);
             }
         }
+    }
+
+    fn to_bytes(&self) -> Vec<u8> {
+        let mut writer = Cursor::new(Vec::new());
+        self.write_le(&mut writer).unwrap();
+        writer.into_inner()
+    }
+}
+
+impl TryFrom<&PathBuf> for Biff {
+    type Error = Box<dyn Error>;
+
+    fn try_from(value: &PathBuf) -> Result<Self, Self::Error> {
+        let file = File::open(value)?;
+        let mut reader = BufReader::new(file);
+        let mut buffer = vec![];
+        reader.read_to_end(&mut buffer)?;
+        Ok(Biff::new(&buffer))
+    }
+}
+
+impl Biff {
+    fn parse_contained_files<R: Read + Seek>(
+        reader: &mut R,
+        fileset_entries: &Vec<FilesetEntry>,
+        tileset_entries: &Vec<TilesetEntry>,
+    ) -> BinResult<Vec<Rc<dyn Model>>> {
+        let mut buffer = vec![];
+        reader.read_to_end(&mut buffer).unwrap();
+
+        let mut out: Vec<Rc<dyn Model>> =
+            Vec::with_capacity(fileset_entries.len() + tileset_entries.len());
+        for fileset_entry in fileset_entries {
+            let start: usize = fileset_entry.offset as usize;
+            let end: usize = start + fileset_entry.size as usize;
+            let buff = buffer.get(start..end).unwrap_or_default();
+            if let Some(data) = from_buffer(buff, fileset_entry.resource_type) {
+                out.push(data);
+            }
+        }
+        for tileset_entry in tileset_entries {
+            let start: usize = tileset_entry.offset as usize;
+            let end: usize = start + (tileset_entry.tile_count * tileset_entry.tile_size) as usize;
+            let buff = buffer.get(start..end).unwrap_or_default();
+            out.push(Rc::new(Tileset {
+                data: buff.to_vec(),
+            }));
+        }
+        Ok(out)
     }
 }
 
@@ -101,49 +122,30 @@ pub struct TilesetEntry {
 
 #[cfg(test)]
 mod tests {
-
+    use super::*;
+    use binrw::io::Read;
+    use pretty_assertions::assert_eq;
+    use serde_json::Value;
     use std::fs::File;
 
-    use super::*;
-    use binrw::io::BufReader;
-    use pretty_assertions::assert_eq;
+    const FIXTURES: [(&str, &str); 1] = [("fixtures/effects.bif", "fixtures/effects.bif.json")];
+
+    fn read_file(path: &str) -> Result<Vec<u8>, Box<dyn Error>> {
+        let mut file = File::open(path)?;
+        let mut buffer = Vec::new();
+        file.read_to_end(&mut buffer)?;
+        Ok(buffer)
+    }
 
     #[test]
-    fn valid_biff_file_parsed() {
-        let file = File::open("fixtures/effects.bif").unwrap();
-        let mut reader = BufReader::new(file);
-        let biff = Biff::new(&mut reader);
-        assert_eq!(
-            biff.header,
-            BiffHeader {
-                header: Header {
-                    signature: "BIFF".into(),
-                    version: "V1  ".into(),
-                },
-                count_of_fileset_entries: 534,
-                count_of_tileset_entries: 0,
-                offset_to_file_entries: 181288
-            }
-        );
-        assert_eq!(
-            *biff.fileset_entries.first().unwrap(),
-            FilesetEntry {
-                resource_locator: Strref(0),
-                offset: 24,
-                size: 492,
-                resource_type: ResourceType::FileTypeVvc,
-                unknown: 0
-            }
-        );
-        assert_eq!(
-            *biff.fileset_entries.last().unwrap(),
-            FilesetEntry {
-                resource_locator: Strref(533),
-                offset: 181012,
-                size: 272,
-                resource_type: ResourceType::FileTypeEff,
-                unknown: 0
-            }
-        )
+    fn parse() -> Result<(), Box<dyn Error>> {
+        for (file_path, json_file_path) in FIXTURES {
+            let biff: Biff = Biff::new(&read_file(file_path)?);
+            let result: Value = serde_json::to_value(biff)?;
+            let expected: Value = serde_json::from_slice(&read_file(json_file_path)?)?;
+
+            assert_eq!(result, expected);
+        }
+        Ok(())
     }
 }
