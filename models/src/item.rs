@@ -3,11 +3,11 @@ use serde::{Deserialize, Serialize};
 
 use crate::common::char_array::CharArray;
 use crate::common::feature_block::FeatureBlock;
-use crate::common::resref::Resref;
+use crate::common::header::Header;
 use crate::model::Model;
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/itm_v1.htm
-#[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
+#[derive(Debug, BinRead, BinWrite, Serialize, Deserialize, PartialEq)]
 pub struct Item {
     #[serde(skip)]
     #[br(parse_with = until_eof, restore_position)]
@@ -41,21 +41,18 @@ impl Model for Item {
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/itm_v1.htm#itmv1_Header
-#[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
+#[derive(Debug, BinRead, BinWrite, Serialize, Deserialize, PartialEq)]
 pub struct ItemHeader {
-    #[br(count = 4)]
-    signature: CharArray,
-    #[br(count = 4)]
-    version: CharArray,
+    #[serde(flatten)]
+    pub header: Header,
     unidentified_item_name: u32,
     identified_item_name: u32,
-    replacement_item: Resref,
+    replacement_item: CharArray<8>,
     // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/itm_v1.htm#Header_Flags
     type_flags: u32,
     category: u16,
     usability: u32,
-    #[br(count = 2)]
-    item_animation: Vec<u8>,
+    item_animation: CharArray<2>,
     min_level: u16,
     min_strength: u16,
     min_strength_bonus: u8,
@@ -71,13 +68,13 @@ pub struct ItemHeader {
     min_charisma: u16,
     base_value: u32,
     max_stackable: u16,
-    item_icon: Resref,
+    item_icon: CharArray<8>,
     lore: u16,
-    ground_icon: Resref,
+    ground_icon: CharArray<8>,
     base_weight: u32,
     item_description_generic: u32,
     item_description_identified: u32,
-    description_icon: Resref,
+    description_icon: CharArray<8>,
     enchantment: u32,
     offset_to_extended_headers: u32,
     count_of_extended_headers: u16,
@@ -87,13 +84,13 @@ pub struct ItemHeader {
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/itm_v1.htm#itmv1_Extended_Header
-#[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
+#[derive(Debug, BinRead, BinWrite, Serialize, Deserialize, PartialEq)]
 pub struct ItemExtendedHeader {
     attack_type: u8, // Note zero is very bad here
     id_required: u8,
     location: u8,
     alternative_dice_sides: u8,
-    use_icon: Resref,
+    use_icon: CharArray<8>,
     target_type: u8,
     target_count: u8,
     range: u16,
@@ -112,16 +109,14 @@ pub struct ItemExtendedHeader {
     feature_blocks_index: u16,
     max_charges: u16,
     charge_depletion_behaviour: u16,
-    flags: u32,
+    #[br(count = 4)]
+    flags: Vec<u8>,
     projectile_animation: u16,
     #[br(count = 6)]
     melee_animation: Vec<u8>,
     is_arrow: u16,
     is_bolt: u16,
     is_bullet: u16,
-    #[bw(ignore)]
-    #[br(count=feature_blocks_count)]
-    effects: Vec<FeatureBlock>,
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/itm_v1.htm#itmv1_Feature_Block
@@ -133,45 +128,44 @@ mod tests {
     use super::*;
     use binrw::io::{BufReader, Read};
     use pretty_assertions::assert_eq;
-    use std::fs::File;
+    use std::{error::Error, fs::File};
 
     #[test]
-    fn valid_item_file_parsed() {
-        let file = File::open("fixtures/gopoof.itm").unwrap();
+    fn valid_item_file_parsed() -> Result<(), Box<dyn Error>> {
+        let file = File::open("fixtures/gopoof.itm")?;
         let mut reader = BufReader::new(file);
         let mut buffer = Vec::new();
-        reader
-            .read_to_end(&mut buffer)
-            .expect("Could not read to buffer");
+        reader.read_to_end(&mut buffer)?;
         let item = Item::new(&buffer);
         assert_eq!(item.header.identified_item_name, 4294967295);
         assert_eq!(item.header.max_stackable, 1);
+        Ok(())
     }
 
     #[test]
-    fn sword_file_parse() {
-        let file = File::open("fixtures/sw1h01.itm").unwrap();
+    fn sword_file_parse() -> Result<(), Box<dyn Error>> {
+        let file = File::open("fixtures/sw1h01.itm")?;
         let mut reader = BufReader::new(file);
         let mut buffer = Vec::new();
-        reader
-            .read_to_end(&mut buffer)
-            .expect("Could not read to buffer");
+        reader.read_to_end(&mut buffer)?;
         let item = Item::new(&buffer);
-        assert_eq!(item.extended_headers.len(), 1);
-        assert_eq!(item.equipping_feature_blocks.len(), 4);
+        let file = File::open("fixtures/sw1h01.itm.json")?;
+        let reader = BufReader::new(file);
+        let mut expected: Item = serde_json::from_reader(reader)?;
+        expected.original_bytes = buffer;
+        assert_eq!(item, expected);
+        Ok(())
     }
 
     #[test]
-    fn baeloth_book_parse() {
-        let file = File::open("fixtures/zbpdnote.itm").unwrap();
+    fn baeloth_book_parse() -> Result<(), Box<dyn Error>> {
+        let file = File::open("fixtures/zbpdnote.itm")?;
         let mut reader = BufReader::new(file);
         let mut buffer = Vec::new();
-        reader
-            .read_to_end(&mut buffer)
-            .expect("Could not read to buffer");
+        reader.read_to_end(&mut buffer)?;
         let item = Item::new(&buffer);
         assert_eq!(item.extended_headers.len(), 1);
-        assert_eq!(item.extended_headers[0].effects.len(), 1);
         assert_eq!(item.equipping_feature_blocks.len(), 0);
+        Ok(())
     }
 }

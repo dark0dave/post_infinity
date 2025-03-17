@@ -2,7 +2,8 @@ use binrw::{helpers::until_eof, io::Cursor, BinRead, BinReaderExt, BinWrite};
 use serde::{Deserialize, Serialize};
 
 use crate::common::char_array::CharArray;
-use crate::common::resref::Resref;
+use crate::common::header::Header;
+use crate::common::Resref;
 
 use crate::{creature::Creature, model::Model};
 
@@ -35,12 +36,9 @@ impl Model for ExpandedCharacter {
 
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct BGCharacter {
-    #[br(count = 4)]
-    pub signature: CharArray,
-    #[br(count = 4)]
-    pub version: CharArray,
-    #[br(count = 32)]
-    pub name: CharArray,
+    #[serde(flatten)]
+    pub header: Header,
+    pub name: CharArray<32>,
     pub offset_to_cre_structure: u32,
     pub length_of_the_cre_structure: u32,
     pub index_into_slots_ids_for_quick_weapon_1: u16,

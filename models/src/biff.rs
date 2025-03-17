@@ -7,7 +7,7 @@ use binrw::{
 };
 use serde::{Deserialize, Serialize};
 
-use crate::common::{char_array::CharArray, strref::Strref};
+use crate::common::{header::Header, strref::Strref};
 use crate::tileset::Tileset;
 use crate::{common::types::ResourceType, from_buffer, model::Model};
 
@@ -69,10 +69,8 @@ impl Biff {
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/bif_v1.htm#bif_v1_Header
 #[derive(Debug, PartialEq, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct BiffHeader {
-    #[br(count = 4)]
-    pub signature: CharArray,
-    #[br(count = 4)]
-    pub version: CharArray,
+    #[serde(flatten)]
+    pub header: Header,
     pub count_of_fileset_entries: u32,
     pub count_of_tileset_entries: u32,
     pub offset_to_file_entries: u32,
@@ -118,8 +116,10 @@ mod tests {
         assert_eq!(
             biff.header,
             BiffHeader {
-                signature: "BIFF".into(),
-                version: "V1  ".into(),
+                header: Header {
+                    signature: "BIFF".into(),
+                    version: "V1  ".into(),
+                },
                 count_of_fileset_entries: 534,
                 count_of_tileset_entries: 0,
                 offset_to_file_entries: 181288

@@ -1,18 +1,16 @@
-use binrw::{
-    io::{Cursor, Read, Seek},
-    BinRead, BinReaderExt, BinResult, BinWrite,
-};
+use binrw::{io::Cursor, BinRead, BinReaderExt, BinWrite};
 use serde::{Deserialize, Serialize};
 
-use crate::{common::char_array::CharArray, model::Model};
+use crate::{
+    common::parsers::{read_to_end, write_string},
+    model::Model,
+};
 
-#[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
-pub struct Biography(#[br(parse_with = |reader, _, _:()| read_to_end(reader))] pub CharArray);
-
-fn read_to_end<R: Read + Seek>(reader: &mut R) -> BinResult<CharArray> {
-    let mut buff = vec![];
-    reader.read_to_end(&mut buff).unwrap_or_default();
-    Ok(CharArray(buff))
+#[derive(Debug, PartialEq, BinRead, BinWrite, Serialize, Deserialize)]
+pub struct Biography {
+    #[bw(write_with = write_string)]
+    #[br(parse_with = read_to_end)]
+    pub contents: String,
 }
 
 impl Model for Biography {
@@ -22,7 +20,7 @@ impl Model for Biography {
     }
 
     fn to_bytes(&self) -> Vec<u8> {
-        self.0 .0.to_vec()
+        self.contents.clone().into_bytes()
     }
 }
 
@@ -34,13 +32,13 @@ mod tests {
     use std::fs::File;
 
     #[test]
-    fn read_biography() {
-        let file = File::open("fixtures/test.bio").expect("Fixture missing");
-        let mut buffer = Vec::new();
-        BufReader::new(file)
-            .read_to_end(&mut buffer)
-            .expect("Could not read to buffer");
+    fn read_biography() -> Result<(), Box<dyn std::error::Error>> {
+        let file = File::open("fixtures/test.bio")?;
+        let mut buffer = vec![];
+        BufReader::new(file).read_to_end(&mut buffer)?;
         let bio = Biography::new(&buffer);
-        assert_eq!(bio.0, CharArray(buffer));
+        let expected = String::from_utf8(buffer.to_vec())?;
+        assert_eq!(bio.contents, expected);
+        Ok(())
     }
 }

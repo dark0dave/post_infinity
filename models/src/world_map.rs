@@ -2,8 +2,9 @@ use binrw::{helpers::until_eof, io::Cursor, io::SeekFrom, BinRead, BinReaderExt,
 use serde::{Deserialize, Serialize};
 
 use crate::common::char_array::CharArray;
-use crate::common::resref::Resref;
+use crate::common::header::Header;
 use crate::common::strref::Strref;
+use crate::common::Resref;
 use crate::model::Model;
 
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
@@ -45,10 +46,8 @@ impl Model for WorldMap {
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/wmap_v1.htm#wmapv1_0_Header
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct WorldMapHeader {
-    #[br(count = 4)]
-    pub signature: CharArray,
-    #[br(count = 4)]
-    pub version: CharArray,
+    #[serde(flatten)]
+    pub header: Header,
     pub count_of_worldmap_entries: u32,
     pub offset_to_worldmap_entries: u32,
 }
@@ -80,8 +79,7 @@ pub struct WorldMapEntry {
 pub struct AreaEntry {
     pub area_resref: Resref,
     pub area_name_short: Resref,
-    #[br(count = 32)]
-    pub area_name_long: CharArray,
+    pub area_name_long: CharArray<32>,
     #[br(count = 4)]
     pub bitmask_indicating_status_of_area: Vec<u8>,
     pub bam_file_sequence_icons: u32,
@@ -107,8 +105,7 @@ pub struct AreaEntry {
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct AreaLink {
     pub index_of_destination_area: u32,
-    #[br(count = 32)]
-    pub entry_point: CharArray,
+    pub entry_point: CharArray<32>,
     pub travel_time: u32,
     pub default_entry_location: u32,
     pub random_encounter_area_1: Resref,

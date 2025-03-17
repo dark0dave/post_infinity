@@ -1,9 +1,9 @@
 use binrw::{helpers::until_eof, io::Cursor, BinRead, BinReaderExt, BinWrite};
 use serde::{Deserialize, Serialize};
 
-use crate::common::char_array::CharArray;
-use crate::common::resref::Resref;
+use crate::common::header::Header;
 use crate::common::strref::Strref;
+use crate::common::Resref;
 use crate::model::Model;
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/sto_v1.htm
@@ -16,6 +16,9 @@ pub struct Store {
     #[serde(flatten)]
     pub header: StoreHeader,
     #[bw(ignore)]
+    #[br(count=header.count_of_items_in_items_purchased_section)]
+    pub items_purchased_here: Vec<u32>,
+    #[bw(ignore)]
     #[br(count=header.count_of_items_for_sale_section)]
     pub items_for_sale: Vec<ItemsForSale>,
     #[bw(ignore)]
@@ -24,9 +27,6 @@ pub struct Store {
     #[bw(ignore)]
     #[br(count=header.count_of_cures_section)]
     pub cures_for_sale: Vec<CuresForSale>,
-    #[bw(ignore)]
-    #[br(count=header.count_of_items_in_items_purchased_section)]
-    pub items_purchased_here: Vec<u32>,
 }
 
 impl Model for Store {
@@ -50,10 +50,8 @@ impl Model for Store {
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/sto_v1.htm#storv1_0_Header
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct StoreHeader {
-    #[br(count = 4)]
-    pub signature: CharArray,
-    #[br(count = 4)]
-    pub version: CharArray,
+    #[serde(flatten)]
+    pub header: Header,
     //  (0=Store, 1=Tavern, 2=Inn, 3=Temple, 5=Container)
     pub store_type: u32,
     pub name: Strref,

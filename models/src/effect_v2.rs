@@ -2,16 +2,15 @@ use binrw::{io::Cursor, BinRead, BinReaderExt, BinWrite};
 use serde::{Deserialize, Serialize};
 
 use crate::common::char_array::CharArray;
-use crate::common::resref::Resref;
+use crate::common::header::Header;
+use crate::common::Resref;
 use crate::model::Model;
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/eff_v2.htm
 #[derive(Debug, PartialEq, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct EffectV2 {
-    #[br(count = 4)]
-    pub signature: CharArray,
-    #[br(count = 4)]
-    pub version: CharArray,
+    #[serde(flatten)]
+    pub header: Header,
     #[serde(flatten)]
     pub body: EffectV2Body,
 }
@@ -44,10 +43,8 @@ impl Model for EffectV2 {
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/eff_v2.htm#effv2_Body
 #[derive(Debug, PartialEq, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct EffectV2Body {
-    #[br(count = 4)]
-    pub signature: CharArray,
-    #[br(count = 4)]
-    pub version: CharArray,
+    #[serde(flatten)]
+    pub header: Header,
     #[serde(flatten)]
     pub body: EffectV2BodyWithOutHeader,
 }
@@ -93,8 +90,7 @@ pub struct EffectV2BodyWithOutHeader {
     pub parent_resource_flags: Vec<u8>,
     pub projectile: u32,
     pub parent_resource_slot: u32,
-    #[br(count = 32)]
-    pub variable_name: CharArray,
+    pub variable_name: CharArray<32>,
     pub caster_level: u32,
     pub first_apply: u32,
     // https://gibberlings3.github.io/iesdp/files/2da/2da_bgee/msectype.htm
@@ -125,11 +121,15 @@ mod tests {
         assert_eq!(
             EffectV2::new(&buffer),
             EffectV2 {
-                signature: "EFF ".into(),
-                version: "V2.0".into(),
-                body: EffectV2Body {
+                header: Header {
                     signature: "EFF ".into(),
                     version: "V2.0".into(),
+                },
+                body: EffectV2Body {
+                    header: Header {
+                        signature: "EFF ".into(),
+                        version: "V2.0".into(),
+                    },
                     body: EffectV2BodyWithOutHeader {
                         opcode_number: 98,
                         target_type: 2,
@@ -141,7 +141,7 @@ mod tests {
                         duration: 120,
                         probability_1: 100,
                         probability_2: 0,
-                        resource_1: Resref("\0\0\0\0\0\0\0\0".into()),
+                        resource_1: "\0\0\0\0\0\0\0\0".into(),
                         dice_thrown: 0,
                         dice_sides: 0,
                         saving_throw_type: 0,
@@ -156,14 +156,14 @@ mod tests {
                         parameter_4: 0,
                         parameter_5: 0,
                         time_applied_ticks: 0,
-                        resource_2: Resref("\0\0\0\0\0\0\0\0".into()),
-                        resource_3: Resref("\0\0\0\0\0\0\0\0".into()),
+                        resource_2: "\0\0\0\0\0\0\0\0".into(),
+                        resource_3: "\0\0\0\0\0\0\0\0".into(),
                         caster_x_coordinate: 4294967295,
                         caster_y_coordinate: 4294967295,
                         target_x_coordinate: 4294967295,
                         target_y_coordinate: 4294967295,
                         parent_resource_type: 0,
-                        parent_resource: Resref("\0\0\0\0\0\0\0\0".into()),
+                        parent_resource: "\0\0\0\0\0\0\0\0".into(),
                         parent_resource_flags: vec![0; 4],
                         projectile: 0,
                         parent_resource_slot: 4294967295,

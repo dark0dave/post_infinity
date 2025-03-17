@@ -15,7 +15,7 @@ pub struct Args {
     #[clap(env, long, short, action=ArgAction::SetTrue)]
     pub process_tlk: bool,
     /// Output Format, expects json(j), binary(b), print(p), or none(empty value)
-    #[clap(env, long, short, value_parser=output_format_parser, default_value = "")]
+    #[clap(env, long, short, value_parser=output_format_parser, default_value = "p")]
     pub output_format: String,
     /// Filename or prefix to extract [WARNING: EXPERIMENTAL]
     #[clap(env, long, short, default_value = "")]
@@ -26,7 +26,7 @@ pub struct Args {
     /// Read Save game
     #[clap(env, long, short, action=ArgAction::SetTrue)]
     pub save: bool,
-    /// Read Save game
+    /// If to_ie_type is set this controls the output
     #[clap(env, long, short, default_value = ".")]
     pub destination: PathBuf,
     /// The path to the file to read

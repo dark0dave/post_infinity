@@ -6,7 +6,7 @@ use binrw::{
 use flate2::bufread::ZlibDecoder;
 use serde::{Deserialize, Serialize};
 
-use crate::{common::char_array::CharArray, model::Model};
+use crate::{common::header::Header, model::Model};
 
 // "BAM\0"
 const BAM_SIGNATURE: &[u8; 4] = &[66, 65, 77, 0];
@@ -28,7 +28,7 @@ pub struct Bam {
     pub original_bytes: Vec<u8>,
     #[bw(ignore)]
     #[serde(flatten)]
-    pub header: BamHeader,
+    pub header: Header,
     // If BAM v1
     #[bw(ignore)]
     #[serde(flatten)]
@@ -122,15 +122,6 @@ impl Model for Bam {
         self.write_le(&mut writer).unwrap();
         writer.into_inner()
     }
-}
-
-// Generic header for this one
-#[derive(Debug, PartialEq, BinRead, BinWrite, Serialize, Deserialize)]
-pub struct BamHeader {
-    #[br(count = 4)]
-    pub signature: CharArray,
-    #[br(count = 4)]
-    pub version: CharArray,
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/bam_v1.htm#bamv1_Header

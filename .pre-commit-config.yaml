@@ -34,18 +34,30 @@ repos:
     - id: commitizen
       stages: [commit-msg]
 
-- repo: https://github.com/doublify/pre-commit-rust
-  rev: v1.0
-  hooks:
-    - id: fmt
-      stages: [pre-commit]
-    - id: cargo-check
-      stages: [pre-commit]
-    - id: clippy
-      stages: [pre-commit]
-
 - repo: local
   hooks:
+    - id: fmt
+      name: fmt
+      description: Format files with cargo fmt.
+      entry: cargo fmt
+      language: system
+      types: [rust]
+      args: ["--"]
+    - id: cargo-check
+      name: cargo check
+      description: Check the package for errors.
+      entry: cargo check
+      language: system
+      types: [rust]
+      pass_filenames: false
+    - id: clippy
+      name: clippy
+      description: Lint rust sources
+      entry: cargo clippy
+      language: system
+      args: ["--", "-D", "warnings"]
+      types: [rust]
+      pass_filenames: false
     - id: cargo-test
       stages: [pre-commit]
       name: cargo test

@@ -1,9 +1,9 @@
 use binrw::{helpers::until_eof, io::Cursor, BinRead, BinReaderExt, BinWrite};
 use serde::{Deserialize, Serialize};
 
-use crate::common::char_array::CharArray;
-use crate::common::resref::Resref;
+use crate::common::header::Header;
 use crate::common::strref::Strref;
+use crate::common::Resref;
 use crate::model::Model;
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/dlg_v1.htm
@@ -48,10 +48,8 @@ impl Model for Dialogue {
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/dlg_v1.htm#formDLGV1_Header
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct DialogueHeader {
-    #[br(count = 4)]
-    pub signature: CharArray,
-    #[br(count = 4)]
-    pub version: CharArray,
+    #[serde(flatten)]
+    pub header: Header,
     pub count_of_state_tables: u32,
     pub offset_to_state_table: u32,
     pub count_of_transitions: u32,
