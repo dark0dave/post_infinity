@@ -41,7 +41,7 @@ pub(crate) fn as_json(
     resource_type: ResourceType,
 ) -> Result<(), Box<dyn Error>> {
     let file_name = Path::new(dest.file_stem().unwrap_or_default())
-        .with_extension(format!("{}.json", resource_type));
+        .with_extension(format!("{:?}.json", resource_type));
     log::info!("Saved as {:#?}", file_name);
 
     let file = File::create(file_name)?;

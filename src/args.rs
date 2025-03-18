@@ -11,7 +11,7 @@ pub struct Args {
     /// Flag to process tiles
     #[clap(env, long, short, action=ArgAction::SetTrue)]
     pub tiles: bool,
-    /// Flag to tlk file
+    /// Flag to process tlk file
     #[clap(env, long, short, action=ArgAction::SetTrue)]
     pub process_tlk: bool,
     /// Output Format, expects json(j), binary(b), print(p), or none(empty value)
@@ -23,15 +23,15 @@ pub struct Args {
     /// Turn a json into an ie file type [WARNING: EXPERIMENTAL]
     #[clap(env, short='i', long, action=ArgAction::SetTrue)]
     pub to_ie_type: bool,
-    /// Read Save game
-    #[clap(env, long, short, action=ArgAction::SetTrue)]
-    pub save: bool,
     /// If to_ie_type is set this controls the output
     #[clap(env, long, short, default_value = ".")]
     pub destination: PathBuf,
-    /// The path to the file to read
+    /// The path of the file to read
     #[clap(env, long, short)]
-    pub resource_file_or_dir: PathBuf,
+    pub file: PathBuf,
+    /// Flag to recurse through Keys or Biffs
+    #[clap(env, long, short, action=ArgAction::SetTrue)]
+    pub recurse: bool,
 }
 
 fn output_format_parser(input: &str) -> Result<String, clap::Error> {
