@@ -110,25 +110,30 @@ pub struct ActionTable {
 #[cfg(test)]
 
 mod tests {
-
     use super::*;
-    use binrw::io::{BufReader, Read};
-    use std::fs::File;
+    use binrw::io::Read;
+    use pretty_assertions::assert_eq;
+    use serde_json::Value;
+    use std::{error::Error, fs::File};
+
+    const FIXTURES: [(&str, &str); 1] = [("fixtures/mazzy.dlg", "fixtures/mazzy.dlg.json")];
+
+    fn read_file(path: &str) -> Result<Vec<u8>, Box<dyn Error>> {
+        let mut file = File::open(path)?;
+        let mut buffer = Vec::new();
+        file.read_to_end(&mut buffer)?;
+        Ok(buffer)
+    }
 
     #[test]
-    fn valid_dialog() {
-        let file = File::open("fixtures/mazzy.dlg").unwrap();
-        let mut reader = BufReader::new(file);
-        let mut buffer = Vec::new();
-        reader
-            .read_to_end(&mut buffer)
-            .expect("Could not read to buffer");
+    fn parse() -> Result<(), Box<dyn Error>> {
+        for (file_path, json_file_path) in FIXTURES {
+            let dialogue: Dialogue = Dialogue::new(&read_file(file_path)?);
+            let result: Value = serde_json::to_value(dialogue)?;
+            let expected: Value = serde_json::from_slice(&read_file(json_file_path)?)?;
 
-        let dialog = Dialogue::new(&buffer);
-        assert_eq!(dialog.state_tables.len(), 58);
-        assert_eq!(dialog.transitions.len(), 103);
-        assert_eq!(dialog.state_triggers.len(), 7);
-        assert_eq!(dialog.transition_triggers.len(), 30);
-        assert_eq!(dialog.action_tables.len(), 33)
+            assert_eq!(result, expected);
+        }
+        Ok(())
     }
 }

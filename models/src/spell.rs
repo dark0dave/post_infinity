@@ -115,88 +115,30 @@ type SpellFeatureBlock = FeatureBlock;
 
 #[cfg(test)]
 mod tests {
-
     use super::*;
-    use crate::common::char_array::CharArray;
-    use binrw::io::{BufReader, Read};
+    use binrw::io::Read;
     use pretty_assertions::assert_eq;
-    use std::fs::File;
+    use serde_json::Value;
+    use std::{error::Error, fs::File};
+
+    const FIXTURES: [(&str, &str); 1] = [("fixtures/gate1.spl", "fixtures/gate1.spl.json")];
+
+    fn read_file(path: &str) -> Result<Vec<u8>, Box<dyn Error>> {
+        let mut file = File::open(path)?;
+        let mut buffer = Vec::new();
+        file.read_to_end(&mut buffer)?;
+        Ok(buffer)
+    }
 
     #[test]
-    fn valid_creature_file_item_table_parsed() {
-        let file = File::open("fixtures/gate1.spl").unwrap();
-        let mut reader = BufReader::new(file);
-        let mut buffer = Vec::new();
-        reader
-            .read_to_end(&mut buffer)
-            .expect("Could not read to buffer");
+    fn parse() -> Result<(), Box<dyn Error>> {
+        for (file_path, json_file_path) in FIXTURES {
+            let spell: Spell = Spell::new(&read_file(file_path)?);
+            let result: Value = serde_json::to_value(spell)?;
+            let expected: Value = serde_json::from_slice(&read_file(json_file_path)?)?;
 
-        let spell = Spell::new(&buffer);
-        assert_eq!(
-            spell.header,
-            SpellHeader {
-                header: Header {
-                    signature: "SPL ".into(),
-                    version: "V1  ".into(),
-                },
-                unidentified_spell_name: 14260,
-                identified_spell_name: 9999999,
-                completion_sound: "CAS_M03\0".into(),
-                flags: 0,
-                spell_type: 1,
-                exclusion_flags: 0,
-                casting_graphics: 18,
-                min_level: 0,
-                primary_spell_school: 2,
-                min_strength: 0,
-                secondary_spell_school: 6,
-                min_strength_bonus: 0,
-                kit_usability_1: 0,
-                min_intelligence: 0,
-                kit_usability_2: 0,
-                min_dexterity: 0,
-                kit_usability_3: 0,
-                min_wisdom: 0,
-                kit_usability_4: 0,
-                min_constitution: 0,
-                min_charisma: 0,
-                spell_level: 9,
-                max_stackable: 1,
-                spell_book_icon: "SPWI905C".into(),
-                lore: 0,
-                ground_icon: "\0\0rb\0\0Un".into(),
-                base_weight: 0,
-                spell_description_generic: Strref(4294967295),
-                spell_description_identified: Strref(9999999),
-                description_icon: CharArray(vec![0, 0, 0, 104, 134, 64, 0, 5]),
-                enchantment: 0,
-                offset_to_extended_headers: 114,
-                count_of_extended_headers: 1,
-                offset_to_feature_block_table: 154,
-                offset_to_casting_feature_blocks: 0,
-                count_of_casting_feature_blocks: 0
-            }
-        );
-        assert_eq!(
-            spell.equipping_feature_blocks,
-            vec![FeatureBlock {
-                opcode_number: 177,
-                target_type: 1,
-                power: 9,
-                parameter_1: 0,
-                parameter_2: 2,
-                timing_mode: 0,
-                dispel_resistance: 2,
-                duration: 100000,
-                probability_1: 39,
-                probability_2: 0,
-                resource: "balorsu\0".into(),
-                dice_thrown_max_level: 0,
-                dice_sides_min_level: 0,
-                saving_throw_type: "".into(),
-                saving_throw_bonus: 0,
-                stacking_id: 0
-            }]
-        )
+            assert_eq!(result, expected);
+        }
+        Ok(())
     }
 }

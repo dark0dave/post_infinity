@@ -124,48 +124,34 @@ type ItemFeatureBlock = FeatureBlock;
 
 #[cfg(test)]
 mod tests {
-
     use super::*;
-    use binrw::io::{BufReader, Read};
+    use binrw::io::Read;
     use pretty_assertions::assert_eq;
+    use serde_json::Value;
     use std::{error::Error, fs::File};
 
-    #[test]
-    fn valid_item_file_parsed() -> Result<(), Box<dyn Error>> {
-        let file = File::open("fixtures/gopoof.itm")?;
-        let mut reader = BufReader::new(file);
+    const FIXTURES: [(&str, &str); 3] = [
+        ("fixtures/gopoof.itm", "fixtures/gopoof.itm.json"),
+        ("fixtures/sw1h01.itm", "fixtures/sw1h01.itm.json"),
+        ("fixtures/zbpdnote.itm", "fixtures/zbpdnote.itm.json"),
+    ];
+
+    fn read_file(path: &str) -> Result<Vec<u8>, Box<dyn Error>> {
+        let mut file = File::open(path)?;
         let mut buffer = Vec::new();
-        reader.read_to_end(&mut buffer)?;
-        let item = Item::new(&buffer);
-        assert_eq!(item.header.identified_item_name, 4294967295);
-        assert_eq!(item.header.max_stackable, 1);
-        Ok(())
+        file.read_to_end(&mut buffer)?;
+        Ok(buffer)
     }
 
     #[test]
-    fn sword_file_parse() -> Result<(), Box<dyn Error>> {
-        let file = File::open("fixtures/sw1h01.itm")?;
-        let mut reader = BufReader::new(file);
-        let mut buffer = Vec::new();
-        reader.read_to_end(&mut buffer)?;
-        let item = Item::new(&buffer);
-        let file = File::open("fixtures/sw1h01.itm.json")?;
-        let reader = BufReader::new(file);
-        let mut expected: Item = serde_json::from_reader(reader)?;
-        expected.original_bytes = buffer;
-        assert_eq!(item, expected);
-        Ok(())
-    }
+    fn parse() -> Result<(), Box<dyn Error>> {
+        for (file_path, json_file_path) in FIXTURES {
+            let item: Item = Item::new(&read_file(file_path)?);
+            let result: Value = serde_json::to_value(item)?;
+            let expected: Value = serde_json::from_slice(&read_file(json_file_path)?)?;
 
-    #[test]
-    fn baeloth_book_parse() -> Result<(), Box<dyn Error>> {
-        let file = File::open("fixtures/zbpdnote.itm")?;
-        let mut reader = BufReader::new(file);
-        let mut buffer = Vec::new();
-        reader.read_to_end(&mut buffer)?;
-        let item = Item::new(&buffer);
-        assert_eq!(item.extended_headers.len(), 1);
-        assert_eq!(item.equipping_feature_blocks.len(), 0);
+            assert_eq!(result, expected);
+        }
         Ok(())
     }
 }

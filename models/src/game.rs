@@ -394,8 +394,8 @@ mod tests {
     use serde_json::Value;
     use std::{error::Error, fs::File};
 
-    const GAME_FIXTURE: &str = "fixtures/bg2eebaldur.gam";
-    const GAME_JSON_FIXTURE: &str = "fixtures/bg2eebaldur.gam.json";
+    const FIXTURES: [(&str, &str); 1] =
+        [("fixtures/bg2eebaldur.gam", "fixtures/bg2eebaldur.gam.json")];
 
     fn read_file(path: &str) -> Result<Vec<u8>, Box<dyn Error>> {
         let mut file = File::open(path)?;
@@ -405,32 +405,14 @@ mod tests {
     }
 
     #[test]
-    fn parse_party_npcs() -> Result<(), Box<dyn Error>> {
-        let game: Game = Game::new(&read_file(GAME_FIXTURE)?);
-        let expected: Value = serde_json::from_slice(&read_file(GAME_JSON_FIXTURE)?)?;
+    fn parse() -> Result<(), Box<dyn Error>> {
+        for (file_path, json_file_path) in FIXTURES {
+            let game: Game = Game::new(&read_file(file_path)?);
+            let result: Value = serde_json::to_value(game)?;
+            let expected: Value = serde_json::from_slice(&read_file(json_file_path)?)?;
 
-        let party_npcs: Vec<GameNPC> = serde_json::from_value(
-            (expected
-                .get("party_npcs")
-                .ok_or("Failed to get party npcs")?)
-            .clone(),
-        )?;
-        assert_eq!(game.party_npcs, party_npcs);
-        Ok(())
-    }
-
-    #[test]
-    fn parse_non_party_npcs() -> Result<(), Box<dyn Error>> {
-        let game: Game = Game::new(&read_file(GAME_FIXTURE)?);
-        let expected: Value = serde_json::from_slice(&read_file(GAME_JSON_FIXTURE)?)?;
-
-        let party_npcs: Vec<GameNPC> = serde_json::from_value(
-            (expected
-                .get("non_party_npcs")
-                .ok_or("Failed to get non party npcs")?)
-            .clone(),
-        )?;
-        assert_eq!(game.non_party_npcs, party_npcs);
+            assert_eq!(result, expected);
+        }
         Ok(())
     }
 }

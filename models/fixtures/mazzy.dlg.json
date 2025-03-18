@@ -1,0 +1,2100 @@
+{
+  "signature": "DLG ",
+  "version": "V1.0",
+  "count_of_state_tables": 58,
+  "offset_to_state_table": 52,
+  "count_of_transitions": 103,
+  "offset_to_transition_table": 980,
+  "offset_to_state_trigger_table": 4276,
+  "count_of_state_triggers": 7,
+  "offset_to_transition_trigger_table": 4332,
+  "count_of_transition_triggers": 30,
+  "offset_to_action_table": 4572,
+  "count_of_action_tables": 33,
+  "flags": [
+    0,
+    0,
+    0,
+    0
+  ],
+  "state_tables": [
+    {
+      "actor_response_text": 24002,
+      "index_of_the_first_transition": 0,
+      "count_of_transitions": 8,
+      "index_of_state_trigger": 2
+    },
+    {
+      "actor_response_text": 24006,
+      "index_of_the_first_transition": 8,
+      "count_of_transitions": 3,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 24010,
+      "index_of_the_first_transition": 11,
+      "count_of_transitions": 2,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 24014,
+      "index_of_the_first_transition": 13,
+      "count_of_transitions": 2,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 24016,
+      "index_of_the_first_transition": 15,
+      "count_of_transitions": 1,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 24017,
+      "index_of_the_first_transition": 16,
+      "count_of_transitions": 2,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 24022,
+      "index_of_the_first_transition": 18,
+      "count_of_transitions": 6,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 24023,
+      "index_of_the_first_transition": 24,
+      "count_of_transitions": 2,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 24026,
+      "index_of_the_first_transition": 26,
+      "count_of_transitions": 2,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 24029,
+      "index_of_the_first_transition": 28,
+      "count_of_transitions": 2,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 24031,
+      "index_of_the_first_transition": 30,
+      "count_of_transitions": 2,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 24034,
+      "index_of_the_first_transition": 32,
+      "count_of_transitions": 1,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 24035,
+      "index_of_the_first_transition": 33,
+      "count_of_transitions": 1,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 24036,
+      "index_of_the_first_transition": 34,
+      "count_of_transitions": 3,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 24040,
+      "index_of_the_first_transition": 37,
+      "count_of_transitions": 1,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 24041,
+      "index_of_the_first_transition": 38,
+      "count_of_transitions": 4,
+      "index_of_state_trigger": 3
+    },
+    {
+      "actor_response_text": 41600,
+      "index_of_the_first_transition": 42,
+      "count_of_transitions": 1,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 41601,
+      "index_of_the_first_transition": 43,
+      "count_of_transitions": 1,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 41602,
+      "index_of_the_first_transition": 44,
+      "count_of_transitions": 1,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 41603,
+      "index_of_the_first_transition": 45,
+      "count_of_transitions": 1,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 41604,
+      "index_of_the_first_transition": 46,
+      "count_of_transitions": 2,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 41605,
+      "index_of_the_first_transition": 48,
+      "count_of_transitions": 1,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 41607,
+      "index_of_the_first_transition": 49,
+      "count_of_transitions": 1,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 41608,
+      "index_of_the_first_transition": 50,
+      "count_of_transitions": 1,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 41609,
+      "index_of_the_first_transition": 51,
+      "count_of_transitions": 1,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 42340,
+      "index_of_the_first_transition": 52,
+      "count_of_transitions": 3,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 42343,
+      "index_of_the_first_transition": 55,
+      "count_of_transitions": 2,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 42346,
+      "index_of_the_first_transition": 57,
+      "count_of_transitions": 1,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 42347,
+      "index_of_the_first_transition": 58,
+      "count_of_transitions": 1,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 46255,
+      "index_of_the_first_transition": 59,
+      "count_of_transitions": 1,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 46256,
+      "index_of_the_first_transition": 60,
+      "count_of_transitions": 1,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 46971,
+      "index_of_the_first_transition": 61,
+      "count_of_transitions": 3,
+      "index_of_state_trigger": 4
+    },
+    {
+      "actor_response_text": 46975,
+      "index_of_the_first_transition": 64,
+      "count_of_transitions": 2,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 46978,
+      "index_of_the_first_transition": 66,
+      "count_of_transitions": 1,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 46979,
+      "index_of_the_first_transition": 67,
+      "count_of_transitions": 2,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 46982,
+      "index_of_the_first_transition": 69,
+      "count_of_transitions": 1,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 46983,
+      "index_of_the_first_transition": 70,
+      "count_of_transitions": 1,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 46984,
+      "index_of_the_first_transition": 71,
+      "count_of_transitions": 1,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 46985,
+      "index_of_the_first_transition": 72,
+      "count_of_transitions": 3,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 46989,
+      "index_of_the_first_transition": 75,
+      "count_of_transitions": 1,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 46990,
+      "index_of_the_first_transition": 76,
+      "count_of_transitions": 2,
+      "index_of_state_trigger": 5
+    },
+    {
+      "actor_response_text": 46993,
+      "index_of_the_first_transition": 78,
+      "count_of_transitions": 3,
+      "index_of_state_trigger": 6
+    },
+    {
+      "actor_response_text": 46997,
+      "index_of_the_first_transition": 81,
+      "count_of_transitions": 1,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 46998,
+      "index_of_the_first_transition": 82,
+      "count_of_transitions": 1,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 46999,
+      "index_of_the_first_transition": 83,
+      "count_of_transitions": 1,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 47001,
+      "index_of_the_first_transition": 84,
+      "count_of_transitions": 3,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 47005,
+      "index_of_the_first_transition": 87,
+      "count_of_transitions": 1,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 47006,
+      "index_of_the_first_transition": 88,
+      "count_of_transitions": 3,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 47010,
+      "index_of_the_first_transition": 91,
+      "count_of_transitions": 2,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 47013,
+      "index_of_the_first_transition": 93,
+      "count_of_transitions": 2,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 47016,
+      "index_of_the_first_transition": 95,
+      "count_of_transitions": 1,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 47017,
+      "index_of_the_first_transition": 96,
+      "count_of_transitions": 1,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 47020,
+      "index_of_the_first_transition": 97,
+      "count_of_transitions": 1,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 49578,
+      "index_of_the_first_transition": 98,
+      "count_of_transitions": 1,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 58651,
+      "index_of_the_first_transition": 99,
+      "count_of_transitions": 1,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 60484,
+      "index_of_the_first_transition": 100,
+      "count_of_transitions": 1,
+      "index_of_state_trigger": 4294967295
+    },
+    {
+      "actor_response_text": 126044,
+      "index_of_the_first_transition": 101,
+      "count_of_transitions": 1,
+      "index_of_state_trigger": 1
+    },
+    {
+      "actor_response_text": 134378,
+      "index_of_the_first_transition": 102,
+      "count_of_transitions": 1,
+      "index_of_state_trigger": 0
+    }
+  ],
+  "transitions": [
+    {
+      "flags": [
+        3,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 24003,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 1
+    },
+    {
+      "flags": [
+        3,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 24004,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 1,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 2
+    },
+    {
+      "flags": [
+        3,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 24005,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 2,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 3
+    },
+    {
+      "flags": [
+        3,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 47000,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 3,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 45
+    },
+    {
+      "flags": [
+        6,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 4294967295,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 4,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "7XSHARJ\u0000",
+      "index_of_the_next_state": 137
+    },
+    {
+      "flags": [
+        6,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 4294967295,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 5,
+      "index_of_transitions_action_table": 1,
+      "resource_name": "7XBRANJ\u0000",
+      "index_of_the_next_state": 104
+    },
+    {
+      "flags": [
+        6,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 4294967295,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 6,
+      "index_of_transitions_action_table": 2,
+      "resource_name": "7XMONTJ\u0000",
+      "index_of_the_next_state": 222
+    },
+    {
+      "flags": [
+        6,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 4294967295,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 7,
+      "index_of_transitions_action_table": 3,
+      "resource_name": "L#2SDSKJ",
+      "index_of_the_next_state": 211
+    },
+    {
+      "flags": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 24007,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 4
+    },
+    {
+      "flags": [
+        3,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 24008,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 8,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 6
+    },
+    {
+      "flags": [
+        3,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 24009,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 9,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 7
+    },
+    {
+      "flags": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 24011,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 1
+    },
+    {
+      "flags": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 24013,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 3
+    },
+    {
+      "flags": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 24018,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 8
+    },
+    {
+      "flags": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 24019,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 6
+    },
+    {
+      "flags": [
+        4,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 4294967295,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 4,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 5
+    },
+    {
+      "flags": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 24020,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 9
+    },
+    {
+      "flags": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 24021,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 10
+    },
+    {
+      "flags": [
+        14,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 4294967295,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 10,
+      "index_of_transitions_action_table": 5,
+      "resource_name": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "index_of_the_next_state": 0
+    },
+    {
+      "flags": [
+        6,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 4294967295,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 11,
+      "index_of_transitions_action_table": 6,
+      "resource_name": "KELDORJ\u0000",
+      "index_of_the_next_state": 225
+    },
+    {
+      "flags": [
+        6,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 4294967295,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 12,
+      "index_of_transitions_action_table": 7,
+      "resource_name": "VALYGARJ",
+      "index_of_the_next_state": 95
+    },
+    {
+      "flags": [
+        6,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 4294967295,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 13,
+      "index_of_transitions_action_table": 8,
+      "resource_name": "AERIEJ\u0000\u0000",
+      "index_of_the_next_state": 171
+    },
+    {
+      "flags": [
+        6,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 4294967295,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 14,
+      "index_of_transitions_action_table": 9,
+      "resource_name": "ANOMENJ\u0000",
+      "index_of_the_next_state": 280
+    },
+    {
+      "flags": [
+        2,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 4294967295,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 15,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "RASAADJ\u0000",
+      "index_of_the_next_state": 337
+    },
+    {
+      "flags": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 24024,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 4
+    },
+    {
+      "flags": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 24025,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 3
+    },
+    {
+      "flags": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 24027,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 16
+    },
+    {
+      "flags": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 24028,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 6
+    },
+    {
+      "flags": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 24030,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 16
+    },
+    {
+      "flags": [
+        2,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 4294967295,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 16,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "RASAADJ\u0000",
+      "index_of_the_next_state": 336
+    },
+    {
+      "flags": [
+        5,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 24032,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 10,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 9
+    },
+    {
+      "flags": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 24033,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 16
+    },
+    {
+      "flags": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 4294967295,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 12
+    },
+    {
+      "flags": [
+        80,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 4294967295,
+      "journal_text": 10102,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 55
+    },
+    {
+      "flags": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 24037,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 53
+    },
+    {
+      "flags": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 24038,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 25
+    },
+    {
+      "flags": [
+        3,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 24039,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 17,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 6
+    },
+    {
+      "flags": [
+        28,
+        1,
+        0,
+        0
+      ],
+      "player_character_text": 4294967295,
+      "journal_text": 23508,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 11,
+      "resource_name": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "index_of_the_next_state": 0
+    },
+    {
+      "flags": [
+        3,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 24042,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 18,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 6
+    },
+    {
+      "flags": [
+        3,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 24043,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 19,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 13
+    },
+    {
+      "flags": [
+        3,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 47018,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 20,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 45
+    },
+    {
+      "flags": [
+        3,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 47019,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 21,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 52
+    },
+    {
+      "flags": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 4294967295,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 17
+    },
+    {
+      "flags": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 4294967295,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 18
+    },
+    {
+      "flags": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 4294967295,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 19
+    },
+    {
+      "flags": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 4294967295,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 29
+    },
+    {
+      "flags": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 4294967295,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 21
+    },
+    {
+      "flags": [
+        6,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 4294967295,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 22,
+      "index_of_transitions_action_table": 12,
+      "resource_name": "7XSHARJ\u0000",
+      "index_of_the_next_state": 154
+    },
+    {
+      "flags": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 4294967295,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 22
+    },
+    {
+      "flags": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 4294967295,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 23
+    },
+    {
+      "flags": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 4294967295,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 24
+    },
+    {
+      "flags": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 4294967295,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 13
+    },
+    {
+      "flags": [
+        3,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 42341,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 23,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 26
+    },
+    {
+      "flags": [
+        3,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 58650,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 24,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 54
+    },
+    {
+      "flags": [
+        13,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 42342,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 13,
+      "resource_name": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "index_of_the_next_state": 0
+    },
+    {
+      "flags": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 42344,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 27
+    },
+    {
+      "flags": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 42345,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 28
+    },
+    {
+      "flags": [
+        12,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 4294967295,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 14,
+      "resource_name": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "index_of_the_next_state": 0
+    },
+    {
+      "flags": [
+        12,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 4294967295,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 15,
+      "resource_name": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "index_of_the_next_state": 0
+    },
+    {
+      "flags": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 4294967295,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 30
+    },
+    {
+      "flags": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 4294967295,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 20
+    },
+    {
+      "flags": [
+        7,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 46972,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 25,
+      "index_of_transitions_action_table": 16,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 32
+    },
+    {
+      "flags": [
+        7,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 46973,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 26,
+      "index_of_transitions_action_table": 17,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 37
+    },
+    {
+      "flags": [
+        7,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 46974,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 27,
+      "index_of_transitions_action_table": 18,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 38
+    },
+    {
+      "flags": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 46976,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 33
+    },
+    {
+      "flags": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 46977,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 34
+    },
+    {
+      "flags": [
+        12,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 4294967295,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 19,
+      "resource_name": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "index_of_the_next_state": 0
+    },
+    {
+      "flags": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 46980,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 35
+    },
+    {
+      "flags": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 46981,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 36
+    },
+    {
+      "flags": [
+        12,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 4294967295,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 20,
+      "resource_name": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "index_of_the_next_state": 0
+    },
+    {
+      "flags": [
+        12,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 4294967295,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 21,
+      "resource_name": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "index_of_the_next_state": 0
+    },
+    {
+      "flags": [
+        12,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 4294967295,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 22,
+      "resource_name": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "index_of_the_next_state": 0
+    },
+    {
+      "flags": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 46986,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 35
+    },
+    {
+      "flags": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 46987,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 36
+    },
+    {
+      "flags": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 46988,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 39
+    },
+    {
+      "flags": [
+        12,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 4294967295,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 23,
+      "resource_name": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "index_of_the_next_state": 0
+    },
+    {
+      "flags": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 46991,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 35
+    },
+    {
+      "flags": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 46992,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 36
+    },
+    {
+      "flags": [
+        3,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 46994,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 28,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 42
+    },
+    {
+      "flags": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 46995,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 44
+    },
+    {
+      "flags": [
+        3,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 46996,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 29,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 43
+    },
+    {
+      "flags": [
+        12,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 4294967295,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 24,
+      "resource_name": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "index_of_the_next_state": 0
+    },
+    {
+      "flags": [
+        8,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 4294967295,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "index_of_the_next_state": 0
+    },
+    {
+      "flags": [
+        8,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 4294967295,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "index_of_the_next_state": 0
+    },
+    {
+      "flags": [
+        5,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 47002,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 25,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 46
+    },
+    {
+      "flags": [
+        5,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 47003,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 26,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 50
+    },
+    {
+      "flags": [
+        5,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 47004,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 27,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 51
+    },
+    {
+      "flags": [
+        4,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 4294967295,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 28,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 47
+    },
+    {
+      "flags": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 47007,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 48
+    },
+    {
+      "flags": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 47008,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 49
+    },
+    {
+      "flags": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 47009,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 51
+    },
+    {
+      "flags": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 47011,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 25
+    },
+    {
+      "flags": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 47012,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 51
+    },
+    {
+      "flags": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 47014,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 25
+    },
+    {
+      "flags": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 47015,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 51
+    },
+    {
+      "flags": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 4294967295,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 47
+    },
+    {
+      "flags": [
+        12,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 4294967295,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 29,
+      "resource_name": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "index_of_the_next_state": 0
+    },
+    {
+      "flags": [
+        12,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 4294967295,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 30,
+      "resource_name": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "index_of_the_next_state": 0
+    },
+    {
+      "flags": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 4294967295,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 14
+    },
+    {
+      "flags": [
+        12,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 4294967295,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 31,
+      "resource_name": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "index_of_the_next_state": 0
+    },
+    {
+      "flags": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 4294967295,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "MAZZY\u0000\u0000\u0000",
+      "index_of_the_next_state": 13
+    },
+    {
+      "flags": [
+        12,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 4294967295,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 32,
+      "resource_name": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "index_of_the_next_state": 0
+    },
+    {
+      "flags": [
+        8,
+        0,
+        0,
+        0
+      ],
+      "player_character_text": 4294967295,
+      "journal_text": 0,
+      "index_of_transitions_trigger": 0,
+      "index_of_transitions_action_table": 0,
+      "resource_name": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+      "index_of_the_next_state": 0
+    }
+  ],
+  "state_triggers": [
+    {
+      "offset_to_start_of_file": 4836,
+      "length_in_bytes": 61
+    },
+    {
+      "offset_to_start_of_file": 4897,
+      "length_in_bytes": 104
+    },
+    {
+      "offset_to_start_of_file": 5001,
+      "length_in_bytes": 21
+    },
+    {
+      "offset_to_start_of_file": 5022,
+      "length_in_bytes": 27
+    },
+    {
+      "offset_to_start_of_file": 5049,
+      "length_in_bytes": 28
+    },
+    {
+      "offset_to_start_of_file": 5077,
+      "length_in_bytes": 31
+    },
+    {
+      "offset_to_start_of_file": 5108,
+      "length_in_bytes": 31
+    }
+  ],
+  "transition_triggers": [
+    {
+      "offset_to_start_of_file": 5139,
+      "length_in_bytes": 35
+    },
+    {
+      "offset_to_start_of_file": 5174,
+      "length_in_bytes": 35
+    },
+    {
+      "offset_to_start_of_file": 5209,
+      "length_in_bytes": 35
+    },
+    {
+      "offset_to_start_of_file": 5244,
+      "length_in_bytes": 35
+    },
+    {
+      "offset_to_start_of_file": 5279,
+      "length_in_bytes": 100
+    },
+    {
+      "offset_to_start_of_file": 5379,
+      "length_in_bytes": 134
+    },
+    {
+      "offset_to_start_of_file": 5513,
+      "length_in_bytes": 101
+    },
+    {
+      "offset_to_start_of_file": 5614,
+      "length_in_bytes": 103
+    },
+    {
+      "offset_to_start_of_file": 5717,
+      "length_in_bytes": 34
+    },
+    {
+      "offset_to_start_of_file": 5751,
+      "length_in_bytes": 34
+    },
+    {
+      "offset_to_start_of_file": 5785,
+      "length_in_bytes": 135
+    },
+    {
+      "offset_to_start_of_file": 5920,
+      "length_in_bytes": 32
+    },
+    {
+      "offset_to_start_of_file": 5952,
+      "length_in_bytes": 67
+    },
+    {
+      "offset_to_start_of_file": 6019,
+      "length_in_bytes": 100
+    },
+    {
+      "offset_to_start_of_file": 6119,
+      "length_in_bytes": 134
+    },
+    {
+      "offset_to_start_of_file": 6253,
+      "length_in_bytes": 37
+    },
+    {
+      "offset_to_start_of_file": 6290,
+      "length_in_bytes": 37
+    },
+    {
+      "offset_to_start_of_file": 6327,
+      "length_in_bytes": 31
+    },
+    {
+      "offset_to_start_of_file": 6358,
+      "length_in_bytes": 35
+    },
+    {
+      "offset_to_start_of_file": 6393,
+      "length_in_bytes": 35
+    },
+    {
+      "offset_to_start_of_file": 6428,
+      "length_in_bytes": 35
+    },
+    {
+      "offset_to_start_of_file": 6463,
+      "length_in_bytes": 35
+    },
+    {
+      "offset_to_start_of_file": 6498,
+      "length_in_bytes": 94
+    },
+    {
+      "offset_to_start_of_file": 6592,
+      "length_in_bytes": 30
+    },
+    {
+      "offset_to_start_of_file": 6622,
+      "length_in_bytes": 30
+    },
+    {
+      "offset_to_start_of_file": 6652,
+      "length_in_bytes": 14
+    },
+    {
+      "offset_to_start_of_file": 6666,
+      "length_in_bytes": 14
+    },
+    {
+      "offset_to_start_of_file": 6680,
+      "length_in_bytes": 15
+    },
+    {
+      "offset_to_start_of_file": 6695,
+      "length_in_bytes": 40
+    },
+    {
+      "offset_to_start_of_file": 6735,
+      "length_in_bytes": 40
+    }
+  ],
+  "action_tables": [
+    {
+      "offset_to_start_of_file": 6775,
+      "length_in_bytes": 41
+    },
+    {
+      "offset_to_start_of_file": 6816,
+      "length_in_bytes": 37
+    },
+    {
+      "offset_to_start_of_file": 6853,
+      "length_in_bytes": 42
+    },
+    {
+      "offset_to_start_of_file": 6895,
+      "length_in_bytes": 38
+    },
+    {
+      "offset_to_start_of_file": 6933,
+      "length_in_bytes": 33
+    },
+    {
+      "offset_to_start_of_file": 6966,
+      "length_in_bytes": 30
+    },
+    {
+      "offset_to_start_of_file": 6996,
+      "length_in_bytes": 30
+    },
+    {
+      "offset_to_start_of_file": 7026,
+      "length_in_bytes": 30
+    },
+    {
+      "offset_to_start_of_file": 7056,
+      "length_in_bytes": 30
+    },
+    {
+      "offset_to_start_of_file": 7086,
+      "length_in_bytes": 30
+    },
+    {
+      "offset_to_start_of_file": 7116,
+      "length_in_bytes": 33
+    },
+    {
+      "offset_to_start_of_file": 7149,
+      "length_in_bytes": 95
+    },
+    {
+      "offset_to_start_of_file": 7244,
+      "length_in_bytes": 35
+    },
+    {
+      "offset_to_start_of_file": 7279,
+      "length_in_bytes": 88
+    },
+    {
+      "offset_to_start_of_file": 7367,
+      "length_in_bytes": 88
+    },
+    {
+      "offset_to_start_of_file": 7455,
+      "length_in_bytes": 88
+    },
+    {
+      "offset_to_start_of_file": 7543,
+      "length_in_bytes": 31
+    },
+    {
+      "offset_to_start_of_file": 7574,
+      "length_in_bytes": 31
+    },
+    {
+      "offset_to_start_of_file": 7605,
+      "length_in_bytes": 31
+    },
+    {
+      "offset_to_start_of_file": 7636,
+      "length_in_bytes": 34
+    },
+    {
+      "offset_to_start_of_file": 7670,
+      "length_in_bytes": 34
+    },
+    {
+      "offset_to_start_of_file": 7704,
+      "length_in_bytes": 97
+    },
+    {
+      "offset_to_start_of_file": 7801,
+      "length_in_bytes": 34
+    },
+    {
+      "offset_to_start_of_file": 7835,
+      "length_in_bytes": 34
+    },
+    {
+      "offset_to_start_of_file": 7869,
+      "length_in_bytes": 97
+    },
+    {
+      "offset_to_start_of_file": 7966,
+      "length_in_bytes": 33
+    },
+    {
+      "offset_to_start_of_file": 7999,
+      "length_in_bytes": 33
+    },
+    {
+      "offset_to_start_of_file": 8032,
+      "length_in_bytes": 33
+    },
+    {
+      "offset_to_start_of_file": 8065,
+      "length_in_bytes": 33
+    },
+    {
+      "offset_to_start_of_file": 8098,
+      "length_in_bytes": 98
+    },
+    {
+      "offset_to_start_of_file": 8196,
+      "length_in_bytes": 12
+    },
+    {
+      "offset_to_start_of_file": 8208,
+      "length_in_bytes": 88
+    },
+    {
+      "offset_to_start_of_file": 8296,
+      "length_in_bytes": 42
+    }
+  ]
+}
