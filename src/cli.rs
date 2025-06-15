@@ -137,8 +137,7 @@ pub fn run(args: &Args) -> Result<(), Box<dyn Error>> {
         let mut reader: BufReader<File> = read_file(&dialogue_path)?;
         let mut buffer = vec![];
         reader.read_to_end(&mut buffer)?;
-        let static_buffer: &'static [u8] = Box::leak(buffer.into_boxed_slice());
-        TLK::parse(static_buffer).ok_or("Could not parse TLK file")?;
+        TLK::parse(&buffer).ok_or("Could not parse TLK file")?;
     }
     Ok(())
 }
