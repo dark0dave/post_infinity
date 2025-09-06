@@ -31,9 +31,6 @@ pub struct Args {
     /// The path of the file to read
     #[clap(env, long, short)]
     pub file: PathBuf,
-    /// Flag to recurse through Keys or Biffs
-    #[clap(env, long, short, action=ArgAction::SetTrue)]
-    pub recurse: bool,
 }
 
 fn output_format_parser(input: &str) -> Result<Printer, clap::Error> {
