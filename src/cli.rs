@@ -33,12 +33,7 @@ fn json_back_to_ie_type(path: &Path, dest: &Path) -> Result<(), Box<dyn Error>> 
     write_file(&out_path, &extension, &out)
 }
 
-fn get_models_from_file(
-    path: &Path,
-    printer: Printer,
-    dest: &Path,
-    recurse: bool,
-) -> Result<(), Box<dyn Error>> {
+fn get_models_from_file(path: &Path, printer: Printer, dest: &Path) -> Result<(), Box<dyn Error>> {
     let resource_type = ResourceType::try_from(path)?;
     let mut reader: BufReader<File> = read_file(path)?;
 
@@ -50,9 +45,7 @@ fn get_models_from_file(
             let mut buffer = vec![];
             reader.read_to_end(&mut buffer)?;
             let mut key = Key::new(&buffer);
-            if recurse {
-                key.recurse(path)?;
-            }
+            key.recurse(path)?;
             Rc::new(key)
         }
         ResourceType::FileTypeTlk => {
@@ -77,7 +70,7 @@ fn get_models_from_file(
 pub fn run(args: &Args) -> Result<(), Box<dyn Error>> {
     log::debug!("{args:?}");
     let path = &args.file;
-    get_models_from_file(path, args.output_format, &args.destination, args.recurse)?;
+    get_models_from_file(path, args.output_format, &args.destination)?;
 
     if args.to_ie_type {
         return json_back_to_ie_type(path, &args.destination);
