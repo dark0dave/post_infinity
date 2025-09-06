@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::common::Resref;
+use crate::common::resref::Resref;
 use binrw::{BinRead, BinWrite};
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/cre_v1.htm#CREV1_0_KnownSpell

@@ -3,6 +3,8 @@ use std::{error::Error, mem::size_of};
 
 use serde::{Deserialize, Serialize};
 
+use crate::common::resref::Resref;
+
 const START_OF_ENTRIES: usize = 18_usize;
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/tlk_v1.htm
@@ -81,7 +83,7 @@ pub struct TLKEntry {
         04 - Token exists (for instance <CHARNAME>), BG2 and EEs only
     */
     pub bit_field: u16,
-    pub resource_name_of_associated_sound: [u8; 8],
+    pub resource_name_of_associated_sound: Resref,
     //  Unused, at minimum in BG1
     pub volume_variance: u32,
     // Unused, at minimum in BG1

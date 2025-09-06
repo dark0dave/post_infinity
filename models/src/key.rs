@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     biff::Biff,
-    common::{header::Header, Resref},
+    common::{header::Header, resref::Resref},
     model::Model,
 };
 

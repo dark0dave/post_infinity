@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::common::char_array::CharArray;
 use crate::common::header::Header;
-use crate::common::Resref;
+use crate::common::resref::Resref;
 
 use crate::{creature::Creature, model::Model};
 
