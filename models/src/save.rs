@@ -1,5 +1,5 @@
-use std::path::Path;
 use std::rc::Rc;
+use std::{error::Error, path::Path};
 
 use binrw::{io::Cursor, io::Read, BinRead, BinReaderExt, BinWrite};
 use flate2::bufread::ZlibDecoder;
@@ -30,7 +30,7 @@ impl Model for Save {
         match reader.read_le() {
             Ok(res) => res,
             Err(err) => {
-                panic!("Errored with {:?}, dumping buffer: {:?}", err, buffer);
+                panic!("Errored with {err:?}, dumping buffer: {buffer:?}");
             }
         }
     }
@@ -53,32 +53,28 @@ pub struct SavedFile {
     pub compressed_data_length: u32,
     #[br(count=compressed_data_length, restore_position)]
     pub compressed_data: Vec<u8>,
-    #[br(count=compressed_data_length, map = |s: Vec<u8>| parse_compressed_data(&s, &filename))]
+    #[br(count=compressed_data_length, map = |s: Vec<u8>| parse_compressed_data(&s, &filename).ok())]
     #[bw(ignore)]
     #[serde(skip)]
     pub uncompressed_data: Option<Rc<dyn Model>>,
 }
 
-fn parse_compressed_data(buff: &[u8], file_name: &String) -> Option<Rc<dyn Model>> {
+fn parse_compressed_data(buff: &[u8], file_name: &String) -> Result<Rc<dyn Model>, Box<dyn Error>> {
     let mut d = ZlibDecoder::new(buff);
     let mut buffer = vec![];
-    match d.read_to_end(&mut buffer) {
-        Ok(_) => {
-            let extension = Path::new(&file_name.to_string())
-                .extension()
-                .unwrap_or_default()
-                .to_ascii_lowercase()
-                .into_string()
-                .unwrap_or_default()
-                .replace('\0', "");
-            let resource_type = ResourceType::from(extension.as_str());
-            from_buffer(&buffer, resource_type)
-        }
-        Err(err) => {
-            log::error!("{}", err);
-            None
-        }
-    }
+    d.read_to_end(&mut buffer).map_err(|err| {
+        log::error!("{err}");
+        err
+    })?;
+    let extension = Path::new(&file_name.to_string())
+        .extension()
+        .unwrap_or_default()
+        .to_ascii_lowercase()
+        .into_string()
+        .unwrap_or_default()
+        .replace('\0', "");
+    let resource_type = ResourceType::from(extension.as_str());
+    from_buffer(&buffer, resource_type)
 }
 
 #[cfg(test)]

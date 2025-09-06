@@ -6,16 +6,19 @@ use binrw::{
 use flate2::bufread::ZlibDecoder;
 use serde::{Deserialize, Serialize};
 
-use crate::{common::header::Header, model::Model};
+use crate::{
+    common::{char_array::CharArray, header::Header},
+    model::Model,
+};
 
 // "BAM\0"
-const BAM_SIGNATURE: &[u8; 4] = &[66, 65, 77, 0];
+const BAM_SIGNATURE: CharArray<4> = CharArray([66, 65, 77, 0]);
 // "BAMC"
-const BAMC_SIGNATURE: &[u8; 4] = &[66, 65, 77, 67];
+const BAMC_SIGNATURE: CharArray<4> = CharArray([66, 65, 77, 67]);
 // "v1  "
-const VERSION1: &[u8; 4] = &[118, 49, 32, 32];
+const VERSION1: CharArray<4> = CharArray([118, 49, 32, 32]);
 // "v2  "
-const VERSION2: &[u8; 4] = &[118, 50, 32, 32];
+const VERSION2: CharArray<4> = CharArray([118, 50, 32, 32]);
 
 // This is slow
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/bam_v1.htm
@@ -32,59 +35,59 @@ pub struct Bam {
     // If BAM v1
     #[bw(ignore)]
     #[serde(flatten)]
-    #[br(if(header.signature.0 == BAM_SIGNATURE && header.version.0 == VERSION1))]
+    #[br(if(header.signature == BAM_SIGNATURE && header.version == VERSION1))]
     pub bamv1header: BamV1Header,
     #[bw(ignore)]
-    #[br(if(header.signature.0 == BAM_SIGNATURE && header.version.0 == VERSION1))]
+    #[br(if(header.signature == BAM_SIGNATURE && header.version == VERSION1))]
     #[br(count=bamv1header.count_of_frame_entries)]
     pub bamv1_frame_entries: Vec<BamV1FrameEntry>,
     #[bw(ignore)]
-    #[br(if(header.signature.0 == BAM_SIGNATURE && header.version.0 == VERSION1))]
+    #[br(if(header.signature == BAM_SIGNATURE && header.version == VERSION1))]
     #[br(count=bamv1header.count_of_cycles)]
     pub bamv1_cycle_entries: Vec<CycleEntry>,
     // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/bam_v1.htm#bamv1_Palette
     #[bw(ignore)]
-    #[br(if(header.signature.0 == BAM_SIGNATURE && header.version.0 == VERSION1))]
+    #[br(if(header.signature == BAM_SIGNATURE && header.version == VERSION1))]
     #[br(count=bamv1header.offset_to_lookup_table-bamv1header.offset_to_palette)]
     pub bamv1_palette: Vec<u8>,
     // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/bam_v1.htm#bamv1_FrameLUT
     #[bw(ignore)]
-    #[br(if(header.signature.0 == BAM_SIGNATURE && header.version.0 == VERSION1))]
+    #[br(if(header.signature == BAM_SIGNATURE && header.version == VERSION1))]
     #[br(count=lookup_table_size(&bamv1_cycle_entries))]
     pub bamv1_lookup_table: Vec<u8>,
     // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/bam_v1.htm#bamv1_Data
     #[bw(ignore)]
-    #[br(if(header.signature.0 == BAM_SIGNATURE && header.version.0 == VERSION1))]
+    #[br(if(header.signature == BAM_SIGNATURE && header.version == VERSION1))]
     #[br(parse_with=binrw::helpers::until_eof)]
     pub bamv1_frame_data: Vec<u8>,
     // If BAMC
     #[bw(ignore)]
-    #[br(if(header.signature.0 == BAMC_SIGNATURE))]
+    #[br(if(header.signature == BAMC_SIGNATURE))]
     pub uncompressed_length: u32,
     #[bw(ignore)]
-    #[br(if(header.signature.0 == BAMC_SIGNATURE))]
+    #[br(if(header.signature == BAMC_SIGNATURE))]
     #[br(parse_with=binrw::helpers::until_eof, restore_position)]
     pub compressed_data: Vec<u8>,
     #[bw(ignore)]
-    #[br(if(header.signature.0 == BAMC_SIGNATURE))]
+    #[br(if(header.signature == BAMC_SIGNATURE))]
     #[br(parse_with=binrw::helpers::until_eof, map = |s: Vec<u8>| parse_compressed_data(&s))]
     pub uncompressed_data: Vec<u8>,
     // If BAM v2
     #[bw(ignore)]
     #[serde(flatten)]
-    #[br(if(header.signature.0 == BAM_SIGNATURE && header.version.0 == VERSION2))]
+    #[br(if(header.signature == BAM_SIGNATURE && header.version == VERSION2))]
     pub bamv2header: BamV2Header,
     #[bw(ignore)]
-    #[br(if(header.signature.0 == BAM_SIGNATURE && header.version.0 == VERSION2))]
+    #[br(if(header.signature == BAM_SIGNATURE && header.version == VERSION2))]
     #[br(count=bamv2header.count_of_frame_entries)]
     pub bamv2_frame_entries: Vec<BamV2FrameEntry>,
     // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/bam_v2.htm#bamv2_CycleEntry
     #[bw(ignore)]
-    #[br(if(header.signature.0 == BAM_SIGNATURE && header.version.0 == VERSION2))]
+    #[br(if(header.signature == BAM_SIGNATURE && header.version == VERSION2))]
     #[br(count=bamv2header.count_of_cycle_entries)]
     pub bamv2_cycle_entries: Vec<CycleEntry>,
     #[bw(ignore)]
-    #[br(if(header.signature.0 == BAM_SIGNATURE && header.version.0 == VERSION2))]
+    #[br(if(header.signature == BAM_SIGNATURE && header.version == VERSION2))]
     #[br(count=bamv2header.count_of_data_blocks)]
     pub bamv2_data_blocks: Vec<DataBlock>,
 }
@@ -106,7 +109,7 @@ fn parse_compressed_data(buff: &[u8]) -> Vec<u8> {
     let mut d = ZlibDecoder::new(buff);
     let mut buffer = vec![];
     if let Err(err) = d.read_to_end(&mut buffer) {
-        log::error!("{}", err);
+        log::error!("{err}");
     }
     buffer
 }

@@ -2,6 +2,8 @@ use std::path::PathBuf;
 
 use clap::{error::ErrorKind, ArgAction, Error, Parser};
 
+use crate::writer::{as_binary, as_json, as_stdout, Printer};
+
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
 pub struct Args {
@@ -15,8 +17,8 @@ pub struct Args {
     #[clap(env, long, short, action=ArgAction::SetTrue)]
     pub process_tlk: bool,
     /// Output Format, expects json(j), binary(b), print(p), or none(empty value)
-    #[clap(env, long, short, value_parser=output_format_parser, default_value = "p")]
-    pub output_format: String,
+    #[clap(env, long, short, value_parser = output_format_parser, default_value = "p")]
+    pub output_format: Printer,
     /// Filename or prefix to extract [WARNING: EXPERIMENTAL]
     #[clap(env, long, short, default_value = "")]
     pub extract: String,
@@ -34,12 +36,12 @@ pub struct Args {
     pub recurse: bool,
 }
 
-fn output_format_parser(input: &str) -> Result<String, clap::Error> {
+fn output_format_parser(input: &str) -> Result<Printer, clap::Error> {
     match input.to_lowercase().as_str() {
-        "json" | "j" => Ok("json".to_string()),
-        "binary" | "bin" | "b" => Ok("binary".to_string()),
-        "" | "n" | "no" | "none" => Ok("".to_string()),
-        "p" | "print" => Ok("print".to_string()),
+        "json" | "j" => Ok(as_json),
+        "binary" | "bin" | "b" => Ok(as_binary),
+        "" | "n" | "no" | "none" => Ok(|_, _, _| Ok(())),
+        "p" | "print" => Ok(as_stdout),
         _ => Err(Error::new(ErrorKind::ValueValidation)),
     }
 }

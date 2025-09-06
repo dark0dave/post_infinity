@@ -14,7 +14,7 @@ fn main() -> ExitCode {
     let args: Args = Args::parse();
     match cli::run(&args) {
         Err(err) => {
-            log::error!("{:?}", err);
+            log::error!("{err:?}");
             ExitCode::FAILURE
         }
         _ => ExitCode::SUCCESS,
