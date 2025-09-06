@@ -82,27 +82,27 @@ impl Key {
 pub struct KeyHeader {
     #[serde(flatten)]
     pub header: Header,
-    count_of_bif_entries: u32,
-    count_of_resource_entries: u32,
-    offset_to_bif_entries: u32,
-    offset_to_resource_entries: u32,
+    pub count_of_bif_entries: u32,
+    pub count_of_resource_entries: u32,
+    pub offset_to_bif_entries: u32,
+    pub offset_to_resource_entries: u32,
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/key_v1.htm#keyv1_BifIndices
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct BiffEntry {
-    file_length: u32,
-    offset_to_file_name: u32,
-    file_name_length: u16,
-    file_location: u16,
+    pub file_length: u32,
+    pub offset_to_file_name: u32,
+    pub file_name_length: u16,
+    pub file_location: u16,
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/key_v1.htm#keyv1_ResIndices
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct ResourceEntry {
-    name: Resref,
-    resource_type: u16,
-    locator: u32,
+    pub name: Resref,
+    pub resource_type: u16,
+    pub locator: u32,
 }
 
 #[cfg(test)]
