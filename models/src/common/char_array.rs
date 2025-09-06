@@ -71,6 +71,6 @@ impl<const N: usize> From<&str> for CharArray<N> {
 
 impl<const N: usize> From<String> for CharArray<N> {
     fn from(value: String) -> Self {
-        value.as_str().into()
+        value.as_bytes().into()
     }
 }
