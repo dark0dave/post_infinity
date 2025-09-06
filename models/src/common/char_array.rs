@@ -1,4 +1,5 @@
 use std::{
+    cmp::min,
     fmt::{Debug, Display, Write},
     str,
 };
@@ -51,29 +52,20 @@ impl<const N: usize> Display for CharArray<N> {
 
 impl<const N: usize> From<&[u8]> for CharArray<N> {
     fn from(value: &[u8]) -> Self {
-        if value.len() > N {
-            let trunc = value[0..N].try_into().unwrap();
-            log::warn!("truncating {value:?} to {trunc:?}");
-            Self(trunc)
-        } else {
-            let mut out = [0; N];
-            for (i, item) in value.iter().enumerate() {
-                out[i] = *item;
-            }
-            Self(out)
+        let mut out = [0; N];
+        unsafe {
+            std::ptr::copy_nonoverlapping(value.as_ptr(), out.as_mut_ptr(), min(N, value.len()));
         }
+        if value.len() > N {
+            log::warn!("truncating {value:?} to {out:?}");
+        }
+        Self(out)
     }
 }
 
 impl<const N: usize> From<&str> for CharArray<N> {
     fn from(value: &str) -> Self {
         value.as_bytes().into()
-    }
-}
-
-impl<const N: usize> From<CharArray<N>> for String {
-    fn from(val: CharArray<N>) -> Self {
-        String::from_utf8(val.0.to_vec()).unwrap_or_default()
     }
 }
 
