@@ -77,7 +77,7 @@ impl Model for Area {
         match reader.read_le() {
             Ok(res) => res,
             Err(err) => {
-                panic!("Errored with {:?}, dumping buffer: {:?}", err, buffer);
+                panic!("Errored with {err:?}, dumping buffer: {buffer:?}");
             }
         }
     }

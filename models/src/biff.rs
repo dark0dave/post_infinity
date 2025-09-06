@@ -32,7 +32,7 @@ impl Model for Biff {
         match reader.read_le() {
             Ok(res) => res,
             Err(err) => {
-                panic!("Errored with {:?}, dumping buffer: {:?}", err, buffer);
+                panic!("Errored with {err:?}, dumping buffer: {buffer:?}");
             }
         }
     }
@@ -63,7 +63,7 @@ impl Biff {
         tileset_entries: &Vec<TilesetEntry>,
     ) -> BinResult<Vec<Rc<dyn Model>>> {
         let mut buffer = vec![];
-        reader.read_to_end(&mut buffer).unwrap();
+        reader.read_to_end(&mut buffer)?;
 
         let mut out: Vec<Rc<dyn Model>> =
             Vec::with_capacity(fileset_entries.len() + tileset_entries.len());
@@ -71,8 +71,18 @@ impl Biff {
             let start: usize = fileset_entry.offset as usize;
             let end: usize = start + fileset_entry.size as usize;
             let buff = buffer.get(start..end).unwrap_or_default();
-            if let Some(data) = from_buffer(buff, fileset_entry.resource_type) {
-                out.push(data);
+            match from_buffer(buff, fileset_entry.resource_type) {
+                Ok(data) => {
+                    out.push(data);
+                }
+                Err(err) => {
+                    log::error!(
+                        "Failed to parse resource: {:#?}, with error: {:#?}",
+                        fileset_entry.resource_type,
+                        err
+                    );
+                    log::debug!("Dumping buffer: {buff:#?}");
+                }
             }
         }
         for tileset_entry in tileset_entries {

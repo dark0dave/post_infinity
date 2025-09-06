@@ -1,14 +1,13 @@
-use std::{error::Error, fs::File, io::Read, path::Path, rc::Rc, str};
+use std::{error::Error, fs::File, io::Read, path::Path, rc::Rc};
 
 use binrw::io::BufReader;
 use models::{
-    biff::Biff, common::types::ResourceType, from_buffer, from_json, key::Key, model::Model,
-    tlk::TLK,
+    common::types::ResourceType, from_buffer, from_json, key::Key, model::Model, tlk::TLK, IEModel,
 };
 
 use crate::{
     args::Args,
-    writer::{as_binary, as_json, to_stdout, write_file},
+    writer::{write_file, Printer},
 };
 
 fn read_file(path: &Path) -> Result<BufReader<File>, Box<dyn Error>> {
@@ -19,9 +18,9 @@ fn read_file(path: &Path) -> Result<BufReader<File>, Box<dyn Error>> {
 fn json_back_to_ie_type(path: &Path, dest: &Path) -> Result<(), Box<dyn Error>> {
     let extension = path
         .extension()
-        .ok_or(format!("Can't convert to str, {:?}", path))?
+        .ok_or(format!("Can't convert to str, {path:?}"))?
         .to_str()
-        .ok_or(format!("Can't convert to str, {:?}", path))?
+        .ok_or(format!("Can't convert to str, {path:?}"))?
         .to_ascii_lowercase();
 
     let resource_type = ResourceType::try_from(path)?;
@@ -36,14 +35,14 @@ fn json_back_to_ie_type(path: &Path, dest: &Path) -> Result<(), Box<dyn Error>> 
 
 fn get_models_from_file(
     path: &Path,
-    output_format: &str,
+    printer: Printer,
     dest: &Path,
     recurse: bool,
 ) -> Result<(), Box<dyn Error>> {
     let resource_type = ResourceType::try_from(path)?;
     let mut reader: BufReader<File> = read_file(path)?;
 
-    let model: Rc<dyn Model> = match resource_type {
+    let model: IEModel = match resource_type {
         ResourceType::NotFound => {
             return Err(format!("Unprocessable file type: {:?}", path.as_os_str()).into());
         }
@@ -56,42 +55,29 @@ fn get_models_from_file(
             }
             Rc::new(key)
         }
-        ResourceType::FileTypeBiff => {
+        ResourceType::FileTypeTlk => {
             let mut buffer = vec![];
             reader.read_to_end(&mut buffer)?;
-            Rc::new(Biff::new(&buffer))
+            let static_buffer: &'static [u8] = Box::leak(buffer.into_boxed_slice());
+            let model = TLK::parse(static_buffer)?;
+            log::info!("{model:#?}");
+            return Ok(());
         }
         _ => {
-            log::debug!("{:?}", resource_type);
+            log::debug!("{resource_type:?}");
             let mut buffer = vec![];
             reader.read_to_end(&mut buffer)?;
-            from_buffer(&buffer, resource_type).ok_or("Could not parse file")?
+            from_buffer(&buffer, resource_type)?
         }
     };
 
-    write(dest, resource_type, model, output_format)?;
-    Ok(())
-}
-
-fn write(
-    dest: &Path,
-    resource_type: ResourceType,
-    model: Rc<dyn Model>,
-    output_format: &str,
-) -> Result<(), Box<dyn Error>> {
-    log::debug!("{}", output_format);
-    match output_format {
-        "json" => as_json(dest, model, resource_type),
-        "binary" => as_binary(dest, model, resource_type),
-        "print" => to_stdout(dest, model, resource_type),
-        _ => Ok(()),
-    }
+    printer(dest, model, resource_type)
 }
 
 pub fn run(args: &Args) -> Result<(), Box<dyn Error>> {
-    log::debug!("{:?}", args);
+    log::debug!("{args:?}");
     let path = &args.file;
-    get_models_from_file(path, &args.output_format, &args.destination, args.recurse)?;
+    get_models_from_file(path, args.output_format, &args.destination, args.recurse)?;
 
     if args.to_ie_type {
         return json_back_to_ie_type(path, &args.destination);
@@ -107,7 +93,7 @@ pub fn run(args: &Args) -> Result<(), Box<dyn Error>> {
         let mut buffer = vec![];
         reader.read_to_end(&mut buffer)?;
         let static_buffer: &'static [u8] = Box::leak(buffer.into_boxed_slice());
-        TLK::parse(static_buffer).ok_or("Could not parse TLK file")?;
+        TLK::parse(static_buffer)?;
     }
     Ok(())
 }

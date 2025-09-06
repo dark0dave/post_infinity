@@ -46,7 +46,7 @@ impl Model for Key {
         match reader.read_le() {
             Ok(res) => res,
             Err(err) => {
-                panic!("Errored with {:?}, dumping buffer: {:?}", err, buffer);
+                panic!("Errored with {err:?}, dumping buffer: {buffer:?}");
             }
         }
     }
@@ -62,14 +62,14 @@ impl Key {
     pub fn recurse(&mut self, path: &Path) -> Result<(), Box<dyn Error>> {
         let parent = path
             .parent()
-            .ok_or_else(|| format!("No parent found for {:?}", path))?;
-        log::trace!("Parent path is: {:?}", parent);
+            .ok_or_else(|| format!("No parent found for {path:?}"))?;
+        log::trace!("Parent path is: {parent:?}");
         let mut out = vec![];
         for bif_file_name in self.bif_file_names.iter() {
             let file_path = &parent
                 .join(bif_file_name.to_string().replace('\0', ""))
                 .canonicalize()?;
-            log::debug!("Path to biff: {:?}", file_path);
+            log::debug!("Path to biff: {file_path:?}");
             out.push(Biff::try_from(file_path)?);
         }
         self.biffs = out;

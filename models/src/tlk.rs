@@ -1,5 +1,5 @@
 use core::{slice, str};
-use std::mem::size_of;
+use std::{error::Error, mem::size_of};
 
 use serde::{Deserialize, Serialize};
 
@@ -18,7 +18,7 @@ pub struct TLK<'data> {
 }
 
 impl<'data> TLK<'data> {
-    pub fn parse(bytes: &'data [u8]) -> Option<Self> {
+    pub fn parse(bytes: &'data [u8]) -> Result<Self, Box<dyn Error>> {
         let header = bytes.get(..size_of::<TLKHeader>()).unwrap_or_default();
         let header = unsafe { &*header.as_ptr().cast::<TLKHeader>() };
         let end = START_OF_ENTRIES + (header.count_of_entries as usize * size_of::<TLKEntry>());
@@ -32,8 +32,7 @@ impl<'data> TLK<'data> {
 
         let tlk_strings = unsafe {
             // Create an uninitialized buffer to hold our &str pointers
-            let layout =
-                std::alloc::Layout::array::<&str>(header.count_of_entries as usize).unwrap();
+            let layout = std::alloc::Layout::array::<&str>(header.count_of_entries as usize)?;
             let ptr = std::alloc::alloc(layout) as *mut &str;
 
             // List through all the entries to find the strings
@@ -51,7 +50,7 @@ impl<'data> TLK<'data> {
             slice::from_raw_parts(ptr, header.count_of_entries as usize)
         };
 
-        Some(TLK {
+        Ok(TLK {
             header,
             entries,
             tlk_strings,
@@ -101,16 +100,16 @@ mod tests {
     use pretty_assertions::assert_eq;
 
     #[test]
-    fn valid_tlk_header_parsed() {
+    fn valid_tlk_header_parsed() -> Result<(), Box<dyn Error>> {
         let mut file = File::open("fixtures/dialog.tlk").expect("Fixture missing");
         let mut buffer = vec![];
-        file.read_to_end(&mut buffer).unwrap();
-        let tlk = TLK::parse(buffer.as_slice()).unwrap();
+        file.read_to_end(&mut buffer)?;
+        let tlk = TLK::parse(buffer.as_slice())?;
         assert_eq!(
             *tlk.header,
             TLKHeader {
-                signature: "TLK ".as_bytes().try_into().unwrap(),
-                version: "V1  ".as_bytes().try_into().unwrap(),
+                signature: "TLK ".as_bytes().try_into()?,
+                version: "V1  ".as_bytes().try_into()?,
                 language_id: 0,
                 count_of_entries: 34000,
                 offset_to_strings: 884018
@@ -142,6 +141,7 @@ mod tests {
                 length_of_this_string: 11,
             }
         );
-        assert_eq!(tlk.tlk_strings.last(), Some(&"placeholder".into()))
+        assert_eq!(tlk.tlk_strings.last(), Some(&"placeholder"));
+        Ok(())
     }
 }
