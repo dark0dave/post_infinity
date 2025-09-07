@@ -9,9 +9,34 @@ use serde::{
     de::{Error, Visitor},
     Deserialize, Serialize,
 };
+use zerovec::ule::{AsULE, ULE};
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, BinRead, BinWrite)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, BinRead, BinWrite)]
 pub struct CharArray<const N: usize>(pub(crate) [u8; N]);
+
+impl<const N: usize> Default for CharArray<N> {
+    fn default() -> Self {
+        Self([0; N])
+    }
+}
+
+unsafe impl<const N: usize> ULE for CharArray<N> {
+    fn validate_bytes(_: &[u8]) -> Result<(), zerovec::ule::UleError> {
+        Ok(())
+    }
+}
+
+impl<const N: usize> AsULE for CharArray<N> {
+    type ULE = CharArray<N>;
+
+    fn to_unaligned(self) -> Self::ULE {
+        self
+    }
+
+    fn from_unaligned(unaligned: Self::ULE) -> Self {
+        unaligned
+    }
+}
 
 impl<const N: usize> Serialize for CharArray<N> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
