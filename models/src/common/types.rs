@@ -70,6 +70,60 @@ impl TryFrom<&Path> for ResourceType {
     }
 }
 
+impl From<ResourceType> for String {
+    fn from(val: ResourceType) -> Self {
+        match val {
+            ResourceType::FileTypeBmp => "bmp",
+            ResourceType::FileTypeMve => "mve",
+            ResourceType::FileTypeWav => "wav",
+            ResourceType::FileTypeWfx => "wfx",
+            ResourceType::FileTypePlt => "plt",
+            ResourceType::FileTypeBam => "bam",
+            ResourceType::FileTypeWed => "wed",
+            ResourceType::FileTypeChu => "chu",
+            ResourceType::FileTypeTi => "ti",
+            ResourceType::FileTypeMos => "mos",
+            ResourceType::FileTypeItm => "itm",
+            ResourceType::FileTypeSpl => "spl",
+            ResourceType::FileTypeBcs => "bcs",
+            ResourceType::FileTypeIds => "ids",
+            ResourceType::FileTypeCre => "cre",
+            ResourceType::FileTypeAre => "are",
+            ResourceType::FileTypeDlg => "dlg",
+            ResourceType::FileType2da => "2da",
+            ResourceType::FileTypeGam => "gam",
+            ResourceType::FileTypeSto => "sto",
+            ResourceType::FileTypeWmap => "wmp",
+            ResourceType::FileTypeEff => "eff",
+            ResourceType::FileTypeBs => "bs",
+            ResourceType::FileTypeChr => "chr",
+            ResourceType::FileTypeVvc => "vvc",
+            ResourceType::FileTypeVef => "vef",
+            ResourceType::FileTypePro => "pro",
+            ResourceType::FileTypeBio => "bio",
+            ResourceType::FileTypeWbm => "wbm",
+            ResourceType::FileTypeFnt => "fnt",
+            ResourceType::FileTypeGui => "gui",
+            ResourceType::FileTypeSql => "sql",
+            ResourceType::FileTypePvrz => "pvrz",
+            ResourceType::FileTypeGlsl => "glsl",
+            ResourceType::FileTypeTlk => "tlk",
+            ResourceType::FileTypeMenu => "menu",
+            ResourceType::FileTypeTtf => "ttf",
+            ResourceType::FileTypePng => "png",
+            ResourceType::FileTypeBah => "bah",
+            ResourceType::FileTypeIni => "ini",
+            ResourceType::FileTypeSrc => "src",
+            // Here our invented FileTypes:
+            ResourceType::FileTypeKey => "key",
+            ResourceType::FileTypeBiff => "bif",
+            ResourceType::FileTypeSave => "sav",
+            _ => "",
+        }
+        .to_string()
+    }
+}
+
 impl From<&str> for ResourceType {
     fn from(value: &str) -> Self {
         match value.to_ascii_lowercase().as_str() {

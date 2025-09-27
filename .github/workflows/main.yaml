@@ -18,6 +18,9 @@ jobs:
     - uses: dtolnay/rust-toolchain@stable
       with:
         toolchain: stable
+    - run: |
+        rustup component add rustfmt
+        rustup component add clippy
     - uses: pre-commit/action@v3.0.1
   build:
     runs-on: ${{ matrix.os }}

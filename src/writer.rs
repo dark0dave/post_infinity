@@ -38,8 +38,9 @@ pub(crate) fn as_json(
     model: IEModel,
     resource_type: ResourceType,
 ) -> Result<(), Box<dyn Error>> {
-    let file_name = Path::new(dest.file_stem().unwrap_or_default())
-        .with_extension(format!("{resource_type:?}.json"));
+    let extension: String = resource_type.into();
+    let file_name =
+        Path::new(dest.file_stem().unwrap_or_default()).with_extension(format!("{extension}.json"));
     log::info!("Saved as {file_name:#?}");
 
     let file = File::create(file_name)?;
