@@ -559,7 +559,8 @@ pub struct SongEntry {
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct RestInterruption {
     pub name: CharArray<32>,
-    pub interruption_explanation_text: CharArray<40>,
+    #[br(count = 10)]
+    pub interruption_explanation_text: Vec<Strref>,
     #[br(count = 10)]
     pub resref_of_creature_to_spawn: Vec<Resref>,
     pub count_of_creatures_in_spawn_table: u16,
@@ -572,9 +573,8 @@ pub struct RestInterruption {
     pub interruption_point_enabled: u16,
     pub probability_day_per_hour: u16,
     pub probability_night_per_hour: u16,
-    #[serde(skip)]
     #[br(count = 56)]
-    _unused: Vec<u8>,
+    pub unused: Vec<u8>,
 }
 
 #[cfg(test)]
@@ -585,16 +585,11 @@ mod tests {
     use serde_json::Value;
     use std::{error::Error, fs::File};
 
-    const AREA_FIXTURES: [&str; 3] = [
+    const AREA_FIXTURES: [&str; 4] = [
         "fixtures/ar0002.are",
         "fixtures/ar0011.are",
         "fixtures/ar0226.are",
-    ];
-
-    const AREA_JSON_FIXTURES: [&str; 3] = [
-        "fixtures/ar0002.are.json",
-        "fixtures/ar0011.are.json",
-        "fixtures/ar0226.are.json",
+        "fixtures/oh8400.are",
     ];
 
     fn read_file(path: &str) -> Result<Vec<u8>, Box<dyn Error>> {
@@ -606,13 +601,13 @@ mod tests {
 
     #[test]
     fn parse() -> Result<(), Box<dyn Error>> {
-        for (index, file_path) in AREA_FIXTURES.iter().enumerate() {
+        for file_path in AREA_FIXTURES {
             let area: Area = Area::new(&read_file(file_path)?);
             let result: Value = serde_json::to_value(area)?;
-            let json_fixture_file = AREA_JSON_FIXTURES.get(index).ok_or("Missing fixture")?;
+            let json_fixture_file = &format!("{file_path}.json");
             let expected: Value = serde_json::from_slice(&read_file(json_fixture_file)?)?;
 
-            assert_eq!(result, expected);
+            assert_eq!(result, expected, "Test {file_path} failed");
         }
         Ok(())
     }

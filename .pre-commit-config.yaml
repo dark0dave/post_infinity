@@ -35,6 +35,7 @@ repos:
 - repo: local
   hooks:
     - id: fmt
+      stages: [pre-commit]
       name: fmt
       description: Format files with cargo fmt.
       entry: cargo fmt --all
@@ -42,6 +43,7 @@ repos:
       types: [rust]
       pass_filenames: false
     - id: cargo-check
+      stages: [pre-commit]
       name: cargo check
       description: Check the package for errors.
       entry: cargo check
@@ -49,6 +51,7 @@ repos:
       types: [rust]
       pass_filenames: false
     - id: clippy
+      stages: [pre-commit]
       name: clippy
       description: Lint rust sources
       entry: cargo clippy --workspace
