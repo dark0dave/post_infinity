@@ -2,8 +2,8 @@ use core::str;
 use std::{error::Error, fs::File, path::PathBuf, rc::Rc};
 
 use binrw::{
-    io::{BufReader, Cursor, Read, Seek, SeekFrom},
     BinRead, BinReaderExt, BinResult, BinWrite,
+    io::{BufReader, Cursor, Read, Seek, SeekFrom},
 };
 use serde::{Deserialize, Serialize};
 

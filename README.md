@@ -166,4 +166,3 @@ you can analyze performance:
 cargo install flamegraph
 flamegraph -- target/release/post_infinity <path to chitin file>
 ```
-

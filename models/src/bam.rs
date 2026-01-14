@@ -1,7 +1,7 @@
 use binrw::{
+    BinRead, BinReaderExt, BinWrite,
     helpers::until_eof,
     io::{Cursor, Read},
-    BinRead, BinReaderExt, BinWrite,
 };
 use flate2::bufread::ZlibDecoder;
 use serde::{Deserialize, Serialize};

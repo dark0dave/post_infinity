@@ -1,10 +1,10 @@
-use binrw::{helpers::until_eof, io::Cursor, io::SeekFrom, BinRead, BinReaderExt, BinWrite};
+use binrw::{BinRead, BinReaderExt, BinWrite, helpers::until_eof, io::Cursor, io::SeekFrom};
 use serde::{Deserialize, Serialize};
 
+use crate::common::Resref;
 use crate::common::char_array::CharArray;
 use crate::common::header::Header;
 use crate::common::strref::Strref;
-use crate::common::Resref;
 use crate::model::Model;
 
 #[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]

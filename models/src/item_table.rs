@@ -1,4 +1,4 @@
-use binrw::{io::Cursor, BinRead, BinReaderExt, BinWrite};
+use binrw::{BinRead, BinReaderExt, BinWrite, io::Cursor};
 use serde::{Deserialize, Serialize};
 
 use crate::common::Resref;

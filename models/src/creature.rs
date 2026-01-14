@@ -1,11 +1,11 @@
 use binrw::{
+    BinRead, BinReaderExt, BinWrite,
     helpers::until_eof,
     io::{Cursor, SeekFrom},
-    BinRead, BinReaderExt, BinWrite,
 };
 use serde::{Deserialize, Serialize};
 
-use crate::common::{header::Header, strref::Strref, Resref};
+use crate::common::{Resref, header::Header, strref::Strref};
 use crate::effect_v1::EffectV1;
 use crate::item_table::ItemReferenceTable;
 use crate::{common::char_array::CharArray, effect_v2::EffectV2Body};

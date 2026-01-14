@@ -1,12 +1,14 @@
 use core::{slice, str};
-use std::{error::Error, mem::size_of};
+use std::error::Error;
 
 use serde::{Deserialize, Serialize};
+use zerocopy::FromBytes;
+use zerocopy_derive::{FromBytes, Immutable, IntoBytes, KnownLayout};
 
 const START_OF_ENTRIES: usize = 18_usize;
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/tlk_v1.htm
-#[derive(Debug, PartialEq, Serialize)]
+#[derive(Debug, PartialEq, Serialize, IntoBytes)]
 #[repr(C, packed)]
 pub struct TLK<'data> {
     #[serde(borrow)]
@@ -14,52 +16,53 @@ pub struct TLK<'data> {
     #[serde(borrow)]
     pub entries: &'data [TLKEntry],
     #[serde(borrow)]
-    pub tlk_strings: &'data [&'data str],
+    pub strings: &'data [&'data str],
 }
 
 impl<'data> TLK<'data> {
     pub fn parse(bytes: &'data [u8]) -> Result<Self, Box<dyn Error>> {
-        let header = bytes.get(..size_of::<TLKHeader>()).unwrap_or_default();
-        let header = unsafe { &*header.as_ptr().cast::<TLKHeader>() };
-        let end = START_OF_ENTRIES + (header.count_of_entries as usize * size_of::<TLKEntry>());
-        let entries = bytes.get(START_OF_ENTRIES..end).unwrap_or_default();
-        let entries: &[TLKEntry] = unsafe {
-            slice::from_raw_parts(entries.as_ptr() as _, header.count_of_entries as usize)
-        };
+        let (header, _) = <TLKHeader>::ref_from_prefix(bytes).map_err(|err| err.to_string())?;
+
+        let source = bytes
+            .get(START_OF_ENTRIES..)
+            .ok_or("could not get entries from tlk buffer")?;
+        let number_of_entries: usize = header.count_of_entries.try_into()?;
+        let (entries, _) = <[TLKEntry]>::ref_from_prefix_with_elems(source, number_of_entries)
+            .map_err(|err| err.to_string())?;
         let tlk_strings = bytes
             .get(header.offset_to_strings as usize..)
-            .unwrap_or_default();
+            .ok_or("could not get tlk strings from tlk buffer")?;
 
-        let tlk_strings = unsafe {
-            // Create an uninitialized buffer to hold our &str pointers
+        let strings = unsafe {
             let layout = std::alloc::Layout::array::<&str>(header.count_of_entries as usize)?;
             let ptr = std::alloc::alloc(layout) as *mut &str;
 
-            // List through all the entries to find the strings
             for (i, entry) in entries.iter().enumerate() {
                 let start = entry.offset_to_this_string as usize;
                 let end = start + entry.length_of_this_string as usize;
                 if end <= bytes.len() {
-                    let slice: &[u8] = &tlk_strings[start..end];
-                    let s = std::str::from_utf8(slice).unwrap_or_default();
-                    *ptr.add(i) = s;
+                    let slice: &[u8] = tlk_strings
+                        .get(start..end)
+                        .ok_or("failed to get bytes for string from buffer")?;
+                    *ptr.add(i) = std::str::from_utf8(slice)?;
                 }
             }
 
-            // Convert our mutable slice of &str to an immutable slice
             slice::from_raw_parts(ptr, header.count_of_entries as usize)
         };
 
         Ok(TLK {
             header,
             entries,
-            tlk_strings,
+            strings,
         })
     }
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/tlk_v1.htm#tlkv1_Header
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(
+    Debug, PartialEq, Serialize, Deserialize, FromBytes, IntoBytes, Immutable, KnownLayout,
+)]
 #[repr(C, packed)]
 pub struct TLKHeader {
     pub signature: [u8; 4],
@@ -70,7 +73,9 @@ pub struct TLKHeader {
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/tlk_v1.htm#tlkv1_Entry
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(
+    Debug, PartialEq, Serialize, Deserialize, FromBytes, IntoBytes, Immutable, KnownLayout,
+)]
 #[repr(C, packed)]
 pub struct TLKEntry {
     /*
@@ -127,7 +132,12 @@ mod tests {
                 length_of_this_string: 213,
             }
         );
-        assert_eq!(tlk.tlk_strings.get(400), Some(&" 'Twas some three hundred years hence, but folk still cringe at the mention of the destruction at Ulcaster School. I've not met a soul who claims to know why it occurred, and none that were there are alive to say."));
+        assert_eq!(
+            tlk.strings.get(400),
+            Some(
+                &" 'Twas some three hundred years hence, but folk still cringe at the mention of the destruction at Ulcaster School. I've not met a soul who claims to know why it occurred, and none that were there are alive to say."
+            )
+        );
 
         let entry = tlk.entries.last().expect("Failed to find entry");
         assert_eq!(
@@ -141,7 +151,7 @@ mod tests {
                 length_of_this_string: 11,
             }
         );
-        assert_eq!(tlk.tlk_strings.last(), Some(&"placeholder"));
+        assert_eq!(tlk.strings.last(), Some(&"placeholder"));
         Ok(())
     }
 }

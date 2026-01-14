@@ -1,7 +1,7 @@
 use std::rc::Rc;
 use std::{error::Error, path::Path};
 
-use binrw::{io::Cursor, io::Read, BinRead, BinReaderExt, BinWrite};
+use binrw::{BinRead, BinReaderExt, BinWrite, io::Cursor, io::Read};
 use flate2::bufread::ZlibDecoder;
 use serde::{Deserialize, Serialize};
 

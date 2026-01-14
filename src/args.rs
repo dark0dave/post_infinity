@@ -1,8 +1,8 @@
 use std::path::PathBuf;
 
-use clap::{error::ErrorKind, ArgAction, Error, Parser};
+use clap::{ArgAction, Error, Parser, error::ErrorKind};
 
-use crate::writer::{as_binary, as_json, as_stdout, Printer};
+use crate::writer::{Printer, as_binary, as_json, as_stdout};
 
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]

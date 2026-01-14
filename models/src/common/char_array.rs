@@ -6,8 +6,8 @@ use std::{
 
 use binrw::{BinRead, BinWrite};
 use serde::{
-    de::{Error, Visitor},
     Deserialize, Serialize,
+    de::{Error, Visitor},
 };
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, BinRead, BinWrite)]
