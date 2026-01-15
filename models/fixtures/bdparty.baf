@@ -656,4 +656,3 @@ THEN
 		ChangeAIScript("bdshout",RACE)
 		ChangeAIScript("",DEFAULT)
 END
-

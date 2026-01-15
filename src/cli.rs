@@ -2,12 +2,12 @@ use std::{error::Error, fs::File, io::Read, path::Path, rc::Rc};
 
 use binrw::io::BufReader;
 use models::{
-    common::types::ResourceType, from_buffer, from_json, key::Key, model::Model, tlk::TLK, IEModel,
+    IEModel, common::types::ResourceType, from_buffer, from_json, key::Key, model::Model, tlk::TLK,
 };
 
 use crate::{
     args::Args,
-    writer::{write_file, Printer},
+    writer::{Printer, write_file},
 };
 
 fn read_file(path: &Path) -> Result<BufReader<File>, Box<dyn Error>> {
@@ -85,8 +85,7 @@ pub fn run(args: &Args) -> Result<(), Box<dyn Error>> {
         let mut reader: BufReader<File> = read_file(&dialogue_path)?;
         let mut buffer = vec![];
         reader.read_to_end(&mut buffer)?;
-        let static_buffer: &'static [u8] = Box::leak(buffer.into_boxed_slice());
-        TLK::parse(static_buffer)?;
+        TLK::parse(&buffer)?;
     }
     Ok(())
 }

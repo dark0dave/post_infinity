@@ -17,17 +17,8 @@ repos:
     - id: check-builtin-literals
       stages: [pre-commit]
 
-- repo: https://github.com/jumanjihouse/pre-commit-hooks
-  rev: 3.0.0
-  hooks:
-    - id: forbid-binary
-      stages: [pre-commit]
-      exclude: (?x)^([models/fixtures|docs])
-    - id: git-dirty
-      stages: [pre-commit]
-
 - repo: https://github.com/commitizen-tools/commitizen
-  rev: v4.8.4
+  rev: v4.11.3
   hooks:
     - id: commitizen
       stages: [commit-msg]
@@ -71,9 +62,15 @@ repos:
       stages: [pre-commit]
       name: version check
       description: Check the version
-      entry: check-version.sh
+      entry: scripts/check-version.sh
       language: script
-      types: [rust]
+      pass_filenames: false
+    - id: git-check
+      stages: [pre-commit]
+      name: git check
+      description: Check the version
+      entry: scripts/check-git.sh
+      language: system
       pass_filenames: false
 
 - repo: https://github.com/codespell-project/codespell

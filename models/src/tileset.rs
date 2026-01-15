@@ -1,4 +1,4 @@
-use binrw::{binread, io::Cursor, BinReaderExt, BinWrite};
+use binrw::{BinReaderExt, BinWrite, binread, io::Cursor};
 use serde::{Deserialize, Serialize};
 
 use crate::model::Model;

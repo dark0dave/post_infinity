@@ -1,9 +1,9 @@
-use binrw::{helpers::until_eof, io::Cursor, BinRead, BinReaderExt, BinWrite};
+use binrw::{BinRead, BinReaderExt, BinWrite, helpers::until_eof, io::Cursor};
 use serde::{Deserialize, Serialize};
 
+use crate::common::Resref;
 use crate::common::char_array::CharArray;
 use crate::common::header::Header;
-use crate::common::Resref;
 
 use crate::{creature::Creature, model::Model};
 

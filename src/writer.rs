@@ -1,7 +1,7 @@
 use std::{error::Error, fs::File, io::Write, path::Path, str};
 
 use erased_serde::Serializer;
-use models::{common::types::ResourceType, IEModel};
+use models::{IEModel, common::types::ResourceType};
 
 pub(crate) type Printer = fn(&Path, IEModel, ResourceType) -> Result<(), Box<dyn Error>>;
 

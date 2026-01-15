@@ -2,12 +2,12 @@ use std::{fmt::Debug, path::Path};
 
 use std::error::Error;
 
-use binrw::{io::Cursor, BinRead, BinReaderExt, BinWrite};
+use binrw::{BinRead, BinReaderExt, BinWrite, io::Cursor};
 use serde::{Deserialize, Serialize};
 
 use crate::{
     biff::Biff,
-    common::{header::Header, Resref},
+    common::{Resref, header::Header},
     model::Model,
 };
 

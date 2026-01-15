@@ -1,14 +1,14 @@
 use binrw::{
+    BinRead, BinReaderExt, BinResult, BinWrite,
     helpers::until_eof,
     io::{Cursor, Read, Seek, SeekFrom},
-    BinRead, BinReaderExt, BinResult, BinWrite,
 };
 use serde::{Deserialize, Serialize};
 
 use crate::common::{char_array::CharArray, header::Header};
 use crate::model::Model;
 use crate::{
-    common::{strref::Strref, Resref},
+    common::{Resref, strref::Strref},
     creature::Creature,
 };
 

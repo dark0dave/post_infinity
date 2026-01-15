@@ -1,10 +1,10 @@
-use binrw::{helpers::until_eof, io::Cursor, BinRead, BinReaderExt, BinWrite};
+use binrw::{BinRead, BinReaderExt, BinWrite, helpers::until_eof, io::Cursor};
 use serde::{Deserialize, Serialize};
 
+use crate::common::Resref;
 use crate::common::feature_block::FeatureBlock;
 use crate::common::header::Header;
 use crate::common::strref::Strref;
-use crate::common::Resref;
 use crate::model::Model;
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/spl_v1.htm
