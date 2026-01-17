@@ -1,6 +1,6 @@
 use std::fmt::Debug;
 
-use erased_serde::Serialize;
+use serde::Serialize;
 
 pub trait Model: Debug + Serialize {
     fn new(reader: &[u8]) -> Self

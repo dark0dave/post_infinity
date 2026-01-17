@@ -1,10 +1,10 @@
-use std::rc::Rc;
 use std::{error::Error, path::Path};
 
 use binrw::{BinRead, BinReaderExt, BinWrite, io::Cursor, io::Read};
 use flate2::bufread::ZlibDecoder;
 use serde::{Deserialize, Serialize};
 
+use crate::IEModels;
 use crate::{
     common::{
         header::Header,
@@ -56,10 +56,10 @@ pub struct SavedFile {
     #[br(count=compressed_data_length, map = |s: Vec<u8>| parse_compressed_data(&s, &filename).ok())]
     #[bw(ignore)]
     #[serde(skip)]
-    pub uncompressed_data: Option<Rc<dyn Model>>,
+    pub uncompressed_data: Option<IEModels>,
 }
 
-fn parse_compressed_data(buff: &[u8], file_name: &String) -> Result<Rc<dyn Model>, Box<dyn Error>> {
+fn parse_compressed_data(buff: &[u8], file_name: &String) -> Result<IEModels, Box<dyn Error>> {
     let mut d = ZlibDecoder::new(buff);
     let mut buffer = vec![];
     d.read_to_end(&mut buffer).map_err(|err| {

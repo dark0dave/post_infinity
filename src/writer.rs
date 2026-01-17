@@ -1,9 +1,8 @@
 use std::{error::Error, fs::File, io::Write, path::Path, str};
 
-use erased_serde::Serializer;
-use models::{IEModel, common::types::ResourceType};
+use models::{IEModels, common::types::ResourceType};
 
-pub(crate) type Printer = fn(&Path, IEModel, ResourceType) -> Result<(), Box<dyn Error>>;
+pub(crate) type Printer = fn(&Path, IEModels, ResourceType) -> Result<(), Box<dyn Error>>;
 
 pub(crate) fn write_file(
     path: &Path,
@@ -17,25 +16,24 @@ pub(crate) fn write_file(
     Ok(())
 }
 
-pub(crate) fn as_stdout(_: &Path, model: IEModel, _: ResourceType) -> Result<(), Box<dyn Error>> {
-    let print = &mut serde_json::Serializer::new(std::io::stdout());
-    let mut format = <dyn Serializer>::erase(print);
-    Ok(model.erased_serialize(&mut format)?)
+pub(crate) fn as_stdout(_: &Path, model: IEModels, _: ResourceType) -> Result<(), Box<dyn Error>> {
+    println!("{}", model.to_json()?);
+    Ok(())
 }
 
 pub(crate) fn as_binary(
     dest: &Path,
-    model: IEModel,
+    model: IEModels,
     _: ResourceType,
 ) -> Result<(), Box<dyn Error>> {
     let mut file = File::create(dest)?;
-    let bytes = model.to_bytes();
+    let bytes = model.to_bytes()?;
     Ok(file.write_all(&bytes)?)
 }
 
 pub(crate) fn as_json(
     dest: &Path,
-    model: IEModel,
+    model: IEModels,
     resource_type: ResourceType,
 ) -> Result<(), Box<dyn Error>> {
     let extension: String = resource_type.into();
@@ -44,7 +42,5 @@ pub(crate) fn as_json(
     log::info!("Saved as {file_name:#?}");
 
     let file = File::create(file_name)?;
-    let mut json = serde_json::Serializer::new(file);
-    let mut format = <dyn Serializer>::erase(&mut json);
-    Ok(model.erased_serialize(&mut format)?)
+    Ok(serde_json::to_writer(file, &model.to_json()?)?)
 }

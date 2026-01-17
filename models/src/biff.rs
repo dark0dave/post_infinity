@@ -1,5 +1,5 @@
 use core::str;
-use std::{error::Error, fs::File, path::PathBuf, rc::Rc};
+use std::{error::Error, fs::File, path::PathBuf};
 
 use binrw::{
     BinRead, BinReaderExt, BinResult, BinWrite,
@@ -7,8 +7,11 @@ use binrw::{
 };
 use serde::{Deserialize, Serialize};
 
-use crate::common::{header::Header, strref::Strref};
 use crate::tileset::Tileset;
+use crate::{
+    IEModels,
+    common::{header::Header, strref::Strref},
+};
 use crate::{common::types::ResourceType, from_buffer, model::Model};
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/bif_v1.htm
@@ -22,8 +25,8 @@ pub struct Biff {
     pub tileset_entries: Vec<TilesetEntry>,
     #[serde(skip)]
     #[br(seek_before=SeekFrom::Start(0), parse_with = |reader, _, _: ()| Biff::parse_contained_files(reader, &fileset_entries, &tileset_entries))]
-    #[bw(map = |x| x.iter().flat_map(|x| x.to_bytes()).collect::<Vec<u8>>())]
-    pub contained_files: Vec<Rc<dyn Model>>,
+    #[bw(map = |x| x.iter().flat_map(|x| x.to_bytes()).flatten().collect::<Vec<u8>>())]
+    pub contained_files: Vec<IEModels>,
 }
 
 impl Model for Biff {
@@ -61,11 +64,11 @@ impl Biff {
         reader: &mut R,
         fileset_entries: &Vec<FilesetEntry>,
         tileset_entries: &Vec<TilesetEntry>,
-    ) -> BinResult<Vec<Rc<dyn Model>>> {
+    ) -> BinResult<Vec<IEModels>> {
         let mut buffer = vec![];
         reader.read_to_end(&mut buffer)?;
 
-        let mut out: Vec<Rc<dyn Model>> =
+        let mut out: Vec<IEModels> =
             Vec::with_capacity(fileset_entries.len() + tileset_entries.len());
         for fileset_entry in fileset_entries {
             let start: usize = fileset_entry.offset as usize;
@@ -89,7 +92,7 @@ impl Biff {
             let start: usize = tileset_entry.offset as usize;
             let end: usize = start + (tileset_entry.tile_count * tileset_entry.tile_size) as usize;
             let buff = buffer.get(start..end).unwrap_or_default();
-            out.push(Rc::new(Tileset {
+            out.push(IEModels::Tileset(Tileset {
                 data: buff.to_vec(),
             }));
         }
