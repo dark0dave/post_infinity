@@ -1,8 +1,8 @@
-use std::{error::Error, fs::File, io::Read, path::Path, rc::Rc};
+use std::{error::Error, fs::File, io::Read, path::Path};
 
 use binrw::io::BufReader;
 use models::{
-    IEModel, common::types::ResourceType, from_buffer, from_json, key::Key, model::Model, tlk::TLK,
+    IEModels, common::types::ResourceType, from_buffer, from_json, key::Key, model::Model, tlk::TLK,
 };
 
 use crate::{
@@ -37,7 +37,7 @@ fn get_models_from_file(path: &Path, printer: Printer, dest: &Path) -> Result<()
     let resource_type = ResourceType::try_from(path)?;
     let mut reader: BufReader<File> = read_file(path)?;
 
-    let model: IEModel = match resource_type {
+    let model: IEModels = match resource_type {
         ResourceType::NotFound => {
             return Err(format!("Unprocessable file type: {:?}", path.as_os_str()).into());
         }
@@ -46,7 +46,7 @@ fn get_models_from_file(path: &Path, printer: Printer, dest: &Path) -> Result<()
             reader.read_to_end(&mut buffer)?;
             let mut key = Key::new(&buffer);
             key.recurse(path)?;
-            Rc::new(key)
+            IEModels::Key(key)
         }
         ResourceType::FileTypeTlk => {
             let mut buffer = vec![];
