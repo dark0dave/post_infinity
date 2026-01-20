@@ -96,7 +96,7 @@
       "resource": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
       "dice_thrown_max_level": 0,
       "dice_sides_min_level": 0,
-      "saving_throw_type": "\u0000\u0000\u0000\u0000",
+      "saving_throw_type": 0,
       "saving_throw_bonus": 0,
       "stacking_id": 0
     },
@@ -114,7 +114,7 @@
       "resource": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
       "dice_thrown_max_level": 0,
       "dice_sides_min_level": 0,
-      "saving_throw_type": "\u0000\u0000\u0000\u0000",
+      "saving_throw_type": 0,
       "saving_throw_bonus": 0,
       "stacking_id": 0
     },
@@ -132,7 +132,7 @@
       "resource": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
       "dice_thrown_max_level": 0,
       "dice_sides_min_level": 0,
-      "saving_throw_type": "\u0000\u0000\u0000\u0000",
+      "saving_throw_type": 0,
       "saving_throw_bonus": 0,
       "stacking_id": 0
     },
@@ -150,7 +150,7 @@
       "resource": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
       "dice_thrown_max_level": 0,
       "dice_sides_min_level": 0,
-      "saving_throw_type": "\u0000\u0000\u0000\u0000",
+      "saving_throw_type": 0,
       "saving_throw_bonus": 0,
       "stacking_id": 0
     }

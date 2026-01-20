@@ -1,32 +1,29 @@
-use binrw::{BinReaderExt, BinWrite, binread, io::Cursor};
+use std::error::Error;
+
 use serde::{Deserialize, Serialize};
 
-use crate::model::Model;
+use crate::model::Parseable;
 
-#[binread]
-#[derive(Debug, PartialEq, BinWrite, Serialize, Deserialize)]
-pub struct Tileset {
-    #[serde(skip)]
-    #[br(temp)]
-    #[bw(ignore)]
-    length: u32,
-
-    #[br(count=length)]
-    pub data: Vec<u8>,
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
+pub struct Tileset<'data> {
+    #[serde(borrow)]
+    pub data: &'data [u8],
 }
 
-impl Model for Tileset {
-    fn new(buffer: &[u8]) -> Self {
-        let mut reader = Cursor::new(buffer);
-        match reader.read_le() {
-            Ok(res) => res,
-            Err(err) => {
-                panic!("Errored with {err:?}, dumping buffer: {buffer:?}");
-            }
-        }
-    }
+impl<'data> Parseable<'data> for Tileset<'data> {}
 
-    fn to_bytes(&self) -> Vec<u8> {
-        self.data.clone()
+impl<'data> TryFrom<&'data [u8]> for Tileset<'data> {
+    type Error = Box<dyn Error>;
+
+    fn try_from(value: &'data [u8]) -> Result<Self, Self::Error> {
+        Ok(Self { data: value })
+    }
+}
+
+impl<'data> TryInto<Vec<u8>> for Tileset<'data> {
+    type Error = Box<dyn Error>;
+
+    fn try_into(self) -> Result<Vec<u8>, Self::Error> {
+        Ok(self.data.to_vec())
     }
 }

@@ -1,105 +1,111 @@
+use std::io::Read;
 use std::{error::Error, path::Path};
 
-use binrw::{BinRead, BinReaderExt, BinWrite, io::Cursor, io::Read};
 use flate2::bufread::ZlibDecoder;
 use serde::{Deserialize, Serialize};
+use zerocopy::IntoBytes;
+use zerovec::ule::VarULE;
+use zerovec::{VarZeroVec, ZeroVec, make_varule};
 
-use crate::IEModels;
 use crate::{
-    common::{
-        header::Header,
-        parsers::{read_string, write_string},
-        types::ResourceType,
-    },
-    from_buffer,
-    model::Model,
+    IEModels,
+    common::{ZeroCharArray, types::ResourceType},
+    from_buffer_with_resouce_type,
+    model::Parseable,
 };
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/sav_v1.htm
-#[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
-pub struct Save {
-    #[serde(flatten)]
-    pub header: Header,
-    #[br(parse_with=binrw::helpers::until_eof)]
-    pub files: Vec<SavedFile>,
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Save<'data> {
+    pub signature: ZeroCharArray,
+    pub version: ZeroCharArray,
+    #[serde(borrow)]
+    pub files: VarZeroVec<'data, SavedFileVARULE>,
 }
 
-impl Model for Save {
-    fn new(buffer: &[u8]) -> Self {
-        let mut reader = Cursor::new(buffer);
-        match reader.read_le() {
-            Ok(res) => res,
-            Err(err) => {
-                panic!("Errored with {err:?}, dumping buffer: {buffer:?}");
-            }
-        }
-    }
+impl<'data> Parseable<'data> for Save<'data> {}
 
-    fn to_bytes(&self) -> Vec<u8> {
-        let mut writer = Cursor::new(Vec::new());
-        self.write_le(&mut writer).unwrap();
-        writer.into_inner()
+impl<'data> TryFrom<&'data [u8]> for Save<'data> {
+    type Error = Box<dyn Error>;
+
+    fn try_from(value: &'data [u8]) -> Result<Self, Self::Error> {
+        let signature = ZeroCharArray(value.get(0..4).unwrap_or_default().try_into()?);
+        let version = ZeroCharArray(value.get(4..8).unwrap_or_default().try_into()?);
+        let files = VarZeroVec::new();
+        Ok(Self {
+            signature,
+            version,
+            files,
+        })
+    }
+}
+
+impl<'data> TryInto<Vec<u8>> for Save<'data> {
+    type Error = Box<dyn Error>;
+
+    fn try_into(self) -> Result<Vec<u8>, Self::Error> {
+        let mut buffer = vec![];
+        buffer.extend_from_slice(self.signature.as_bytes());
+        buffer.extend_from_slice(self.version.as_bytes());
+        for iefile in self.files.iter() {
+            buffer.extend_from_slice(iefile.as_bytes());
+        }
+        Ok(buffer)
     }
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/sav_v1.htm#savv1_File
-#[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
-pub struct SavedFile {
+
+#[make_varule(SavedFileVARULE)]
+#[zerovec::derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Serialize, Deserialize)]
+pub struct SavedFile<'data> {
     pub length_of_filename: u32,
-    #[bw(write_with = write_string)]
-    #[br(parse_with = |reader, _, _:()| read_string(reader, length_of_filename.into()))]
-    pub filename: String,
+    #[serde(borrow)]
+    pub filename: &'data str,
     pub uncompressed_data_length: u32,
     pub compressed_data_length: u32,
-    #[br(count=compressed_data_length, restore_position)]
-    pub compressed_data: Vec<u8>,
-    #[br(count=compressed_data_length, map = |s: Vec<u8>| parse_compressed_data(&s, &filename).ok())]
-    #[bw(ignore)]
-    #[serde(skip)]
-    pub uncompressed_data: Option<IEModels>,
+    #[serde(borrow)]
+    pub compressed_data: ZeroVec<'data, u8>,
 }
 
-fn parse_compressed_data(buff: &[u8], file_name: &String) -> Result<IEModels, Box<dyn Error>> {
-    let mut d = ZlibDecoder::new(buff);
-    let mut buffer = vec![];
-    d.read_to_end(&mut buffer).map_err(|err| {
-        log::error!("{err}");
-        err
-    })?;
-    let extension = Path::new(&file_name.to_string())
-        .extension()
-        .unwrap_or_default()
-        .to_ascii_lowercase()
-        .into_string()
-        .unwrap_or_default()
-        .replace('\0', "");
-    let resource_type = ResourceType::from(extension.as_str());
-    from_buffer(&buffer, resource_type)
+impl<'data> SavedFile<'data> {
+    pub fn decompress(&self) -> Result<Vec<u8>, Box<dyn Error>> {
+        let mut d = ZlibDecoder::new(self.compressed_data.as_ule_slice());
+        let mut buffer = vec![];
+        d.read_to_end(&mut buffer).map_err(|err| {
+            log::error!("{err}");
+            err
+        })?;
+        Ok(buffer)
+    }
+}
+
+pub fn parse_compressed_data<'data>(
+    buffer: &'data [u8],
+    file_path: &Path,
+) -> Result<IEModels<'data>, Box<dyn Error>> {
+    let resource_type = ResourceType::try_from(file_path)?;
+    from_buffer_with_resouce_type(buffer, resource_type)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use binrw::io::Read;
     use pretty_assertions::assert_eq;
     use serde_json::Value;
-    use std::{error::Error, fs::File};
+    use std::{error::Error, fs};
 
     const FIXTURES: [(&str, &str); 1] = [("fixtures/baldur.sav", "fixtures/baldur.sav.json")];
-
-    fn read_file(path: &str) -> Result<Vec<u8>, Box<dyn Error>> {
-        let mut file = File::open(path)?;
-        let mut buffer = Vec::new();
-        file.read_to_end(&mut buffer)?;
-        Ok(buffer)
-    }
 
     #[test]
     fn parse() -> Result<(), Box<dyn Error>> {
         for (file_path, json_file_path) in FIXTURES {
-            let save: Save = Save::new(&read_file(file_path)?);
+            let file = fs::read(file_path)?;
+            let buffer = file.as_slice();
+            let save: Save = Save::try_from(buffer)?;
             let result: Value = serde_json::to_value(save)?;
-            let expected: Value = serde_json::from_slice(&read_file(json_file_path)?)?;
+            let expected: Value = serde_json::from_slice(&fs::read(json_file_path)?)?;
 
             assert_eq!(result, expected);
         }

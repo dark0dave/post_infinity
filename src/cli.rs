@@ -1,19 +1,11 @@
-use std::{error::Error, fs::File, io::Read, path::Path};
+use std::{error::Error, fs, path::Path};
 
-use binrw::io::BufReader;
-use models::{
-    IEModels, common::types::ResourceType, from_buffer, from_json, key::Key, model::Model, tlk::TLK,
-};
+use models::{common::types::ResourceType, from_buffer_with_resouce_type, from_json, tlk::TLK};
 
 use crate::{
     args::Args,
     writer::{Printer, write_file},
 };
-
-fn read_file(path: &Path) -> Result<BufReader<File>, Box<dyn Error>> {
-    let file = File::open(path)?;
-    Ok(BufReader::new(file))
-}
 
 fn json_back_to_ie_type(path: &Path, dest: &Path) -> Result<(), Box<dyn Error>> {
     let extension = path
@@ -24,9 +16,7 @@ fn json_back_to_ie_type(path: &Path, dest: &Path) -> Result<(), Box<dyn Error>> 
         .to_ascii_lowercase();
 
     let resource_type = ResourceType::try_from(path)?;
-    let mut reader = read_file(path)?;
-    let mut buffer = vec![];
-    reader.read_to_end(&mut buffer)?;
+    let buffer = fs::read(path)?;
     let out = from_json(&buffer, resource_type)?;
     let name = path.file_name().ok_or("Path has no file name")?;
     let out_path = dest.join(name);
@@ -35,34 +25,12 @@ fn json_back_to_ie_type(path: &Path, dest: &Path) -> Result<(), Box<dyn Error>> 
 
 fn get_models_from_file(path: &Path, printer: Printer, dest: &Path) -> Result<(), Box<dyn Error>> {
     let resource_type = ResourceType::try_from(path)?;
-    let mut reader: BufReader<File> = read_file(path)?;
-
-    let model: IEModels = match resource_type {
-        ResourceType::NotFound => {
-            return Err(format!("Unprocessable file type: {:?}", path.as_os_str()).into());
-        }
-        ResourceType::FileTypeKey => {
-            let mut buffer = vec![];
-            reader.read_to_end(&mut buffer)?;
-            let mut key = Key::new(&buffer);
-            key.recurse(path)?;
-            IEModels::Key(key)
-        }
-        ResourceType::FileTypeTlk => {
-            let mut buffer = vec![];
-            reader.read_to_end(&mut buffer)?;
-            let static_buffer: &'static [u8] = Box::leak(buffer.into_boxed_slice());
-            let model = TLK::parse(static_buffer)?;
-            log::info!("{model:#?}");
-            return Ok(());
-        }
-        _ => {
-            log::debug!("{resource_type:?}");
-            let mut buffer = vec![];
-            reader.read_to_end(&mut buffer)?;
-            from_buffer(&buffer, resource_type)?
-        }
-    };
+    if resource_type == ResourceType::NotFound {
+        return Err(format!("Unprocessable file type: {:?}", path.as_os_str()).into());
+    }
+    let buffer = fs::read(path)?;
+    let static_buffer: &'static [u8] = Box::leak(buffer.into_boxed_slice());
+    let model = from_buffer_with_resouce_type(static_buffer, resource_type)?;
 
     printer(dest, model, resource_type)
 }
@@ -82,10 +50,8 @@ pub fn run(args: &Args) -> Result<(), Box<dyn Error>> {
             .join("lang")
             .join(args.game_lang.clone())
             .join("dialog.tlk");
-        let mut reader: BufReader<File> = read_file(&dialogue_path)?;
-        let mut buffer = vec![];
-        reader.read_to_end(&mut buffer)?;
-        TLK::parse(&buffer)?;
+        let buffer = fs::read(&dialogue_path)?;
+        TLK::try_from(buffer.as_slice())?;
     }
     Ok(())
 }

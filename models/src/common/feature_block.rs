@@ -1,7 +1,7 @@
 use binrw::{BinRead, BinWrite};
 use serde::{Deserialize, Serialize};
 
-use super::char_array::CharArray;
+use crate::common::Resref;
 
 #[derive(Debug, PartialEq, BinRead, BinWrite, Serialize, Deserialize)]
 pub struct FeatureBlock {
@@ -15,10 +15,10 @@ pub struct FeatureBlock {
     pub duration: u32,
     pub probability_1: u8,
     pub probability_2: u8,
-    pub resource: CharArray<8>,
+    pub resource: Resref,
     pub dice_thrown_max_level: u32,
     pub dice_sides_min_level: u32,
-    pub saving_throw_type: CharArray<4>,
+    pub saving_throw_type: u32,
     pub saving_throw_bonus: u32,
     pub stacking_id: u32,
 }

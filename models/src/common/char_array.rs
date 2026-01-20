@@ -10,7 +10,7 @@ use serde::{
     de::{Error, Visitor},
 };
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, BinRead, BinWrite)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, BinRead, BinWrite)]
 pub struct CharArray<const N: usize>(pub(crate) [u8; N]);
 
 impl<const N: usize> Serialize for CharArray<N> {

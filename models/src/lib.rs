@@ -3,6 +3,7 @@ use std::error::Error;
 use bam::Bam;
 use common::types::ResourceType;
 use model::Model;
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use tileset::Tileset;
 
@@ -39,8 +40,9 @@ pub mod world_map;
 
 const NOT_IMPLIMENTED: &str = "Not implimented yet";
 
-#[derive(Debug)]
-pub enum IEModels {
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(untagged, bound(deserialize = "'de:'a"))]
+pub enum IEModels<'a> {
     Area(Area),
     Biography(Biography),
     Creature(Creature),
@@ -48,19 +50,19 @@ pub enum IEModels {
     EffectV2(EffectV2),
     ExpandedCharacter(ExpandedCharacter),
     Game(Game),
-    Ids(Ids),
+    Ids(Ids<'a>),
     Item(Item),
-    Key(Key),
-    Save(Save),
+    Key(Key<'a>),
+    Save(Save<'a>),
     Spell(Spell),
     Store(Store),
-    Tileset(Tileset),
+    Tileset(Tileset<'a>),
     TwoDA(TwoDA),
     WorldMap(WorldMap),
 }
 
-impl IEModels {
-    pub fn to_bytes(&self) -> Result<Vec<u8>, Box<dyn Error>> {
+impl<'a> IEModels<'a> {
+    pub fn to_bytes(self) -> Result<Vec<u8>, Box<dyn Error>> {
         match self {
             IEModels::Area(area) => Ok(area.to_bytes()),
             IEModels::Biography(biography) => Ok(biography.to_bytes()),
@@ -69,13 +71,13 @@ impl IEModels {
             IEModels::EffectV2(effect_v2) => Ok(effect_v2.to_bytes()),
             IEModels::ExpandedCharacter(expanded_character) => Ok(expanded_character.to_bytes()),
             IEModels::Game(game) => Ok(game.to_bytes()),
-            IEModels::Ids(ids) => Ok(ids.to_bytes()),
+            IEModels::Ids(ids) => ids.try_into(),
             IEModels::Item(item) => Ok(item.to_bytes()),
-            IEModels::Key(key) => Ok(key.to_bytes()),
-            IEModels::Save(save) => Ok(save.to_bytes()),
+            IEModels::Key(key) => key.try_into(),
+            IEModels::Save(save) => save.try_into(),
             IEModels::Spell(spell) => Ok(spell.to_bytes()),
             IEModels::Store(store) => Ok(store.to_bytes()),
-            IEModels::Tileset(tileset) => Ok(tileset.to_bytes()),
+            IEModels::Tileset(tileset) => tileset.try_into(),
             IEModels::TwoDA(two_da) => Ok(two_da.to_bytes()),
             IEModels::WorldMap(world_map) => Ok(world_map.to_bytes()),
         }
@@ -104,7 +106,10 @@ impl IEModels {
     }
 }
 
-pub fn from_buffer(buffer: &[u8], resource_type: ResourceType) -> Result<IEModels, Box<dyn Error>> {
+pub fn from_buffer_with_resouce_type(
+    buffer: &'_ [u8],
+    resource_type: ResourceType,
+) -> Result<IEModels<'_>, Box<dyn Error>> {
     match resource_type {
         // I am skipping image files
         ResourceType::FileTypeBmp => Err(NOT_IMPLIMENTED.into()),
@@ -120,14 +125,14 @@ pub fn from_buffer(buffer: &[u8], resource_type: ResourceType) -> Result<IEModel
         ResourceType::FileTypeWed => Err(NOT_IMPLIMENTED.into()),
         // I am skipping GUI defs
         ResourceType::FileTypeChu => Err(NOT_IMPLIMENTED.into()),
-        ResourceType::FileTypeTi => Ok(IEModels::Tileset(Tileset::new(buffer))),
+        ResourceType::FileTypeTis => Ok(IEModels::Tileset(Tileset::try_from(buffer)?)),
         // I am skipping compress graphic files
         ResourceType::FileTypeMos => Err(NOT_IMPLIMENTED.into()),
         ResourceType::FileTypeItm => Ok(IEModels::Item(Item::new(buffer))),
         ResourceType::FileTypeSpl => Ok(IEModels::Spell(Spell::new(buffer))),
         // I am ignoring scripting files
         ResourceType::FileTypeBcs => Err(NOT_IMPLIMENTED.into()),
-        ResourceType::FileTypeIds => Ok(IEModels::Ids(Ids::new(buffer))),
+        ResourceType::FileTypeIds => Ok(IEModels::Ids(Ids::try_from(buffer)?)),
         ResourceType::FileTypeCre => Ok(IEModels::Creature(Creature::new(buffer))),
         ResourceType::FileTypeAre => Ok(IEModels::Area(Area::new(buffer))),
         ResourceType::FileTypeDlg => Ok(IEModels::Dialogue(Dialogue::new(buffer))),
@@ -165,9 +170,15 @@ pub fn from_buffer(buffer: &[u8], resource_type: ResourceType) -> Result<IEModel
         ResourceType::FileTypeSrc => Err(NOT_IMPLIMENTED.into()),
         ResourceType::NotFound => Err(NOT_IMPLIMENTED.into()),
         // Our invented file types:
-        ResourceType::FileTypeSave => Ok(IEModels::Save(Save::new(buffer))),
+        ResourceType::FileTypeSave => Ok(IEModels::Save(Save::try_from(buffer)?)),
+        ResourceType::FileTypeKey => Ok(IEModels::Key(Key::try_from(buffer)?)),
         _ => Err(NOT_IMPLIMENTED.into()),
     }
+}
+
+pub fn from_buffer(buffer: &'_ [u8], resource_type: u16) -> Result<IEModels<'_>, Box<dyn Error>> {
+    let resource_type: ResourceType = unsafe { std::mem::transmute(resource_type) };
+    from_buffer_with_resouce_type(buffer, resource_type)
 }
 
 pub fn from_json(buffer: &[u8], resource_type: ResourceType) -> Result<Vec<u8>, Box<dyn Error>> {
@@ -186,14 +197,16 @@ pub fn from_json(buffer: &[u8], resource_type: ResourceType) -> Result<Vec<u8>, 
         ResourceType::FileTypeWed => Err(NOT_IMPLIMENTED.into()),
         // I am skipping GUI defs
         ResourceType::FileTypeChu => Err(NOT_IMPLIMENTED.into()),
-        ResourceType::FileTypeTi => Err(NOT_IMPLIMENTED.into()),
+        ResourceType::FileTypeTis => Err(NOT_IMPLIMENTED.into()),
         // I am skipping compress graphic files
         ResourceType::FileTypeMos => Err(NOT_IMPLIMENTED.into()),
         ResourceType::FileTypeItm => Ok(serde_json::from_slice::<Item>(buffer)?.to_bytes()),
         ResourceType::FileTypeSpl => Ok(serde_json::from_slice::<Spell>(buffer)?.to_bytes()),
         // I am ignoring scripting files
         ResourceType::FileTypeBcs => Err(NOT_IMPLIMENTED.into()),
-        ResourceType::FileTypeIds => Ok(serde_json::from_slice::<Ids>(buffer)?.to_bytes()),
+        ResourceType::FileTypeIds => {
+            TryInto::<Vec<u8>>::try_into(serde_json::from_slice::<Ids>(buffer)?)
+        }
         ResourceType::FileTypeCre => Ok(serde_json::from_slice::<Creature>(buffer)?.to_bytes()),
         ResourceType::FileTypeAre => Ok(serde_json::from_slice::<Area>(buffer)?.to_bytes()),
         ResourceType::FileTypeDlg => Ok(serde_json::from_slice::<Dialogue>(buffer)?.to_bytes()),
@@ -231,7 +244,9 @@ pub fn from_json(buffer: &[u8], resource_type: ResourceType) -> Result<Vec<u8>, 
         ResourceType::FileTypeSrc => Err(NOT_IMPLIMENTED.into()),
         ResourceType::NotFound => Err(NOT_IMPLIMENTED.into()),
         // Our invented file types:
-        ResourceType::FileTypeSave => Ok(serde_json::from_slice::<Save>(buffer)?.to_bytes()),
+        ResourceType::FileTypeSave => {
+            TryInto::<Vec<u8>>::try_into(serde_json::from_slice::<Save>(buffer)?)
+        }
         _ => Err(NOT_IMPLIMENTED.into()),
     }
 }

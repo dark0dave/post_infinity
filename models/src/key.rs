@@ -1,87 +1,98 @@
-use std::{fmt::Debug, path::Path};
+use std::fmt::Debug;
 
 use std::error::Error;
 
-use binrw::{BinRead, BinReaderExt, BinWrite, io::Cursor};
 use serde::{Deserialize, Serialize};
+use zerocopy::{FromBytes, IntoBytes};
+use zerocopy_derive::{FromBytes, Immutable, IntoBytes, KnownLayout};
+use zerovec::maps::MutableZeroVecLike;
+use zerovec::vecs::Index32;
+use zerovec::{VarZeroVec, ZeroVec, make_ule};
 
-use crate::{
-    biff::Biff,
-    common::{Resref, header::Header},
-    model::Model,
-};
+use crate::common::{ZeroCharArray, ZeroResref};
+use crate::model::Parseable;
+
+const SIZE_OF_KEY_HEADER: usize = std::mem::size_of::<KeyHeader>();
+const SIZE_OF_BIF_ENTRY: usize = std::mem::size_of::<BiffEntry>();
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/key_v1.htm
-#[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
-pub struct Key {
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Key<'data> {
     #[serde(flatten)]
     pub header: KeyHeader,
-    #[br(count=header.count_of_bif_entries)]
-    pub bif_entries: Vec<BiffEntry>,
-    #[br(count=header.offset_to_resource_entries - (header.offset_to_bif_entries + 12 * bif_entries.len() as u32), map = |s: Vec<u8>| read_key_strings(&s, &bif_entries))]
-    #[bw(map = |x : &Vec<String>| x.iter().flat_map(|x: &String| x.clone().into_bytes()).collect::<Vec<u8>>())]
-    pub bif_file_names: Vec<String>,
-    #[br(count=header.count_of_resource_entries)]
-    pub resource_entries: Vec<ResourceEntry>,
-    #[bw(ignore)]
-    #[br(ignore)]
-    pub biffs: Vec<Biff>,
+    #[serde(borrow)]
+    pub bif_entries: ZeroVec<'data, BiffEntry>,
+    #[serde(borrow)]
+    pub bif_file_names: VarZeroVec<'data, str, Index32>,
+    #[serde(borrow)]
+    pub resource_entries: ZeroVec<'data, ResourceEntry>,
 }
 
-fn read_key_strings(s: &[u8], entries: &Vec<BiffEntry>) -> Vec<String> {
-    let mut out: Vec<String> = Vec::with_capacity(entries.len());
-    let mut start = 0;
-    for entry in entries {
+impl<'data> Parseable<'data> for Key<'data> {}
+
+impl<'data> TryFrom<&'data [u8]> for Key<'data> {
+    type Error = Box<dyn Error>;
+
+    fn try_from(value: &'data [u8]) -> Result<Self, Self::Error> {
+        let (header, buff) = <KeyHeader>::read_from_prefix(value).map_err(|err| err.to_string())?;
+        let biff_entries_end: usize =
+            (header.count_of_bif_entries as usize * SIZE_OF_BIF_ENTRY) - SIZE_OF_KEY_HEADER;
+        let bif_entries: ZeroVec<'data, BiffEntry> =
+            ZeroVec::parse_bytes(buff.get(0..biff_entries_end).unwrap_or_default())?;
+        let bif_file_names = read_key_strings(buff, &bif_entries);
+        let resource_entires_start: usize = header.offset_to_resource_entries as usize;
+        let resource_entires_end: usize = resource_entires_start
+            + (header.count_of_resource_entries * header.count_of_resource_entries) as usize;
+        let resource_entries: ZeroVec<'data, ResourceEntry> = ZeroVec::parse_bytes(
+            buff.get(resource_entires_start..resource_entires_end)
+                .unwrap_or_default(),
+        )?;
+        Ok(Self {
+            header,
+            bif_entries,
+            bif_file_names,
+            resource_entries,
+        })
+    }
+}
+
+impl<'data> TryInto<Vec<u8>> for Key<'data> {
+    type Error = Box<dyn Error>;
+
+    fn try_into(self) -> Result<Vec<u8>, Self::Error> {
+        let mut buffer = vec![];
+        self.header
+            .write_to(&mut buffer)
+            .map_err(|err| err.to_string())?;
+        buffer.extend_from_slice(self.bif_entries.as_bytes());
+        buffer.extend_from_slice(self.bif_file_names.as_bytes());
+        buffer.extend_from_slice(self.resource_entries.as_bytes());
+        Ok(buffer)
+    }
+}
+
+fn read_key_strings<'data>(
+    buffer: &'data [u8],
+    entries: &ZeroVec<'data, BiffEntry>,
+) -> VarZeroVec<'data, str, Index32> {
+    let mut out = VarZeroVec::zvl_with_capacity(entries.len());
+    for entry in entries.iter() {
+        let start = entry.offset_to_file_name as usize - SIZE_OF_KEY_HEADER;
         let end = entry.file_name_length as usize + start;
-        let slice = s.get(start..end).unwrap_or_default();
-        out.push(String::from_utf8(slice.to_vec()).unwrap_or_default());
-        start = end;
+        let slice = buffer.get(start..end).unwrap_or_default();
+        out.zvl_push(std::str::from_utf8(slice).unwrap_or_default());
     }
     out
 }
 
-impl Model for Key {
-    fn new(buffer: &[u8]) -> Self {
-        let mut reader = Cursor::new(buffer);
-        match reader.read_le() {
-            Ok(res) => res,
-            Err(err) => {
-                panic!("Errored with {err:?}, dumping buffer: {buffer:?}");
-            }
-        }
-    }
-
-    fn to_bytes(&self) -> Vec<u8> {
-        let mut writer = Cursor::new(Vec::new());
-        self.write_le(&mut writer).unwrap();
-        writer.into_inner()
-    }
-}
-
-impl Key {
-    pub fn recurse(&mut self, path: &Path) -> Result<(), Box<dyn Error>> {
-        let parent = path
-            .parent()
-            .ok_or_else(|| format!("No parent found for {path:?}"))?;
-        log::trace!("Parent path is: {parent:?}");
-        let mut out = vec![];
-        for bif_file_name in self.bif_file_names.iter() {
-            let file_path = &parent
-                .join(bif_file_name.to_string().replace('\0', ""))
-                .canonicalize()?;
-            log::debug!("Path to biff: {file_path:?}");
-            out.push(Biff::try_from(file_path)?);
-        }
-        self.biffs = out;
-        Ok(())
-    }
-}
-
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/key_v1.htm#keyv1_Header
-#[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
+#[derive(
+    Debug, PartialEq, Serialize, Deserialize, FromBytes, IntoBytes, Immutable, KnownLayout, Clone,
+)]
+#[repr(C, packed)]
 pub struct KeyHeader {
-    #[serde(flatten)]
-    pub header: Header,
+    pub signature: ZeroCharArray,
+    pub version: ZeroCharArray,
     pub count_of_bif_entries: u32,
     pub count_of_resource_entries: u32,
     pub offset_to_bif_entries: u32,
@@ -89,7 +100,8 @@ pub struct KeyHeader {
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/key_v1.htm#keyv1_BifIndices
-#[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Eq, Ord, Serialize, Deserialize)]
+#[make_ule(BiffEntryULE)]
 pub struct BiffEntry {
     pub file_length: u32,
     pub offset_to_file_name: u32,
@@ -98,36 +110,32 @@ pub struct BiffEntry {
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/key_v1.htm#keyv1_ResIndices
-#[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Eq, Ord, Serialize, Deserialize)]
+#[make_ule(ResourceEntryULE)]
 pub struct ResourceEntry {
-    pub name: Resref,
+    pub name: ZeroResref,
     pub resource_type: u16,
     pub locator: u32,
 }
 
 #[cfg(test)]
 mod tests {
+    use std::fs;
+
     use super::*;
-    use binrw::io::Read;
     use pretty_assertions::assert_eq;
     use serde_json::Value;
-    use std::fs::File;
 
     const FIXTURES: [(&str, &str); 1] = [("fixtures/chitin.key", "fixtures/chitin.key.json")];
-
-    fn read_file(path: &str) -> Result<Vec<u8>, Box<dyn Error>> {
-        let mut file = File::open(path)?;
-        let mut buffer = Vec::new();
-        file.read_to_end(&mut buffer)?;
-        Ok(buffer)
-    }
 
     #[test]
     fn parse() -> Result<(), Box<dyn Error>> {
         for (file_path, json_file_path) in FIXTURES {
-            let key: Key = Key::new(&read_file(file_path)?);
+            let buffer = fs::read(file_path)?;
+            let key: Key = Key::try_from(buffer.as_slice())?;
             let result: Value = serde_json::to_value(key)?;
-            let expected: Value = serde_json::from_slice(&read_file(json_file_path)?)?;
+            let json_buffer = fs::read(json_file_path)?;
+            let expected: Value = serde_json::from_slice(json_buffer.as_slice())?;
 
             assert_eq!(result, expected);
         }

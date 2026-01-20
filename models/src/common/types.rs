@@ -6,7 +6,20 @@ use binrw::{BinRead, BinWrite};
 use serde::{Deserialize, Serialize};
 
 // https://gibberlings3.github.io/iesdp/file_formats/general.htm#FileFormats
-#[derive(Debug, Copy, Clone, Hash, PartialEq, BinRead, BinWrite, Serialize, Deserialize)]
+#[derive(
+    Debug,
+    Copy,
+    Clone,
+    Hash,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    BinRead,
+    BinWrite,
+    Serialize,
+    Deserialize,
+)]
 #[brw(little, repr = u16)]
 #[repr(u16)]
 pub enum ResourceType {
@@ -19,7 +32,7 @@ pub enum ResourceType {
     FileTypeBam = 0x03e8,
     FileTypeWed = 0x03e9,
     FileTypeChu = 0x03ea,
-    FileTypeTi = 0x03eb,
+    FileTypeTis = 0x03eb,
     FileTypeMos = 0x03ec,
     FileTypeItm = 0x03ed,
     FileTypeSpl = 0x03ee,
@@ -65,12 +78,17 @@ impl TryFrom<&Path> for ResourceType {
     fn try_from(value: &Path) -> Result<Self, Self::Error> {
         let extension = value.extension().ok_or("Path has no extension")?;
         Ok(Self::from(
-            extension.to_str().ok_or("Could not convert to string")?,
+            extension
+                .to_str()
+                .ok_or("Could not convert to string")?
+                .to_ascii_lowercase()
+                .replace('\0', "")
+                .as_str(),
         ))
     }
 }
 
-impl From<ResourceType> for String {
+impl From<ResourceType> for &str {
     fn from(val: ResourceType) -> Self {
         match val {
             ResourceType::FileTypeBmp => "bmp",
@@ -81,7 +99,7 @@ impl From<ResourceType> for String {
             ResourceType::FileTypeBam => "bam",
             ResourceType::FileTypeWed => "wed",
             ResourceType::FileTypeChu => "chu",
-            ResourceType::FileTypeTi => "ti",
+            ResourceType::FileTypeTis => "tis",
             ResourceType::FileTypeMos => "mos",
             ResourceType::FileTypeItm => "itm",
             ResourceType::FileTypeSpl => "spl",
@@ -120,7 +138,6 @@ impl From<ResourceType> for String {
             ResourceType::FileTypeSave => "sav",
             _ => "",
         }
-        .to_string()
     }
 }
 
@@ -135,7 +152,7 @@ impl From<&str> for ResourceType {
             "bam" => ResourceType::FileTypeBam,
             "wed" => ResourceType::FileTypeWed,
             "chu" => ResourceType::FileTypeChu,
-            "ti" => ResourceType::FileTypeTi,
+            "tis" => ResourceType::FileTypeTis,
             "mos" => ResourceType::FileTypeMos,
             "itm" => ResourceType::FileTypeItm,
             "spl" => ResourceType::FileTypeSpl,
