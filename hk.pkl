@@ -1,0 +1,53 @@
+amends "package://github.com/jdx/hk/releases/download/v1.44.2/hk@1.44.2#/Config.pkl"
+import "package://github.com/jdx/hk/releases/download/v1.44.2/hk@1.44.2#/Builtins.pkl"
+
+local message = new Mapping<String, Step> {
+  ["check-conventional-commit"] = Builtins.check_conventional_commit
+}
+
+local builtins = new Mapping<String, Step> {
+  ["cargo-check"] = Builtins.cargo_check
+  ["cargo-clippy"] = Builtins.cargo_clippy
+  ["cargo-fmt"] = Builtins.cargo_fmt
+  ["check-case-conflict"] = Builtins.check_case_conflict
+  ["check-merge-conflict"] = Builtins.check_merge_conflict
+  ["trailing-whitespace"] = Builtins.trailing_whitespace
+  ["yamlfmt"] = Builtins.yamlfmt
+}
+
+local local_hooks = new Mapping<String, Step> {
+  ["codespell"] {
+    glob = List("**/*.rs", "readme.md")
+    exclude = List("target/**", "models/fixtures/**", "hk.pkl")
+    check = "codespell -c {{files}}"
+    fix = "codespell -cw {{files}}"
+  }
+  ["end-of-file-fixer"] = (Builtins.newlines) {
+    exclude = List("target/**", "models/fixtures/**", "docs/")
+  }
+  ["version-check"] {
+    check = "scripts/check-version.sh"
+  }
+  ["git-check"] {
+    check = "scripts/check-git.sh"
+  }
+  ["nix fmt"] {
+    fix = "nixfmt flake.nix"
+  }
+}
+
+hooks {
+  ["commit-msg"] {
+    steps {
+      ...message
+    }
+  }
+  ["pre-commit"] {
+    fix = true
+    stash = "git"
+    steps {
+      ...builtins
+      ...local_hooks
+    }
+  }
+}
