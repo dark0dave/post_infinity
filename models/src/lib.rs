@@ -37,7 +37,7 @@ pub mod tlk;
 pub mod twoda;
 pub mod world_map;
 
-const NOT_IMPLIMENTED: &str = "Not implimented yet";
+const NOT_IMPLIMENTED: &str = "Not implemented yet";
 
 #[derive(Debug)]
 pub enum IEModels {

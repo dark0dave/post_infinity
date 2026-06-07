@@ -1,35 +1,61 @@
 {
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/2cd3cac16691a933e94276f0a810453f17775c28";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable-small";
+    hk = {
+      url = "github:jdx/hk/v1.44.2";
+    };
   };
-
-  outputs = { self, nixpkgs }:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      hk,
+    }:
     let
-      systems = [ "x86_64-linux" "aarch64-linux" "aarch64-darwin" ];
-      forAllSystems = f: nixpkgs.lib.genAttrs systems (system: f system);
+      systems = [
+        "x86_64-linux"
+        "aarch64-linux"
+        "aarch64-darwin"
+      ];
+      forEachSystem = f: nixpkgs.lib.genAttrs systems (system: f system);
       pkgsFor = nixpkgs.legacyPackages;
-    in {
-      devShells = forAllSystems (system:
+    in
+    {
+      devShells = forEachSystem (
+        system:
         let
           pkgs = import nixpkgs { inherit system; };
           overrides = (builtins.fromTOML (builtins.readFile ./rust-toolchain.toml));
-        in {
-          default = pkgs.mkShell {
-            # Libs
-            buildInputs = with pkgs; [
-              rustup
-            ];
-            # Tools
-            nativeBuildInputs = with pkgs; [
-              git
-              pkg-config
-              pre-commit
-            ];
-            RUSTC_VERSION = overrides.toolchain.channel;
-          };
-        });
-      packages = forAllSystems (system: {
+        in
+        {
+          default =
+            with pkgs;
+            mkShell rec {
+              nativeBuildInputs = [
+                cargo
+                clippy
+                hk.packages.${system}.default
+                nixfmt
+                codespell
+                git
+                pkg-config
+                rust-analyzer
+                rustc
+                rustfmt
+                yamlfmt
+              ];
+              buildInputs = [
+                openssl
+              ];
+              env.HK_PKL_BACKEND = "pklr";
+              env.RUST_SRC_PATH = "${pkgs.rustPlatform.rustLibSrc}";
+              env.RUSTC_VERSION = overrides.toolchain.channel;
+            };
+        }
+      );
+      packages = forEachSystem (system: {
         default = pkgsFor.${system}.callPackage ./default.nix { };
       });
+      formatter = forEachSystem (system: nixpkgs.${system}.nixfmt);
     };
 }
