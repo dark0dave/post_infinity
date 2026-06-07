@@ -7,7 +7,7 @@ use serde_json::Value;
 use tileset::Tileset;
 
 use crate::{
-    area::Area, bio::Biography, character::ExpandedCharacter, creature::Creature,
+    area::Area, biff::Biff, bio::Biography, character::ExpandedCharacter, creature::Creature,
     dialogue::Dialogue, effect_v2::EffectV2, game::Game, ids::Ids, item::Item, key::Key,
     save::Save, spell::Spell, store::Store, twoda::TwoDA, world_map::WorldMap,
 };
@@ -42,7 +42,9 @@ const NOT_IMPLIMENTED: &str = "Not implemented yet";
 #[derive(Debug)]
 pub enum IEModels {
     Area(Area),
+    Bam(Bam),
     Biography(Biography),
+    Biff(Biff),
     Creature(Creature),
     Dialogue(Dialogue),
     EffectV2(EffectV2),
@@ -63,7 +65,9 @@ impl IEModels {
     pub fn to_bytes(&self) -> Result<Vec<u8>, Box<dyn Error>> {
         match self {
             IEModels::Area(area) => Ok(area.to_bytes()),
+            IEModels::Bam(bam) => Ok(bam.to_bytes()),
             IEModels::Biography(biography) => Ok(biography.to_bytes()),
+            IEModels::Biff(biff) => Ok(biff.to_bytes()),
             IEModels::Creature(creature) => Ok(creature.to_bytes()),
             IEModels::Dialogue(dialogue) => Ok(dialogue.to_bytes()),
             IEModels::EffectV2(effect_v2) => Ok(effect_v2.to_bytes()),
@@ -83,7 +87,9 @@ impl IEModels {
     pub fn to_json(&self) -> Result<Value, Box<dyn Error>> {
         Ok(match self {
             IEModels::Area(area) => serde_json::to_value(area),
+            IEModels::Bam(bam) => serde_json::to_value(bam),
             IEModels::Biography(biography) => serde_json::to_value(biography),
+            IEModels::Biff(biff) => serde_json::to_value(biff),
             IEModels::Creature(creature) => serde_json::to_value(creature),
             IEModels::Dialogue(dialogue) => serde_json::to_value(dialogue),
             IEModels::EffectV2(effect_v2) => serde_json::to_value(effect_v2),
@@ -115,7 +121,7 @@ pub fn from_buffer(buffer: &[u8], resource_type: ResourceType) -> Result<IEModel
         ResourceType::FileTypeWfx => Err(NOT_IMPLIMENTED.into()),
         // Skipping
         ResourceType::FileTypePlt => Err(NOT_IMPLIMENTED.into()),
-        ResourceType::FileTypeBam => Err(NOT_IMPLIMENTED.into()),
+        ResourceType::FileTypeBam => Ok(IEModels::Bam(Bam::new(buffer))),
         // I am skipping texture files
         ResourceType::FileTypeWed => Err(NOT_IMPLIMENTED.into()),
         // I am skipping GUI defs
@@ -166,6 +172,7 @@ pub fn from_buffer(buffer: &[u8], resource_type: ResourceType) -> Result<IEModel
         ResourceType::NotFound => Err(NOT_IMPLIMENTED.into()),
         // Our invented file types:
         ResourceType::FileTypeSave => Ok(IEModels::Save(Save::new(buffer))),
+        ResourceType::FileTypeBiff => Ok(IEModels::Biff(Biff::new(buffer))),
         _ => Err(NOT_IMPLIMENTED.into()),
     }
 }
@@ -232,6 +239,7 @@ pub fn from_json(buffer: &[u8], resource_type: ResourceType) -> Result<Vec<u8>, 
         ResourceType::NotFound => Err(NOT_IMPLIMENTED.into()),
         // Our invented file types:
         ResourceType::FileTypeSave => Ok(serde_json::from_slice::<Save>(buffer)?.to_bytes()),
+        ResourceType::FileTypeBiff => Ok(serde_json::from_slice::<Biff>(buffer)?.to_bytes()),
         _ => Err(NOT_IMPLIMENTED.into()),
     }
 }
