@@ -5,8 +5,6 @@ use serde::{Deserialize, Serialize};
 use zerocopy::FromBytes;
 use zerocopy_derive::{FromBytes, Immutable, IntoBytes, KnownLayout};
 
-const START_OF_ENTRIES: usize = 18_usize;
-
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/tlk_v1.htm
 #[derive(Debug, PartialEq, Serialize, IntoBytes)]
 #[repr(C, packed)]
@@ -21,34 +19,28 @@ pub struct TLK<'data> {
 
 impl<'data> TLK<'data> {
     pub fn parse(bytes: &'data [u8]) -> Result<Self, Box<dyn Error>> {
-        let (header, _) = <TLKHeader>::ref_from_prefix(bytes).map_err(|err| err.to_string())?;
+        let (header, tail) = <TLKHeader>::ref_from_prefix(bytes).map_err(|err| err.to_string())?;
 
-        let source = bytes
-            .get(START_OF_ENTRIES..)
-            .ok_or("could not get entries from tlk buffer")?;
         let number_of_entries: usize = header.count_of_entries.try_into()?;
-        let (entries, _) = <[TLKEntry]>::ref_from_prefix_with_elems(source, number_of_entries)
+        let (entries, tail) = <[TLKEntry]>::ref_from_prefix_with_elems(tail, number_of_entries)
             .map_err(|err| err.to_string())?;
-        let tlk_strings = bytes
-            .get(header.offset_to_strings as usize..)
-            .ok_or("could not get tlk strings from tlk buffer")?;
 
         let strings = unsafe {
-            let layout = std::alloc::Layout::array::<&str>(header.count_of_entries as usize)?;
+            let layout = std::alloc::Layout::array::<&str>(number_of_entries)?;
             let ptr = std::alloc::alloc(layout) as *mut &str;
 
             for (i, entry) in entries.iter().enumerate() {
                 let start = entry.offset_to_this_string as usize;
                 let end = start + entry.length_of_this_string as usize;
                 if end <= bytes.len() {
-                    let slice: &[u8] = tlk_strings
+                    let slice: &[u8] = tail
                         .get(start..end)
                         .ok_or("failed to get bytes for string from buffer")?;
                     *ptr.add(i) = std::str::from_utf8(slice)?;
                 }
             }
 
-            slice::from_raw_parts(ptr, header.count_of_entries as usize)
+            slice::from_raw_parts(ptr, number_of_entries)
         };
 
         Ok(TLK {
