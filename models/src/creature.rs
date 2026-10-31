@@ -5,7 +5,7 @@ use binrw::{
 };
 use serde::{Deserialize, Serialize};
 
-use crate::common::{Resref, header::Header, strref::Strref};
+use crate::common::{Resref, Strref, header::Header};
 use crate::effect_v1::EffectV1;
 use crate::item_table::ItemReferenceTable;
 use crate::{common::char_array::CharArray, effect_v2::EffectV2Body};

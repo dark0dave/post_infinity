@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 use crate::common::{char_array::CharArray, header::Header};
 use crate::model::Model;
 use crate::{
-    common::{Resref, strref::Strref},
+    common::{Resref, Strref},
     creature::Creature,
 };
 
