@@ -1,5 +1,5 @@
 use binrw::{
-    BinRead, BinReaderExt, BinWrite,
+    BinRead, BinWrite,
     helpers::until_eof,
     io::{Cursor, Read},
 };
@@ -116,8 +116,8 @@ fn parse_compressed_data(buff: &[u8]) -> Vec<u8> {
 
 impl Model for Bam {
     fn new(buffer: &[u8]) -> Self {
-        let mut reader = Cursor::new(buffer);
-        reader.read_le().unwrap()
+        let mut reader: Cursor<&[u8]> = Cursor::new(buffer);
+        binrw::BinReaderExt::read_le(&mut reader).unwrap()
     }
 
     fn to_bytes(&self) -> Vec<u8> {

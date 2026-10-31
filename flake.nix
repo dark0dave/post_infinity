@@ -1,15 +1,11 @@
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable-small";
-    hk = {
-      url = "github:jdx/hk/v1.44.2";
-    };
   };
   outputs =
     {
       self,
       nixpkgs,
-      hk,
     }:
     let
       systems = [
@@ -30,14 +26,16 @@
         {
           default =
             with pkgs;
-            mkShell rec {
+            mkShell {
               nativeBuildInputs = [
                 cargo
+                cargo-shear
                 clippy
-                hk.packages.${system}.default
-                nixfmt
                 codespell
                 git
+                hk
+                nil
+                nixfmt
                 pkg-config
                 rust-analyzer
                 rustc
@@ -47,7 +45,6 @@
               buildInputs = [
                 openssl
               ];
-              env.HK_PKL_BACKEND = "pklr";
               env.RUST_SRC_PATH = "${pkgs.rustPlatform.rustLibSrc}";
               env.RUSTC_VERSION = overrides.toolchain.channel;
             };

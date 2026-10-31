@@ -1,6 +1,6 @@
 use std::{error::Error, path::Path};
 
-use binrw::{BinRead, BinReaderExt, BinWrite, io::Cursor, io::Read};
+use binrw::{BinRead, BinWrite, io::Cursor, io::Read};
 use flate2::bufread::ZlibDecoder;
 use serde::{Deserialize, Serialize};
 
@@ -27,7 +27,7 @@ pub struct Save {
 impl Model for Save {
     fn new(buffer: &[u8]) -> Self {
         let mut reader = Cursor::new(buffer);
-        match reader.read_le() {
+        match binrw::BinReaderExt::read_le(&mut reader) {
             Ok(res) => res,
             Err(err) => {
                 panic!("Errored with {err:?}, dumping buffer: {buffer:?}");
