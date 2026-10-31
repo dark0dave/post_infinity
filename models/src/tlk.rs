@@ -5,6 +5,8 @@ use serde::{Deserialize, Serialize};
 use zerocopy::FromBytes;
 use zerocopy_derive::{FromBytes, Immutable, IntoBytes, KnownLayout};
 
+use crate::common::{Signature, Version, zero_char_vec::ZeroCharVec};
+
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/tlk_v1.htm
 #[derive(Debug, PartialEq, Serialize, IntoBytes)]
 #[repr(C, packed)]
@@ -14,7 +16,7 @@ pub struct TLK<'data> {
     #[serde(borrow)]
     pub entries: &'data [TLKEntry],
     #[serde(borrow)]
-    pub strings: &'data [&'data str],
+    pub strings: &'data [ZeroCharVec<'data>],
 }
 
 impl<'data> TLK<'data> {
@@ -25,18 +27,18 @@ impl<'data> TLK<'data> {
         let (entries, tail) = <[TLKEntry]>::ref_from_prefix_with_elems(tail, number_of_entries)
             .map_err(|err| err.to_string())?;
 
+        let layout = std::alloc::Layout::array::<ZeroCharVec>(number_of_entries)?;
         let strings = unsafe {
-            let layout = std::alloc::Layout::array::<&str>(number_of_entries)?;
-            let ptr = std::alloc::alloc(layout) as *mut &str;
+            let ptr = std::alloc::alloc(layout) as *mut ZeroCharVec;
 
             for (i, entry) in entries.iter().enumerate() {
                 let start = entry.offset_to_this_string as usize;
                 let end = start + entry.length_of_this_string as usize;
-                if end <= bytes.len() {
+                if end <= tail.len() {
                     let slice: &[u8] = tail
                         .get(start..end)
                         .ok_or("failed to get bytes for string from buffer")?;
-                    *ptr.add(i) = std::str::from_utf8(slice)?;
+                    *ptr.add(i) = ZeroCharVec::from(slice);
                 }
             }
 
@@ -52,13 +54,11 @@ impl<'data> TLK<'data> {
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/tlk_v1.htm#tlkv1_Header
-#[derive(
-    Debug, PartialEq, Serialize, Deserialize, FromBytes, IntoBytes, Immutable, KnownLayout,
-)]
+#[derive(Debug, PartialEq, Serialize, FromBytes, IntoBytes, Immutable, KnownLayout)]
 #[repr(C, packed)]
 pub struct TLKHeader {
-    pub signature: [u8; 4],
-    pub version: [u8; 4],
+    pub signature: Signature,
+    pub version: Version,
     pub language_id: u16,
     pub count_of_entries: u32,
     pub offset_to_strings: u32,
@@ -124,11 +124,10 @@ mod tests {
                 length_of_this_string: 213,
             }
         );
+        let result = tlk.strings.get(400).expect("Could not get 400th entry");
         assert_eq!(
-            tlk.strings.get(400),
-            Some(
-                &" 'Twas some three hundred years hence, but folk still cringe at the mention of the destruction at Ulcaster School. I've not met a soul who claims to know why it occurred, and none that were there are alive to say."
-            )
+            result,
+            &" 'Twas some three hundred years hence, but folk still cringe at the mention of the destruction at Ulcaster School. I've not met a soul who claims to know why it occurred, and none that were there are alive to say.".into()
         );
 
         let entry = tlk.entries.last().expect("Failed to find entry");
@@ -143,7 +142,11 @@ mod tests {
                 length_of_this_string: 11,
             }
         );
-        assert_eq!(tlk.strings.last(), Some(&"placeholder"));
+        let result = tlk
+            .strings
+            .last()
+            .expect("Could not get last element from tlk");
+        assert_eq!(result, &"placeholder".into());
         Ok(())
     }
 }
