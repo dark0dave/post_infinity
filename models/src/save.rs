@@ -62,10 +62,7 @@ pub struct SavedFile {
 fn parse_compressed_data(buff: &[u8], file_name: &String) -> Result<IEModels, Box<dyn Error>> {
     let mut d = ZlibDecoder::new(buff);
     let mut buffer = vec![];
-    d.read_to_end(&mut buffer).map_err(|err| {
-        log::error!("{err}");
-        err
-    })?;
+    d.read_to_end(&mut buffer)?;
     let extension = Path::new(&file_name.to_string())
         .extension()
         .unwrap_or_default()
