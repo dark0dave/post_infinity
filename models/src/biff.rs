@@ -2,7 +2,7 @@ use core::str;
 use std::{error::Error, fs::File, path::PathBuf};
 
 use binrw::{
-    BinRead, BinReaderExt, BinResult, BinWrite,
+    BinRead, BinResult, BinWrite,
     io::{BufReader, Cursor, Read, Seek, SeekFrom},
 };
 use serde::{Deserialize, Serialize};
@@ -32,7 +32,7 @@ pub struct Biff {
 impl Model for Biff {
     fn new(buffer: &[u8]) -> Self {
         let mut reader = Cursor::new(buffer);
-        match reader.read_le() {
+        match binrw::BinReaderExt::read_le(&mut reader) {
             Ok(res) => res,
             Err(err) => {
                 panic!("Errored with {err:?}, dumping buffer: {buffer:?}");

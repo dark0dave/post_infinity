@@ -1,5 +1,5 @@
 use binrw::{
-    BinRead, BinReaderExt, BinResult, BinWrite,
+    BinRead, BinResult, BinWrite,
     helpers::until_eof,
     io::{Cursor, Read, Seek, SeekFrom},
 };
@@ -75,7 +75,7 @@ fn parse_creatures<R: Read + Seek>(
 impl Model for Game {
     fn new(buffer: &[u8]) -> Self {
         let mut reader = Cursor::new(buffer);
-        reader.read_le().unwrap()
+        binrw::BinReaderExt::read_le(&mut reader).unwrap()
     }
 
     fn to_bytes(&self) -> Vec<u8> {

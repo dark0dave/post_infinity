@@ -1,4 +1,6 @@
-{ pkgs ? import <nixpkgs> { } }:
+{
+  pkgs ? import <nixpkgs> { },
+}:
 pkgs.rustPlatform.buildRustPackage rec {
   pname = "post_infinity";
   version = "5.4.0";
