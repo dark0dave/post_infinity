@@ -2,8 +2,8 @@ use binrw::{BinRead, BinReaderExt, BinWrite, helpers::until_eof, io::Cursor};
 use serde::{Deserialize, Serialize};
 
 use crate::common::Resref;
+use crate::common::Strref;
 use crate::common::header::Header;
-use crate::common::strref::Strref;
 use crate::model::Model;
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/dlg_v1.htm

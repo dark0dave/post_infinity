@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 use crate::tileset::Tileset;
 use crate::{
     IEModels,
-    common::{header::Header, strref::Strref},
+    common::{Strref, header::Header},
 };
 use crate::{common::types::ResourceType, from_buffer, model::Model};
 
