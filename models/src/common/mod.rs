@@ -14,3 +14,4 @@ pub mod zero_char_vec;
 pub type Resref = CharArray<8>;
 pub type Signature = ZeroCharArray<4>;
 pub type Version = ZeroCharArray<4>;
+pub type ZeroResref = ZeroCharArray<8>;

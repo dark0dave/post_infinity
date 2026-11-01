@@ -11,7 +11,7 @@ use crate::common::{Signature, Version, zero_char_vec::ZeroCharVec};
 #[derive(Debug, PartialEq, Serialize, IntoBytes)]
 #[repr(C, packed)]
 pub struct TLK<'data> {
-    #[serde(borrow)]
+    #[serde(borrow, flatten)]
     pub header: &'data TLKHeader,
     #[serde(borrow)]
     pub entries: &'data [TLKEntry],
@@ -54,7 +54,9 @@ impl<'data> TLK<'data> {
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/tlk_v1.htm#tlkv1_Header
-#[derive(Debug, PartialEq, Serialize, FromBytes, IntoBytes, Immutable, KnownLayout)]
+#[derive(
+    Debug, PartialEq, Serialize, Deserialize, FromBytes, IntoBytes, Immutable, KnownLayout,
+)]
 #[repr(C, packed)]
 pub struct TLKHeader {
     pub signature: Signature,

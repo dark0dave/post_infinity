@@ -8,8 +8,8 @@ use tileset::Tileset;
 
 use crate::{
     area::Area, biff::Biff, bio::Biography, character::ExpandedCharacter, creature::Creature,
-    dialogue::Dialogue, effect_v2::EffectV2, game::Game, ids::Ids, item::Item, key::Key,
-    save::Save, spell::Spell, store::Store, twoda::TwoDA, world_map::WorldMap,
+    dialogue::Dialogue, effect_v2::EffectV2, game::Game, ids::Ids, item::Item, save::Save,
+    spell::Spell, store::Store, twoda::TwoDA, world_map::WorldMap,
 };
 
 pub mod area;
@@ -52,7 +52,6 @@ pub enum IEModels {
     Game(Game),
     Ids(Ids),
     Item(Item),
-    Key(Key),
     Save(Save),
     Spell(Spell),
     Store(Store),
@@ -75,7 +74,6 @@ impl IEModels {
             IEModels::Game(game) => Ok(game.to_bytes()),
             IEModels::Ids(ids) => Ok(ids.to_bytes()),
             IEModels::Item(item) => Ok(item.to_bytes()),
-            IEModels::Key(key) => Ok(key.to_bytes()),
             IEModels::Save(save) => Ok(save.to_bytes()),
             IEModels::Spell(spell) => Ok(spell.to_bytes()),
             IEModels::Store(store) => Ok(store.to_bytes()),
@@ -99,7 +97,6 @@ impl IEModels {
             IEModels::Game(game) => serde_json::to_value(game),
             IEModels::Ids(ids) => serde_json::to_value(ids),
             IEModels::Item(item) => serde_json::to_value(item),
-            IEModels::Key(key) => serde_json::to_value(key),
             IEModels::Save(save) => serde_json::to_value(save),
             IEModels::Spell(spell) => serde_json::to_value(spell),
             IEModels::Store(store) => serde_json::to_value(store),
