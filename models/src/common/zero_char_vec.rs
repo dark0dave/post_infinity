@@ -1,12 +1,12 @@
-use std::fmt::Display;
+use std::fmt::{Display, Write};
 
 use serde::{Deserialize, Serialize};
 use zerocopy_derive::IntoBytes;
 
-#[derive(Debug, PartialEq, Serialize, Deserialize, IntoBytes)]
+#[derive(Debug, PartialEq, Deserialize, IntoBytes)]
 #[repr(C, packed)]
 pub struct ZeroCharVec<'data> {
-    #[serde(borrow, flatten)]
+    #[serde(borrow)]
     inner: &'data [u8],
 }
 
@@ -26,10 +26,18 @@ impl<'data> From<&'data str> for ZeroCharVec<'data> {
 
 impl<'data> Display for ZeroCharVec<'data> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let str = std::str::from_utf8(self.inner).map_err(|err| {
-            log::error!("{err}");
-            std::fmt::Error
-        })?;
-        f.write_str(str)
+        for element in self.inner {
+            f.write_char(*element as char)?;
+        }
+        Ok(())
+    }
+}
+
+impl<'data> Serialize for ZeroCharVec<'data> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(&self.to_string())
     }
 }

@@ -1,9 +1,7 @@
 use std::{error::Error, fs::File, io::Read, path::Path};
 
 use binrw::io::BufReader;
-use models::{
-    IEModels, common::types::ResourceType, from_buffer, from_json, key::Key, model::Model, tlk::TLK,
-};
+use models::{IEModels, common::types::ResourceType, from_buffer, from_json, key::Key, tlk::TLK};
 
 use crate::{
     args::Args,
@@ -44,9 +42,12 @@ fn get_models_from_file(path: &Path, printer: Printer, dest: &Path) -> Result<()
         ResourceType::FileTypeKey => {
             let mut buffer = vec![];
             reader.read_to_end(&mut buffer)?;
-            let mut key = Key::new(&buffer);
-            key.recurse(path)?;
-            IEModels::Key(key)
+            let mut key = Key::parse(&buffer)?;
+            log::info!("{key:#?}");
+            for biff in key.recurse(path)? {
+                printer(dest, IEModels::Biff(biff), ResourceType::FileTypeBiff)?;
+            }
+            return Ok(());
         }
         ResourceType::FileTypeTlk => {
             let mut buffer = vec![];
