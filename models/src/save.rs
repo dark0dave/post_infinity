@@ -71,7 +71,7 @@ fn parse_compressed_data(buff: &[u8], file_name: &String) -> Result<IEModels, Bo
         .unwrap_or_default()
         .replace('\0', "");
     let resource_type = ResourceType::from(extension.as_str());
-    from_buffer(&buffer, resource_type)
+    from_buffer(&buffer, &resource_type)
 }
 
 #[cfg(test)]

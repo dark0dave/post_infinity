@@ -1,12 +1,12 @@
 use core::{slice, str};
 use std::error::Error;
-use std::{fmt::Debug, path::Path};
+use std::fmt::Debug;
+use std::path::{Path, PathBuf};
 
 use serde::{Deserialize, Serialize};
 use zerocopy::FromBytes;
 use zerocopy_derive::{FromBytes, Immutable, IntoBytes, KnownLayout};
 
-use crate::biff::Biff;
 use crate::common::ZeroResref;
 
 use crate::common::{Signature, Version, zero_char_vec::ZeroCharVec};
@@ -68,18 +68,18 @@ impl<'data> Key<'data> {
             resource_entries,
         })
     }
-    pub fn recurse(&mut self, path: &Path) -> Result<Vec<Biff>, Box<dyn Error>> {
+    pub fn get_file_paths(&self, path: &Path) -> Result<Vec<PathBuf>, Box<dyn Error>> {
         let parent = path
             .parent()
             .ok_or_else(|| format!("No parent found for {path:?}"))?;
         log::trace!("Parent path is: {parent:?}");
         let mut out = vec![];
-        for bif_file_name in self.bif_file_names.iter() {
-            let file_path = &parent
-                .join(bif_file_name.to_string().replace('\0', ""))
+        for file_name in self.bif_file_names {
+            let file_path = parent
+                .join(file_name.to_string().replace('\0', ""))
                 .canonicalize()?;
             log::debug!("Path to biff: {file_path:?}");
-            out.push(Biff::try_from(file_path)?);
+            out.push(file_path);
         }
         Ok(out)
     }
