@@ -1,135 +1,120 @@
 use core::str;
-use std::{error::Error, fs::File, path::PathBuf};
+use std::{error::Error, slice};
 
-use binrw::{
-    BinRead, BinResult, BinWrite,
-    io::{BufReader, Cursor, Read, Seek, SeekFrom},
-};
 use serde::{Deserialize, Serialize};
+use zerocopy::FromBytes;
+use zerocopy_derive::{FromBytes, Immutable, IntoBytes, KnownLayout};
 
-use crate::tileset::Tileset;
-use crate::{
-    IEModels,
-    common::{Strref, header::Header},
-};
-use crate::{common::types::ResourceType, from_buffer, model::Model};
+use crate::common::{Signature, Strref, Version, zero_char_vec::ZeroCharVec};
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/bif_v1.htm
-#[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
-pub struct Biff {
-    #[serde(flatten)]
-    pub header: BiffHeader,
-    #[br(seek_before=SeekFrom::Start(header.offset_to_file_entries as u64), count=header.count_of_fileset_entries)]
-    pub fileset_entries: Vec<FilesetEntry>,
-    #[br(count=header.count_of_tileset_entries)]
-    pub tileset_entries: Vec<TilesetEntry>,
-    #[serde(skip)]
-    #[br(seek_before=SeekFrom::Start(0), parse_with = |reader, _, _: ()| Biff::parse_contained_files(reader, &fileset_entries, &tileset_entries))]
-    #[bw(map = |x| x.iter().flat_map(|x| x.to_bytes()).flatten().collect::<Vec<u8>>())]
-    pub contained_files: Vec<IEModels>,
+#[derive(Debug, PartialEq, Serialize, IntoBytes)]
+#[repr(C, packed)]
+pub struct Biff<'data> {
+    #[serde(flatten, borrow)]
+    pub header: &'data BiffHeader,
+    #[serde(borrow)]
+    pub fileset_entries: &'data [FilesetEntry],
+    #[serde(borrow)]
+    pub tileset_entries: &'data [TilesetEntry],
+    #[serde(borrow)]
+    pub data: &'data [ZeroCharVec<'data>],
 }
 
-impl Model for Biff {
-    fn new(buffer: &[u8]) -> Self {
-        let mut reader = Cursor::new(buffer);
-        match binrw::BinReaderExt::read_le(&mut reader) {
-            Ok(res) => res,
-            Err(err) => {
-                panic!("Errored with {err:?}, dumping buffer: {buffer:?}");
+impl<'data> Biff<'data> {
+    pub fn parse(bytes: &'data [u8]) -> Result<Self, Box<dyn Error>> {
+        let header = <BiffHeader>::ref_from_bytes(bytes).map_err(|err| err.to_string())?;
+
+        let offset_to_fileset_entries: usize = header.offset_to_file_entries.try_into()?;
+        let number_of_fileset_entries: usize = header.count_of_fileset_entries.try_into()?;
+        let (fileset_entries, tail) = <[FilesetEntry]>::ref_from_prefix_with_elems(
+            bytes.get(offset_to_fileset_entries..).unwrap_or_default(),
+            number_of_fileset_entries,
+        )
+        .map_err(|err| err.to_string())?;
+
+        let number_of_tileset_entries: usize = header.count_of_tileset_entries.try_into()?;
+        let tileset_entries =
+            <[TilesetEntry]>::ref_from_bytes_with_elems(tail, number_of_fileset_entries)
+                .map_err(|err| err.to_string())?;
+
+        let number_of_contained_files = number_of_fileset_entries + number_of_tileset_entries;
+        let layout = std::alloc::Layout::array::<ZeroCharVec>(number_of_contained_files)?;
+        let data = unsafe {
+            let ptr = std::alloc::alloc(layout) as *mut ZeroCharVec;
+
+            let mut i = 0;
+            for entry in fileset_entries.iter() {
+                let start: usize = entry.offset.try_into()?;
+                let size: usize = entry.size.try_into()?;
+                let end: usize = size + start;
+                let slice: &[u8] = tail
+                    .get(start..end)
+                    .ok_or("failed to get bytes for string from buffer")?;
+                *ptr.add(i) = ZeroCharVec::from(slice);
+                i += 1;
             }
-        }
-    }
 
-    fn to_bytes(&self) -> Vec<u8> {
-        let mut writer = Cursor::new(Vec::new());
-        self.write_le(&mut writer).unwrap();
-        writer.into_inner()
-    }
-}
-
-impl TryFrom<&PathBuf> for Biff {
-    type Error = Box<dyn Error>;
-
-    fn try_from(value: &PathBuf) -> Result<Self, Self::Error> {
-        let file = File::open(value)?;
-        let mut reader = BufReader::new(file);
-        let mut buffer = vec![];
-        reader.read_to_end(&mut buffer)?;
-        Ok(Biff::new(&buffer))
-    }
-}
-
-impl Biff {
-    fn parse_contained_files<R: Read + Seek>(
-        reader: &mut R,
-        fileset_entries: &Vec<FilesetEntry>,
-        tileset_entries: &Vec<TilesetEntry>,
-    ) -> BinResult<Vec<IEModels>> {
-        let mut buffer = vec![];
-        reader.read_to_end(&mut buffer)?;
-
-        let mut out: Vec<IEModels> =
-            Vec::with_capacity(fileset_entries.len() + tileset_entries.len());
-        for fileset_entry in fileset_entries {
-            let start: usize = fileset_entry.offset as usize;
-            let end: usize = start + fileset_entry.size as usize;
-            let buff = buffer.get(start..end).unwrap_or_default();
-            match from_buffer(buff, fileset_entry.resource_type) {
-                Ok(data) => {
-                    out.push(data);
-                }
-                Err(err) => {
-                    log::error!(
-                        "Failed to parse resource: {:#?}, with error: {:#?}",
-                        fileset_entry.resource_type,
-                        err
-                    );
-                    log::debug!("Dumping buffer: {buff:#?}");
-                }
+            for entry in tileset_entries.iter() {
+                let start: usize = entry.offset.try_into()?;
+                let size: usize = (entry.tile_count * entry.tile_size).try_into()?;
+                let end: usize = size + start;
+                let slice: &[u8] = tail
+                    .get(start..end)
+                    .ok_or("failed to get bytes for string from buffer")?;
+                *ptr.add(i) = ZeroCharVec::from(slice);
+                i += 1;
             }
-        }
-        for tileset_entry in tileset_entries {
-            let start: usize = tileset_entry.offset as usize;
-            let end: usize = start + (tileset_entry.tile_count * tileset_entry.tile_size) as usize;
-            let buff = buffer.get(start..end).unwrap_or_default();
-            out.push(IEModels::Tileset(Tileset {
-                data: buff.to_vec(),
-            }));
-        }
-        Ok(out)
+
+            slice::from_raw_parts(ptr, number_of_contained_files)
+        };
+        Ok(Self {
+            header,
+            fileset_entries,
+            tileset_entries,
+            data,
+        })
     }
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/bif_v1.htm#bif_v1_Header
-#[derive(Debug, PartialEq, BinRead, BinWrite, Serialize, Deserialize)]
+#[derive(
+    Debug, PartialEq, Serialize, Deserialize, FromBytes, IntoBytes, Immutable, KnownLayout,
+)]
+#[repr(C, packed)]
 pub struct BiffHeader {
-    #[serde(flatten)]
-    pub header: Header,
+    pub signature: Signature,
+    pub version: Version,
     pub count_of_fileset_entries: u32,
     pub count_of_tileset_entries: u32,
     pub offset_to_file_entries: u32,
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/bif_v1.htm#bif_v1_FileEntry
-#[derive(Debug, PartialEq, BinRead, BinWrite, Serialize, Deserialize)]
+#[derive(
+    Debug, PartialEq, Serialize, Deserialize, FromBytes, IntoBytes, Immutable, KnownLayout,
+)]
+#[repr(C, packed)]
 pub struct FilesetEntry {
     pub resource_locator: Strref,
     pub offset: u32,
     pub size: u32,
-    pub resource_type: ResourceType,
+    pub resource_type: u16,
     pub unknown: u16,
 }
 
 // https://gibberlings3.github.io/iesdp/file_formats/ie_formats/bif_v1.htm#bif_v1_TilesetEntry
-#[derive(Debug, BinRead, BinWrite, Serialize, Deserialize)]
-
+#[derive(
+    Debug, PartialEq, Serialize, Deserialize, FromBytes, IntoBytes, Immutable, KnownLayout,
+)]
+#[repr(C, packed)]
 pub struct TilesetEntry {
     pub resource_locator: u32,
     pub offset: u32,
     pub tile_count: u32,
     pub tile_size: u32,
     // Type of this resource (always 0x3eb - TIS)
-    pub resource_type: ResourceType,
+    pub resource_type: u16,
     pub unknown: u16,
 }
 
@@ -153,7 +138,8 @@ mod tests {
     #[test]
     fn parse() -> Result<(), Box<dyn Error>> {
         for (file_path, json_file_path) in FIXTURES {
-            let biff: Biff = Biff::new(&read_file(file_path)?);
+            let bytes = read_file(file_path)?;
+            let biff: Biff = Biff::parse(&bytes)?;
             let result: Value = serde_json::to_value(biff)?;
             let expected: Value = serde_json::from_slice(&read_file(json_file_path)?)?;
 

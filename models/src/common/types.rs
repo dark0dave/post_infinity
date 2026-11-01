@@ -2,12 +2,11 @@
 
 use std::{error::Error, path::Path};
 
-use binrw::{BinRead, BinWrite};
 use serde::{Deserialize, Serialize};
+use zerocopy_derive::{Immutable, IntoBytes, KnownLayout};
 
 // https://gibberlings3.github.io/iesdp/file_formats/general.htm#FileFormats
-#[derive(Debug, Copy, Clone, Hash, PartialEq, BinRead, BinWrite, Serialize, Deserialize)]
-#[brw(little, repr = u16)]
+#[derive(Debug, PartialEq, Serialize, Deserialize, IntoBytes, Immutable, KnownLayout)]
 #[repr(u16)]
 pub enum ResourceType {
     NotFound = 0x0000,

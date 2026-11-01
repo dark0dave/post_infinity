@@ -1,7 +1,9 @@
 use std::{error::Error, fs::File, io::Read, path::Path};
 
 use binrw::io::BufReader;
-use models::{IEModels, common::types::ResourceType, from_buffer, from_json, key::Key, tlk::TLK};
+use models::{
+    IEModels, biff::Biff, common::types::ResourceType, from_buffer, from_json, key::Key, tlk::TLK,
+};
 
 use crate::{
     args::Args,
@@ -42,10 +44,20 @@ fn get_models_from_file(path: &Path, printer: Printer, dest: &Path) -> Result<()
         ResourceType::FileTypeKey => {
             let mut buffer = vec![];
             reader.read_to_end(&mut buffer)?;
-            let mut key = Key::parse(&buffer)?;
+            let key = Key::parse(&buffer)?;
             log::info!("{key:#?}");
-            for biff in key.recurse(path)? {
-                printer(dest, IEModels::Biff(biff), ResourceType::FileTypeBiff)?;
+            for resource_path in key.get_file_paths(path)? {
+                get_models_from_file(&resource_path, printer, dest)?;
+            }
+            return Ok(());
+        }
+        ResourceType::FileTypeBiff => {
+            let mut buffer = vec![];
+            reader.read_to_end(&mut buffer)?;
+            let biff = Biff::parse(&buffer)?;
+            log::info!("{biff:#?}");
+            for _path in biff.data {
+                // TODO: Parse other models here
             }
             return Ok(());
         }
@@ -61,7 +73,7 @@ fn get_models_from_file(path: &Path, printer: Printer, dest: &Path) -> Result<()
             log::debug!("{resource_type:?}");
             let mut buffer = vec![];
             reader.read_to_end(&mut buffer)?;
-            from_buffer(&buffer, resource_type)?
+            from_buffer(&buffer, &resource_type)?
         }
     };
 
